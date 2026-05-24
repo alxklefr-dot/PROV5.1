@@ -23,7 +23,6 @@
         .app-header h1 { font-size: 26px; margin: 0; font-family: Georgia, serif; }
         .app-header p { color: var(--text-muted); margin: 4px 0 0 0; font-size: 13px; }
         
-        /* SLEEK PREMIUM FEED SEGMENTED TAB BAR */
         .feed-tabs-container {
             display: flex;
             background: rgba(140, 120, 83, 0.08);
@@ -66,15 +65,19 @@
         .slider-container { width: 100%; max-width: 460px; display: flex; flex-direction: column; align-items: center; }
         input[type="range"] { width: 100%; accent-color: var(--accent-color); margin: 4px 0; }
         .ticks { display: flex; justify-content: space-between; width: 100%; font-size: 10px; font-weight: bold; color: #888; }
-        .reader-content { margin-top: 130px; width: 100%; }
+        
+        .reader-content { margin-top: 145px; width: 100%; }
         .story-title { font-family: Georgia, serif; font-size: 24px; margin-bottom: 18px; line-height: 1.3; font-weight: bold; }
-        .text-block p { font-size: 16.5px; line-height: 1.8; margin-bottom: 20px; text-align: justify; }
-        span.w { border-bottom: 1px dashed var(--accent-color); cursor: pointer; padding: 0 1px; }
-        span.w:active { background-color: var(--accent-light); }
+        
+        /* FULL TEXT INTERACTIVE TEXT ENGINE GRAPHICS */
+        .text-block p { font-size: 17px; line-height: 1.9; margin-bottom: 22px; text-align: justify; }
+        .reader-content span.w { cursor: pointer; padding: 0 2px; border-radius: 3px; transition: background 0.15s ease; }
+        .reader-content span.w:hover { background-color: var(--accent-light); }
+        .reader-content span.w:active { background-color: #d8c4a0; }
+
         .eng-toggle-btn { display: block; margin: 25px auto; background: none; border: 1px solid var(--accent-color); color: var(--accent-color); padding: 8px 18px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; }
         .english-translation-panel { background-color: #f3f0ea; border-left: 4px solid var(--accent-color); padding: 16px; font-size: 14.5px; color: #444; line-height: 1.6; white-space: pre-line; display: none; margin-bottom: 35px; border-radius: 0 8px 8px 0; }
         
-        /* PREMIUM VISUAL MARKETING ADVERT DESIGN */
         .brand-ad-card { 
             position: relative; 
             min-height: 200px; 
@@ -119,6 +122,7 @@
         .loading-screen { display: none; text-align: center; padding: 50px 20px; font-style: italic; color: var(--text-muted); }
         .spinner { border: 4px solid rgba(0,0,0,0.1); width: 36px; height: 36px; border-radius: 50%; border-left-color: var(--accent-color); animation: spin 1s linear infinite; margin: 0 auto 15px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
         .flashcard-container { display: flex; flex-direction: column; align-items: center; margin-top: 15px; }
         .card-counter { font-size: 13px; color: var(--text-muted); margin-bottom: 12px; }
         .flashcard { width: 100%; max-width: 340px; height: 180px; background-color: var(--card-bg); border-radius: 16px; box-shadow: 0 6px 20px rgba(0,0,0,0.05); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; box-sizing: border-box; position: relative; cursor: pointer; }
@@ -130,11 +134,12 @@
         .btn-know { background-color: var(--success-color); }
         .btn-unknown { background-color: var(--accent-color); }
         .empty-deck { text-align: center; color: var(--text-muted); padding: 40px; }
+        
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 65px; background-color: var(--nav-bg); border-top: 1px solid rgba(0,0,0,0.06); display: flex; justify-content: space-around; align-items: center; z-index: 900; }
         .nav-item { display: flex; flex-direction: column; align-items: center; background: none; border: none; color: #aaa; font-size: 11px; font-weight: bold; width: 50%; cursor: pointer; }
         .nav-item.active { color: var(--accent-color); }
         .nav-item-icon { font-size: 18px; margin-bottom: 2px; }
-        .toast { position: fixed; bottom: 80px; background: #2c2520; color: #fff; padding: 10px 18px; border-radius: 20px; font-size: 13px; display: none; z-index: 2000; }
+        .toast { position: fixed; bottom: 80px; background: #2c2520; color: #fff; padding: 10px 18px; border-radius: 20px; font-size: 13px; display: none; z-index: 2000; text-align: center; max-width: 80%; }
     </style>
 </head>
 <body>
@@ -146,13 +151,13 @@
                 <p>Niveaux CEFR en direct et intégration publicitaire</p>
             </div>
             <div class="action-bar">
-                <button class="refresh-btn" onclick="generateMultiFeedMatrix()">🔄 Actualiser</button>
+                <button class="refresh-btn" onclick="rotateNewsCarousel()">🔄 Permuter les articles (Batch)</button>
                 <button class="refresh-btn" style="color:#c62828;" onclick="clearApiKey()">🔑 Reset Key</button>
             </div>
             
             <div id="loading-spinner-block" class="loading-screen">
                 <div class="spinner"></div>
-                <div id="spinner-text-msg">Analyse linguistique et génération des niveaux...</div>
+                <div id="spinner-text-msg">Analyse linguistique approfondie et génération des niveaux...</div>
             </div>
 
             <div id="news-feeds-canvas">
@@ -231,14 +236,77 @@
         let selectedLevelIndex = 1;
         let selectedArticle = null;
         let activeCardIndex = 0;
+        let currentCarouselBatchIndex = 0; // 0 for articles 1-5, 1 for articles 6-10
         const levels = { 1: "A1", 2: "A2", 3: "B1", 4: "C1", 5: "Fluide" };
 
+        const database = {
+            paris: [
+                { t: "Paris 2026: Modernisation verte majeure des places historiques", d: "La Mairie de Paris lance un plan de végétalisation massive pour transformer les grands axes routiers urbains en promenades ombragées." },
+                { t: "Rénovation et extension des pistes cyclables intra-muros", d: "De nouveaux aménagements protégés vont voir le jour pour fluidifier les déplacements écologiques dans le centre de la capitale." },
+                { t: "Nouveau festival culturel prévu le long de la Seine cet été", d: "Une alliance d'artistes locaux propose un parcours d'expositions gratuites en plein air pour dynamiser les quais parisiens." },
+                { t: "Inauguration d'un incubateur de start-ups écologiques à Bastille", d: "Ce nouvel espace va accueillir cinquante jeunes entreprises dédiées aux innovations technologiques environnementales." },
+                { t: "Plan de restauration pour les fontaines historiques de la ville", d: "Les monuments hydrauliques les plus célèbres vont bénéficier d'une modernisation de leurs circuits d'eau fermés." },
+                { t: "Ouverture prochaine d'un grand pôle de running au Bois de Boulogne", d: "Un centre d'accueil moderne va proposer des vestiaires, des parcours connectés et des conseils aux athlètes amateurs." },
+                { t: "Modernisation de l'éclairage public dans le Marais", d: "La ville déploie des systèmes LED intelligents pour préserver le patrimoine nocturne tout en réduisant la consommation." },
+                { t: "Exposition majeure dédiée au design urbain au Pavillon de l'Arsenal", d: "L'événement retrace un siècle d'innovations architecturales et présente les maquettes du Paris de demain." },
+                { t: "Création de potagers participatifs sur les toits des écoles", d: "Une initiative verte pour sensibiliser la jeune génération à l'agriculture urbaine et à la biodiversité." },
+                { t: "Nouveau plan de piétonnisation autour des grands monuments", d: "La circulation automobile sera restreinte le week-end aux abords directs des édifices les plus visités de la capitale." }
+            ],
+            europe: [
+                { t: "Bruxelles harmonise les normes énergétiques pour le logement", d: "L'Union Européenne adopte un texte majeur pour accélérer l'isolation thermique des bâtiments résidentiels publics." },
+                { t: "Coopération renforcée pour les trains à grande vitesse européens", d: "Les opérateurs ferroviaires annoncent de nouvelles lignes directes pour relier les grandes capitales sans escale." },
+                { t: "Sommet pour la protection de la biodiversité marine en Méditerranée", d: "Plusieurs pays côtiers s'engagent à élargir de manière stricte les zones maritimes totalement protégées." },
+                { t: "Nouveau programme de bourses pour la recherche spatiale", d: "L'Agence Spatiale Européenne va financer de nouveaux laboratoires universitaires dédiés à l'exploration robotique." },
+                { t: "Accord douanier simplifié pour les produits artisanaux régionaux", d: "Les parlements valident une directive facilitant l'exportation des savoir-faire traditionnels sur le continent." },
+                { t: "Plan européen pour la sauvegarde des forêts anciennes", d: "Une enveloppe financière dédiée va permettre de reboiser et de surveiller les parcs naturels sensibles." },
+                { t: "Mise en place d'un réseau unique de recharge électrique rapide", d: "Les grands axes routiers transfrontaliers seront équipés de bornes haute puissance tous les cinquante kilomètres." },
+                { t: "Protection renforcée pour les indications géographiques protégées", d: "L'Europe durcit les contrôles pour éviter les contrefaçons des produits du terroir sur les marchés internationaux." },
+                { t: "Création d'un orchestre philharmonique des jeunes d'Europe", d: "Cent musiciens talentueux issus de divers horizons vont participer à une grande tournée artistique continentale." },
+                { t: "Sommet de l'innovation numérique et des architectures cloud", d: "Les leaders de la tech se réunissent pour définir les standards de sécurité applicables aux données industrielles." }
+            ],
+            world: [
+                { t: "Transition globale: Hausse record des investissements solaires", d: "Les rapports internationaux indiquent un basculement historique vers les énergies renouvelables à l'échelle mondiale." },
+                { t: "Découverte archéologique majeure au cœur de la jungle d'Amérique centrale", d: "Des technologies laser révèlent les fondations oubliées d'une cité antique d'une ampleur insoupçonnée." },
+                { t: "Protocole international pour la sécurité des télécommunications", d: "Les nations s'accordent sur un traité cadre pour sécuriser les câbles sous-marins de transmission internet." },
+                { t: "Expédition scientifique réussie dans les fosses océaniques du Pacifique", d: "Des chercheurs observent des espèces vivantes uniques adaptées aux conditions de pression extrêmes." },
+                { t: "Conférence mondiale pour la gestion des réserves d'eau douce", d: "Les experts tirent la sonnette d'alarme et proposent des solutions de partage équitable des fleuves frontaliers." },
+                { t: "Succès d'une mission d'observation des astéroïdes géocroiseurs", d: "Un nouveau télescope spatial transmet des données cruciales pour cartographier les trajectoires des corps célestes." },
+                { t: "Plan mondial de lutte contre la pollution plastique des océans", d: "Une coalition industrielle s'engage à réduire la production de polymères non dégradables à usage unique." },
+                { t: "Sommet international pour le développement de la médecine préventive", d: "Les ministères partagent leurs stratégies pour anticiper les défis liés au vieillissement des populations." },
+                { t: "Déploiement de fermes agricoles connectées dans les zones arides", d: "Des systèmes d'irrigation gérés par capteurs permettent de faire pousser des cultures avec un minimum d'eau." },
+                { t: "Rapport annuel sur la stabilisation des écosystèmes forestiers tropicaux", d: "Les images satellites montrent un ralentissement encourageant de la déforestation dans les réserves majeures." }
+            ]
+        };
+
+        /* LOCAL DICTIONARY BASE FOR THE GLOBAL CLICK TRANSLATOR ENGINE */
+        const localDict = {
+            "le": "the", "la": "the", "les": "the", "un": "a / one", "une": "a / one", "des": "some",
+            "est": "is", "sont": "are", "pour": "for", "dans": "in / inside", "avec": "with", "plus": "more",
+            "ville": "city", "vert": "green", "verte": "green", "plan": "plan / map", "nouveau": "new",
+            "mairie": "city hall", "pistes": "tracks / lanes", "cyclables": "cycle paths", "centre": "center",
+            "espace": "space", "entreprises": "companies", "fontaines": "fountains", "eau": "water",
+            "bois": "woods / forest", "parcours": "route / path", "sport": "sport", "éclairage": "lighting",
+            "public": "public", "nuit": "night", "design": "design", "toits": "roofs", "écoles": "schools",
+            "circulation": "traffic", "semaine": "week", "bruxelles": "Brussels", "logement": "housing",
+            "bâtiments": "buildings", "trains": "trains", "lignes": "lines", "mer": "sea", "pays": "countries",
+            "bourses": "scholarships / grants", "espace": "space / outer space", "produits": "products",
+            "forêts": "forests", "parcs": "parks", "bornes": "charging points / terminals", "route": "road",
+            "marchés": "markets", "jeunes": "young people", "musique": "music", "données": "data",
+            "sécurité": "security", "solaire": "solar", "monde": "world", "jungle": "jungle", "antique": "ancient",
+            "traité": "treaty", "câbles": "cables", "chercheurs": "researchers", "fleuves": "rivers",
+            "solutions": "solutions", "télescope": "telescope", "données": "data", "plastique": "plastic",
+            "pollution": "pollution", "santé": "health", "médecine": "medicine", "fermes": "farms",
+            "capteurs": "sensors", "images": "images", "satellite": "satellite", "arides": "dry / arid",
+            "majeure": "major", "historiques": "historical", "lancement": "launch", "massiv": "massive",
+            "urbanisme": "urban planning"
+        };
+
         const adMatrix = {
-            1: { header: "Partagez le <b>goût</b> de Coca-Cola. Sans <b>sucre</b> !", badge: "Nouveau goût !", cta: "Déjà goûté ?", eng: "[A1 Ad] Share the taste of Coca-Cola. Without sugar! / New taste! / Tried it?" },
-            2: { header: "Partagez le bon <b>goût</b> de Coca-Cola. Zéro <b>sucre</b> !", badge: "Nouvelle recette !", cta: "L'avez-vous essayé ?", eng: "[A2 Ad] Share the good taste... / New recipe! / Have you tried it?" },
-            3: { header: "Partagez le vrai <b>goût</b> de Coca-Cola, le <b>sucre</b> en moins.", badge: "Nouvelle Formule !", cta: "Qu'attendez-vous pour y goûter ?", eng: "[B1 Ad] Share the true taste... / New Formula! / What are you waiting for?" },
-            4: { header: "Partagez toute l'<b>intensité</b> de Coca-Cola, la culpabilité en moins.", badge: "Saveur réinventée !", cta: "Prêt à tenter l'<b>expérience</b> ?", eng: "[C1 Ad] Share all the intensity... / Re-invented flavor! / Ready for the experience?" },
-            5: { header: "Partagez le <b>goût</b> unique de Coca-Cola. Tout le <b>plaisir</b>, zéro <b>sucre</b>.", badge: "Pure intensité !", cta: "L'avez-vous testé ?", eng: "[Fluide Ad] Share the unique taste... / All the pleasure, zero sugar. / Tested it?" }
+            1: { header: "Partagez le goût de Coca-Cola. Sans sucre !", badge: "Nouveau goût !", cta: "Déjà goûté ?", eng: "[A1 Ad] Share the taste of Coca-Cola. Without sugar! / New taste! / Tried it?" },
+            2: { header: "Partagez le bon goût de Coca-Cola. Zéro sucre !", badge: "Nouvelle recette !", cta: "L'avez-vous essayé ?", eng: "[A2 Ad] Share the good taste... / New recipe! / Have you tried it?" },
+            3: { header: "Partagez le vrai goût de Coca-Cola, le sucre en moins.", badge: "Nouvelle Formule !", cta: "Qu'attendez-vous pour y goûter ?", eng: "[B1 Ad] Share the true taste... / New Formula! / What are you waiting for?" },
+            4: { header: "Partagez toute l'intensité de Coca-Cola, la culpabilité en moins.", badge: "Saveur réinventée !", cta: "Prêt à tenter l'expérience ?", eng: "[C1 Ad] Share all the intensity... / Re-invented flavor! / Ready for the experience?" },
+            5: { header: "Partagez le goût unique de Coca-Cola. Tout le plaisir, zéro sucre.", badge: "Pure intensité !", cta: "L'avez-vous testé ?", eng: "[Fluide Ad] Share the unique taste... / All the pleasure, zero sugar. / Tested it?" }
         };
 
         function getApiKey() {
@@ -264,7 +332,6 @@
             if (tabId === 'view-flashcards') renderFlashcards();
         }
 
-        /* INSTANT FEED TRANSITION CONTROLLER */
         function switchFeedPanel(panelKey) {
             document.querySelectorAll('.feed-tab-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.feed-panel').forEach(p => p.classList.remove('active'));
@@ -273,73 +340,56 @@
             document.getElementById(`panel-${panelKey}`).classList.add('active');
         }
 
+        /* CAROUSEL BATCH ROTATION ENGINE */
+        function rotateNewsCarousel() {
+            currentCarouselBatchIndex = (currentCarouselBatchIndex === 0) ? 1 : 0;
+            showToast(`🔄 Permutation : Affichage des articles ${currentCarouselBatchIndex === 0 ? "1 à 5" : "6 à 10"}`);
+            renderFeedModules();
+        }
+
         function generateMultiFeedMatrix() {
-            showToast("📰 Chargement des 30 flux...");
+            newsArticlesCache = [];
+            let globalId = 0;
+
+            // Pre-cache all 30 database metrics items
+            ['paris', 'europe', 'world'].forEach(sectionKey => {
+                database[sectionKey].forEach(item => {
+                    newsArticlesCache.push({
+                        id: globalId,
+                        section: sectionKey,
+                        title: item.t,
+                        text: item.d,
+                        payload: null
+                    });
+                    globalId++;
+                });
+            });
+
+            renderFeedModules();
+        }
+
+        /* CAROUSEL RENDER STREAM */
+        function renderFeedModules() {
             document.getElementById('panel-paris').innerHTML = '';
             document.getElementById('panel-europe').innerHTML = '';
             document.getElementById('panel-world').innerHTML = '';
-            newsArticlesCache = [];
 
-            const database = {
-                paris: [
-                    { t: "Paris 2026: Modernisation verte majeure des places historiques", d: "La Mairie de Paris lance un plan de végétalisation massive pour transformer les grands axes routiers urbains en promenades ombragées." },
-                    { t: "Rénovation et extension des pistes cyclables intra-muros", d: "De nouveaux aménagements protégés vont voir le jour pour fluidifier les déplacements écologiques dans le centre de la capitale." },
-                    { t: "Nouveau festival culturel prévu le long de la Seine cet été", d: "Une alliance d'artistes locaux propose un parcours d'expositions gratuites en plein air pour dynamiser les quais parisiens." },
-                    { t: "Inauguration d'un incubateur de start-ups écologiques à Bastille", d: "Ce nouvel espace va accueillir cinquante jeunes entreprises dédiées aux innovations technologiques environnementales." },
-                    { t: "Plan de restauration pour les fontaines historiques de la ville", d: "Les monuments hydrauliques les plus célèbres vont bénéficier d'une modernisation de leurs circuits d'eau fermés." },
-                    { t: "Ouverture prochaine d'un grand pôle de running au Bois de Boulogne", d: "Un centre d'accueil moderne va proposer des vestiaires, des parcours connectés et des conseils aux athlètes amateurs." },
-                    { t: "Modernisation de l'éclairage public dans le Marais", d: "La ville déploie des systèmes LED intelligents pour préserver le patrimoine nocturne tout en réduisant la consommation." },
-                    { t: "Exposition majeure dédiée au design urbain au Pavillon de l'Arsenal", d: "L'événement retrace un siècle d'innovations architecturales et présente les maquettes du Paris de demain." },
-                    { t: "Création de potagers participatifs sur les toits des écoles", d: "Une initiative verte pour sensibiliser la jeune génération à l'agriculture urbaine et à la biodiversité." },
-                    { t: "Nouveau plan de piétonnisation autour des grands monuments", d: "La circulation automobile sera restreinte le week-end aux abords directs des édifices les plus visités de la capitale." }
-                ],
-                europe: [
-                    { t: "Bruxelles harmonise les normes énergétiques pour le logement", d: "L'Union Européenne adopte un texte majeur pour accélérer l'isolation thermique des bâtiments résidentiels publics." },
-                    { t: "Coopération renforcée pour les trains à grande vitesse européens", d: "Les opérateurs ferroviaires annoncent de nouvelles lignes directes pour relier les grandes capitales sans escale." },
-                    { t: "Sommet pour la protection de la biodiversité marine en Méditerranée", d: "Plusieurs pays côtiers s'engagent à élargir de manière stricte les zones maritimes totalement protégées." },
-                    { t: "Nouveau programme de bourses pour la recherche spatiale", d: "L'Agence Spatiale Européenne va financer de nouveaux laboratoires universitaires dédiés à l'exploration robotique." },
-                    { t: "Accord douanier simplifié pour les produits artisanaux régionaux", d: "Les parlements valident une directive facilitant l'exportation des savoir-faire traditionnels sur le continent." },
-                    { t: "Plan européen pour la sauvegarde des forêts anciennes", d: "Une enveloppe financière dédiée va permettre de reboiser et de surveiller les parcs naturels sensibles." },
-                    { t: "Mise en place d'un réseau unique de recharge électrique rapide", d: "Les grands axes routiers transfrontaliers seront équipés de bornes haute puissance tous les cinquante kilomètres." },
-                    { t: "Protection renforcée pour les indications géographiques protégées", d: "L'Europe durcit les contrôles pour éviter les contrefaçons des produits du terroir sur les marchés internationaux." },
-                    { t: "Création d'un orchestre philharmonique des jeunes d'Europe", d: "Cent musiciens talentueux issus de divers horizons vont participer à une grande tournée artistique continentale." },
-                    { t: "Sommet de l'innovation numérique et des architectures cloud", d: "Les leaders de la tech se réunissent pour définir les standards de sécurité applicables aux données industrielles." }
-                ],
-                world: [
-                    { t: "Transition globale: Hausse record des investissements solaires", d: "Les rapports internationaux indiquent un basculement historique vers les énergies renouvelables à l'échelle mondiale." },
-                    { t: "Découverte archéologique majeure au cœur de la jungle d'Amérique centrale", d: "Des technologies laser révèlent les fondations oubliées d'une cité antique d'une ampleur insoupçonnée." },
-                    { t: "Protocole international pour la sécurité des télécommunications", d: "Les nations s'accordent sur un traité cadre pour sécuriser les câbles sous-marins de transmission internet." },
-                    { t: "Expédition scientifique réussie dans les fosses océaniques du Pacifique", d: "Des chercheurs observent des espèces vivantes uniques adaptées aux conditions de pression extrêmes." },
-                    { t: "Conférence mondiale pour la gestion des réserves d'eau douce", d: "Les experts tirent la sonnette d'alarme et proposent des solutions de partage équitable des fleuves frontaliers." },
-                    { t: "Succès d'une mission d'observation des astéroïdes géocroiseurs", d: "Un nouveau télescope spatial transmet des données cruciales pour cartographier les trajectoires des corps célestes." },
-                    { t: "Plan mondial de lutte contre la pollution plastique des océans", d: "Une coalition industrielle s'engage à réduire la production de polymères non dégradables à usage unique." },
-                    { t: "Sommet international pour le développement de la médecine préventive", d: "Les ministères partagent leurs stratégies pour anticiper les défis liés au vieillissement des populations." },
-                    { t: "Déploiement de fermes agricoles connectées dans les zones arides", d: "Des systèmes d'irrigation gérés par capteurs permettent de faire pousser des cultures avec un minimum d'eau." },
-                    { t: "Rapport annuel sur la stabilisation des écosystèmes forestiers tropicaux", d: "Les images satellites montrent un ralentissement encourageant de la déforestation dans les réserves majeures." }
-                ]
-            };
+            const startIndex = currentCarouselBatchIndex * 5;
+            const endIndex = startIndex + 5;
 
-            let globalId = 0;
+            ['paris', 'europe', 'world'].forEach(sectionKey => {
+                const targetBox = document.getElementById(`panel-${sectionKey}`);
+                const sectionItems = newsArticlesCache.filter(a => a.section === sectionKey);
+                const slicedBatch = sectionItems.slice(startIndex, endIndex);
 
-            const makeCards = (sectionArray, containerId) => {
-                const targetBox = document.getElementById(containerId);
-                sectionArray.forEach(item => {
-                    const articleObj = { id: globalId, title: item.t, text: item.d, payload: null };
-                    newsArticlesCache.push(articleObj);
-
+                slicedBatch.forEach(articleObj => {
                     const card = document.createElement('div');
                     card.className = 'content-card';
-                    let bindId = globalId;
-                    card.onclick = () => runAiPipeline(bindId);
-                    card.innerHTML = `<h3>${item.t}</h3><p>${item.d}</p>`;
+                    card.onclick = () => runAiPipeline(articleObj.id);
+                    card.innerHTML = `<h3>${articleObj.title}</h3><p>${articleObj.text}</p>`;
                     targetBox.appendChild(card);
-                    globalId++;
                 });
-            };
-
-            makeCards(database.paris, 'panel-paris');
-            makeCards(database.europe, 'panel-europe');
-            makeCards(database.world, 'panel-world');
+            });
         }
 
         async function runAiPipeline(id) {
@@ -354,12 +404,13 @@
             document.getElementById('news-feeds-canvas').style.display = 'none';
             document.getElementById('loading-spinner-block').style.display = 'block';
 
+            // ENHANCED PROMPT: DEMANDING SUBSTANTIALLY LONGER TEXT BLOCKS FOR BEGINNER TIERS (A1/A2)
             const promptText = `
             Context: Title: ${article.title}. Text: ${article.text}
-            Task: Re-author this context into exactly 3 full paragraphs for each of these 5 language tiers: A1, A2, B1, C1, Fluide. 
-            In each French tier block, wrap exactly 3 important vocabulary words inside HTML bold tags like <b>mot</b>.
-            Provide matching English translations for each tier.
-            Return ONLY a raw JSON structure matching this blueprint:
+            Task: Re-author this context into exactly 3 complete, long, detailed, and highly comprehensive narrative paragraphs for EACH of these 5 language tiers: A1, A2, B1, C1, Fluide. 
+            CRITICAL: Even the A1 and A2 tiers MUST be long, explicit, and substantive text layouts (at least 6-8 full sentences per paragraph), using simple structural phrasing but offering maximum reading length.
+            Provide matching English translations for each structural tier block.
+            Return ONLY a raw, clean, standard JSON structure matching this blueprint without any markdown wrappers:
             {
               "title": "${article.title}",
               "A1": "<p>...</p><p>...</p><p>...</p>",
@@ -381,13 +432,20 @@
                 });
 
                 const data = await res.json();
-                article.payload = JSON.parse(data.candidates[0].content.parts[0].text);
+                let cleanJsonString = data.candidates[0].content.parts[0].text.trim();
+                
+                // Edge case safety handler if markdown leaks
+                if(cleanJsonString.startsWith("```json")) {
+                    cleanJsonString = cleanJsonString.replace(/^```json/, "").replace(/```$/, "");
+                }
+
+                article.payload = JSON.parse(cleanJsonString);
                 
                 document.getElementById('news-feeds-canvas').style.display = 'block';
                 document.getElementById('loading-spinner-block').style.display = 'none';
                 openReader();
             } catch (e) {
-                alert("Erreur de connexion avec l'IA. Vérifiez votre clé.");
+                alert("Erreur d'analyse IA. Assurez-vous d'utiliser une clé API valide.");
                 document.getElementById('news-feeds-canvas').style.display = 'block';
                 document.getElementById('loading-spinner-block').style.display = 'none';
             }
@@ -404,35 +462,64 @@
             document.getElementById('view-news').classList.add('active');
         }
 
+        /* GLOBAL SEGMENTATION WORD CONVERTER ENGINE */
         function renderContent() {
             const data = selectedArticle.payload;
             const key = levels[selectedLevelIndex];
             document.getElementById('level-tag').innerText = key;
             document.getElementById('reader-title-display').innerText = data.title;
 
-            let bodyHtml = data[key];
-            let cleanBody = bodyHtml.replace(/<b>(.*?)<\/b>/g, function(m, word) {
-                return `<span class="w" data-en="Terme d'étude">${word}</span>`;
-            });
-            document.getElementById('reader-body-display').innerHTML = cleanBody;
+            let originalHtml = data[key];
+            
+            // Temporary container parsing mechanics to manipulate node strings safely
+            let parserDummy = document.createElement('div');
+            parserDummy.innerHTML = originalHtml;
+            
+            let paragraphs = parserDummy.querySelectorAll('p');
+            let builtOutputHtml = "";
 
-            const ad = adMatrix[selectedLevelIndex];
-            let cleanAd = ad.header.replace(/<b>(.*?)<\/b>/g, function(m, word) {
-                return `<span class="w" style="border-bottom-color:#e60000; color:#fff;" data-en="Ad Term">${word}</span>`;
+            paragraphs.forEach(p => {
+                let paragraphText = p.innerText;
+                // Split carefully keeping punctuation separated or clean
+                let wordsArray = paragraphText.split(/(\s+)/);
+                let interactiveWordsMarkup = "";
+
+                wordsArray.forEach(token => {
+                    if (token.trim().length === 0) {
+                        interactiveWordsMarkup += token; // preserve spacing spaces
+                    } else {
+                        // Extract alphanumeric text block content
+                        let cleanWord = token.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?"']/g,"");
+                        let standardLower = cleanWord.toLowerCase();
+                        let targetTranslation = localDict[standardLower] || "Terme de lecture";
+
+                        interactiveWordsMarkup += `<span class="w" data-lookup="${cleanWord}" data-translation="${targetTranslation}">${token}</span>`;
+                    }
+                });
+                builtOutputHtml += `<p>${interactiveWordsMarkup}</p>`;
             });
-            document.getElementById('ad-header-display').innerHTML = cleanAd;
+
+            document.getElementById('reader-body-display').innerHTML = builtOutputHtml;
+
+            // RENDER VISUAL BRAND ADVERT PLACEMENT
+            const ad = adMatrix[selectedLevelIndex];
+            document.getElementById('ad-header-display').innerHTML = ad.header;
             document.getElementById('ad-badge-display').innerText = ad.badge;
             document.getElementById('ad-cta-display').innerText = ad.cta;
 
             document.getElementById('reader-translation-panel').innerText = `${data["Eng_" + key]}\n\n===========================\n📊 PUBLICITÉ METRICS:\n${ad.eng}`;
             
-            document.querySelectorAll('span.w').forEach(el => {
+            /* DYNAMIC GLOBAL CLICK EVENT BINDINGS */
+            document.querySelectorAll('.reader-content span.w').forEach(el => {
                 el.onclick = function(e) {
                     e.stopPropagation();
-                    const wordText = this.innerText;
-                    showToast(`💡 ${wordText} ajouté aux Flashcards !`);
-                    if(!vocabularyList.find(v => v.fr === wordText)) {
-                        vocabularyList.push({ fr: wordText, en: "Vocabulaire" });
+                    const surfaceWord = this.getAttribute('data-lookup');
+                    const translationValue = this.getAttribute('data-translation');
+                    
+                    showToast(`💡 <b>${surfaceWord}</b> saved to Flashcards!`);
+                    
+                    if(!vocabularyList.find(v => v.fr.toLowerCase() === surfaceWord.toLowerCase())) {
+                        vocabularyList.push({ fr: surfaceWord, en: translationValue });
                         document.getElementById('global-card-count').innerText = vocabularyList.length;
                     }
                 };
@@ -447,7 +534,7 @@
         function renderFlashcards() {
             const w = document.getElementById('deck-wrapper');
             if (vocabularyList.length === 0) {
-                w.innerHTML = `<div class="empty-deck"><p>Votre carnet est vide. Touchez les mots soulignés pour commencer.</p></div>`;
+                w.innerHTML = `<div class="empty-deck"><p>Votre carnet de vocabulaire est vide. Touchez n'importe quel mot d'un article pour commencer.</p></div>`;
                 return;
             }
             if (activeCardIndex >= vocabularyList.length) activeCardIndex = 0;
@@ -457,8 +544,8 @@
                     <div class="card-counter">Mot ${activeCardIndex + 1} / ${vocabularyList.length}</div>
                     <div class="flashcard" onclick="document.getElementById('fc-back').style.display = (document.getElementById('fc-back').style.display === 'block') ? 'none' : 'block'">
                         <div class="word-surface">${card.fr}</div>
-                        <div class="word-translation" id="fc-back">Traduction / Définition</div>
-                        <div class="card-hint">Tapez pour retourner</div>
+                        <div class="word-translation" id="fc-back">${card.en}</div>
+                        <div class="card-hint">Tapez pour retourner la carte</div>
                     </div>
                     <div class="card-controls">
                         <button class="card-btn btn-unknown" onclick="activeCardIndex++; renderFlashcards();">Je ne sais pas</button>
@@ -469,7 +556,7 @@
 
         function showToast(msg) {
             const t = document.getElementById('toast'); t.innerHTML = msg; t.style.display = 'block';
-            setTimeout(() => { t.style.display = 'none'; }, 2000);
+            setTimeout(() => { t.style.display = 'none'; }, 2200);
         }
 
         document.getElementById('level-slider').addEventListener('input', function() {
