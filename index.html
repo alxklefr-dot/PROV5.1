@@ -19,16 +19,46 @@
         .app-container { max-width: 500px; width: 100%; min-height: 100vh; box-sizing: border-box; padding: 20px 20px 110px 20px; }
         .menu-view { display: none; }
         .menu-view.active { display: block; }
-        .app-header { margin-top: 10px; margin-bottom: 20px; text-align: center; }
+        .app-header { margin-top: 10px; margin-bottom: 15px; text-align: center; }
         .app-header h1 { font-size: 26px; margin: 0; font-family: Georgia, serif; }
         .app-header p { color: var(--text-muted); margin: 4px 0 0 0; font-size: 13px; }
-        .feed-section-title { font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: var(--accent-color); margin: 25px 0 12px 0; font-weight: bold; border-bottom: 1px solid var(--accent-light); padding-bottom: 4px; }
+        
+        /* SLEEK PREMIUM FEED SEGMENTED TAB BAR */
+        .feed-tabs-container {
+            display: flex;
+            background: rgba(140, 120, 83, 0.08);
+            padding: 4px;
+            border-radius: 25px;
+            margin: 20px 0;
+            gap: 4px;
+        }
+        .feed-tab-btn {
+            flex: 1;
+            background: none;
+            border: none;
+            padding: 10px 2px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+        .feed-tab-btn.active {
+            background: var(--card-bg);
+            color: var(--text-color);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .feed-panel { display: none; }
+        .feed-panel.active { display: flex; flex-direction: column; gap: 12px; }
+
         .action-bar { display: flex; justify-content: center; margin-bottom: 15px; gap: 10px; }
         .refresh-btn { background-color: var(--card-bg); border: 1px solid var(--accent-light); color: var(--accent-color); padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; }
-        .item-list { display: flex; flex-direction: column; gap: 12px; }
         .content-card { background-color: var(--card-bg); border-radius: 12px; padding: 16px; box-shadow: 0 3px 10px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.02); cursor: pointer; }
         .content-card h3 { margin: 0 0 6px 0; font-size: 15px; line-height: 1.35; }
         .content-card p { margin: 0; font-size: 12px; color: var(--text-muted); line-height: 1.4; }
+        
         .reader-header { position: fixed; top: 0; left: 0; right: 0; background-color: var(--bg-color); padding: 14px 20px; box-shadow: 0 3px 15px rgba(0,0,0,0.07); display: flex; flex-direction: column; align-items: center; z-index: 1000; border-bottom: 1px solid rgba(0,0,0,0.05); }
         .nav-row { display: flex; width: 100%; max-width: 500px; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .back-btn { background: none; border: none; font-size: 15px; color: var(--accent-color); font-weight: bold; cursor: pointer; }
@@ -126,14 +156,15 @@
             </div>
 
             <div id="news-feeds-canvas">
-                <div class="feed-section-title">📍 Actu Paris</div>
-                <div id="news-paris-container" class="item-list"></div>
-                
-                <div class="feed-section-title">🇪🇺 Actu Europe</div>
-                <div id="news-europe-container" class="item-list"></div>
+                <div class="feed-tabs-container">
+                    <button id="tab-paris" class="feed-tab-btn active" onclick="switchFeedPanel('paris')">📍 Paris</button>
+                    <button id="tab-europe" class="feed-tab-btn" onclick="switchFeedPanel('europe')">🇪🇺 Europe</button>
+                    <button id="tab-world" class="feed-tab-btn" onclick="switchFeedPanel('world')">🌍 Monde</button>
+                </div>
 
-                <div class="feed-section-title">🌍 Actu Monde</div>
-                <div id="news-world-container" class="item-list"></div>
+                <div id="panel-paris" class="feed-panel active"></div>
+                <div id="panel-europe" class="feed-panel"></div>
+                <div id="panel-world" class="feed-panel"></div>
             </div>
         </div>
 
@@ -233,11 +264,20 @@
             if (tabId === 'view-flashcards') renderFlashcards();
         }
 
+        /* INSTANT FEED TRANSITION CONTROLLER */
+        function switchFeedPanel(panelKey) {
+            document.querySelectorAll('.feed-tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.feed-panel').forEach(p => p.classList.remove('active'));
+            
+            document.getElementById(`tab-${panelKey}`).classList.add('active');
+            document.getElementById(`panel-${panelKey}`).classList.add('active');
+        }
+
         function generateMultiFeedMatrix() {
             showToast("📰 Chargement des 30 flux...");
-            document.getElementById('news-paris-container').innerHTML = '';
-            document.getElementById('news-europe-container').innerHTML = '';
-            document.getElementById('news-world-container').innerHTML = '';
+            document.getElementById('panel-paris').innerHTML = '';
+            document.getElementById('panel-europe').innerHTML = '';
+            document.getElementById('panel-world').innerHTML = '';
             newsArticlesCache = [];
 
             const database = {
@@ -297,9 +337,9 @@
                 });
             };
 
-            makeCards(database.paris, 'news-paris-container');
-            makeCards(database.europe, 'news-europe-container');
-            makeCards(database.world, 'news-world-container');
+            makeCards(database.paris, 'panel-paris');
+            makeCards(database.europe, 'panel-europe');
+            makeCards(database.world, 'panel-world');
         }
 
         async function runAiPipeline(id) {
@@ -376,7 +416,6 @@
             });
             document.getElementById('reader-body-display').innerHTML = cleanBody;
 
-            // RENDER DYNAMIC VISUAL MARKING ADVERT
             const ad = adMatrix[selectedLevelIndex];
             let cleanAd = ad.header.replace(/<b>(.*?)<\/b>/g, function(m, word) {
                 return `<span class="w" style="border-bottom-color:#e60000; color:#fff;" data-en="Ad Term">${word}</span>`;
