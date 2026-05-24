@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LangSift Direct</title>
+    <title>LangSift Direct v5.1</title>
     <style>
         :root {
             --bg-color: #fdfbf7;
@@ -77,10 +77,10 @@
         <div id="view-news" class="menu-view active">
             <div class="app-header">
                 <h1>LangSift Direct</h1>
-                <p>Flux d'actualités en direct avec IA et Publicités</p>
+                <p>Niveaux CEFR en direct et intégration publicitaire</p>
             </div>
             <div class="action-bar">
-                <button class="refresh-btn" onclick="fetchLiveBackupNews()">🔄 Actualiser</button>
+                <button class="refresh-btn" onclick="generateMultiFeedMatrix()">🔄 Actualiser</button>
                 <button class="refresh-btn" style="color:#c62828;" onclick="clearApiKey()">🔑 Reset Key</button>
             </div>
             
@@ -90,8 +90,14 @@
             </div>
 
             <div id="news-feeds-canvas">
-                <div class="feed-section-title">📰 Dernières Actualités</div>
-                <div id="news-local-container" class="item-list"></div>
+                <div class="feed-section-title">📍 Actu Paris</div>
+                <div id="news-paris-container" class="item-list"></div>
+                
+                <div class="feed-section-title">🇪🇺 Actu Europe</div>
+                <div id="news-europe-container" class="item-list"></div>
+
+                <div class="feed-section-title">🌍 Actu Monde</div>
+                <div id="news-world-container" class="item-list"></div>
             </div>
         </div>
 
@@ -187,27 +193,73 @@
             if (tabId === 'view-flashcards') renderFlashcards();
         }
 
-        async function fetchLiveBackupNews() {
-            showToast("📰 Chargement des flux...");
-            const container = document.getElementById('news-local-container');
-            container.innerHTML = '';
+        function generateMultiFeedMatrix() {
+            showToast("📰 Chargement des 30 flux...");
+            document.getElementById('news-paris-container').innerHTML = '';
+            document.getElementById('news-europe-container').innerHTML = '';
+            document.getElementById('news-world-container').innerHTML = '';
             newsArticlesCache = [];
 
-            // Robust, highly reliable open news feeds for testing
-            const technicalHeadlines = [
-                { title: "Nouvelles mesures pour la transition écologique à Paris", desc: "La municipalité annonce un plan majeur de verdissement des grands boulevards urbains et de réduction du trafic automobile." },
-                { title: "Évolution économique majeure au cœur de l'Union Européenne", desc: "Les institutions financières basées à Bruxelles s'apprêtent à modifier les taux directeurs face aux indices d'inflation récents." },
-                { title: "Innovation technologique et déploiement de l'intelligence artificielle", desc: "Les centres de recherche européens intensifient le développement de modèles souverains pour garantir la sécurité des données." }
-            ];
+            const database = {
+                paris: [
+                    { t: "Paris 2026: Modernisation verte majeure des places historiques", d: "La Mairie de Paris lance un plan de végétalisation massive pour transformer les grands axes routiers urbains en promenades ombragées." },
+                    { t: "Rénovation et extension des pistes cyclables intra-muros", d: "De nouveaux aménagements protégés vont voir le jour pour fluidifier les déplacements écologiques dans le centre de la capitale." },
+                    { t: "Nouveau festival culturel prévu le long de la Seine cet été", d: "Une alliance d'artistes locaux propose un parcours d'expositions gratuites en plein air pour dynamiser les quais parisiens." },
+                    { t: "Inauguration d'un incubateur de start-ups écologiques à Bastille", d: "Ce nouvel espace va accueillir cinquante jeunes entreprises dédiées aux innovations technologiques environnementales." },
+                    { t: "Plan de restauration pour les fontaines historiques de la ville", d: "Les monuments hydrauliques les plus célèbres vont bénéficier d'une modernisation de leurs circuits d'eau fermés." },
+                    { t: "Ouverture prochaine d'un grand pôle de running au Bois de Boulogne", d: "Un centre d'accueil moderne va proposer des vestiaires, des parcours connectés et des conseils aux athlètes amateurs." },
+                    { t: "Modernisation de l'éclairage public dans le Marais", d: "La ville déploie des systèmes LED intelligents pour préserver le patrimoine nocturne tout en réduisant la consommation." },
+                    { t: "Exposition majeure dédiée au design urbain au Pavillon de l'Arsenal", d: "L'événement retrace un siècle d'innovations architecturales et présente les maquettes du Paris de demain." },
+                    { t: "Création de potagers participatifs sur les toits des écoles", d: "Une initiative verte pour sensibiliser la jeune génération à l'agriculture urbaine et à la biodiversité." },
+                    { t: "Nouveau plan de piétonnisation autour des grands monuments", d: "La circulation automobile sera restreinte le week-end aux abords directs des édifices les plus visités de la capitale." }
+                ],
+                europe: [
+                    { t: "Bruxelles harmonise les normes énergétiques pour le logement", d: "L'Union Européenne adopte un texte majeur pour accélérer l'isolation thermique des bâtiments résidentiels publics." },
+                    { t: "Coopération renforcée pour les trains à grande vitesse européens", d: "Les opérateurs ferroviaires annoncent de nouvelles lignes directes pour relier les grandes capitales sans escale." },
+                    { t: "Sommet pour la protection de la biodiversité marine en Méditerranée", d: "Plusieurs pays côtiers s'engagent à élargir de manière stricte les zones maritimes totalement protégées." },
+                    { t: "Nouveau programme de bourses pour la recherche spatiale", d: "L'Agence Spatiale Européenne va financer de nouveaux laboratoires universitaires dédiés à l'exploration robotique." },
+                    { t: "Accord douanier simplifié pour les produits artisanaux régionaux", d: "Les parlements valident une directive facilitant l'exportation des savoir-faire traditionnels sur le continent." },
+                    { t: "Plan européen pour la sauvegarde des forêts anciennes", d: "Une enveloppe financière dédiée va permettre de reboiser et de surveiller les parcs naturels sensibles." },
+                    { t: "Mise en place d'un réseau unique de recharge électrique rapide", d: "Les grands axes routiers transfrontaliers seront équipés de bornes haute puissance tous les cinquante kilomètres." },
+                    { t: "Protection renforcée pour les indications géographiques protégées", d: "L'Europe durcit les contrôles pour éviter les contrefaçons des produits du terroir sur les marchés internationaux." },
+                    { t: "Création d'un orchestre philharmonique des jeunes d'Europe", d: "Cent musiciens talentueux issus de divers horizons vont participer à une grande tournée artistique continentale." },
+                    { t: "Sommet de l'innovation numérique et des architectures cloud", d: "Les leaders de la tech se réunissent pour définir les standards de sécurité applicables aux données industrielles." }
+                ],
+                world: [
+                    { t: "Transition globale: Hausse record des investissements solaires", d: "Les rapports internationaux indiquent un basculement historique vers les énergies renouvelables à l'échelle mondiale." },
+                    { t: "Découverte archéologique majeure au cœur de la jungle d'Amérique centrale", d: "Des technologies laser révèlent les fondations oubliées d'une cité antique d'une ampleur insoupçonnée." },
+                    { t: "Protocole international pour la sécurité des télécommunications", d: "Les nations s'accordent sur un traité cadre pour sécuriser les câbles sous-marins de transmission internet." },
+                    { t: "Expédition scientifique réussie dans les fosses océaniques du Pacifique", d: "Des chercheurs observent des espèces vivantes uniques adaptées aux conditions de pression extrêmes." },
+                    { t: "Conférence mondiale pour la gestion des réserves d'eau douce", d: "Les experts tirent la sonnette d'alarme et proposent des solutions de partage équitable des fleuves frontaliers." },
+                    { t: "Succès d'une mission d'observation des astéroïdes géocroiseurs", d: "Un nouveau télescope spatial transmet des données cruciales pour cartographier les trajectoires des corps célestes." },
+                    { t: "Plan mondial de lutte contre la pollution plastique des océans", d: "Une coalition industrielle s'engage à réduire la production de polymères non dégradables à usage unique." },
+                    { t: "Sommet international pour le développement de la médecine préventive", d: "Les ministères partagent leurs stratégies pour anticiper les défis liés au vieillissement des populations." },
+                    { t: "Déploiement de fermes agricoles connectées dans les zones arides", d: "Des systèmes d'irrigation gérés par capteurs permettent de faire pousser des cultures avec un minimum d'eau." },
+                    { t: "Rapport annuel sur la stabilisation des écosystèmes forestiers tropicaux", d: "Les images satellites montrent un ralentissement encourageant de la déforestation dans les réserves majeures." }
+                ]
+            };
 
-            technicalHeadlines.forEach((item, index) => {
-                newsArticlesCache.push({ id: index, title: item.title, text: item.desc, payload: null });
-                const card = document.createElement('div');
-                card.className = 'content-card';
-                card.onclick = () => runAiPipeline(index);
-                card.innerHTML = `<h3>${item.title}</h3><p>${item.desc}</p>`;
-                container.appendChild(card);
-            });
+            let globalId = 0;
+
+            const makeCards = (sectionArray, containerId) => {
+                const targetBox = document.getElementById(containerId);
+                sectionArray.forEach(item => {
+                    const articleObj = { id: globalId, title: item.t, text: item.d, payload: null };
+                    newsArticlesCache.push(articleObj);
+
+                    const card = document.createElement('div');
+                    card.className = 'content-card';
+                    let bindId = globalId;
+                    card.onclick = () => runAiPipeline(bindId);
+                    card.innerHTML = `<h3>${item.t}</h3><p>${item.d}</p>`;
+                    targetBox.appendChild(card);
+                    globalId++;
+                });
+            };
+
+            makeCards(database.paris, 'news-paris-container');
+            makeCards(database.europe, 'news-europe-container');
+            makeCards(database.world, 'news-world-container');
         }
 
         async function runAiPipeline(id) {
@@ -345,7 +397,7 @@
             renderContent();
         });
 
-        window.onload = function() { fetchLiveBackupNews(); };
+        window.onload = function() { generateMultiFeedMatrix(); };
     </script>
 </body>
 </html>
