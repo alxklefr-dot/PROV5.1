@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LangSift Direct v5.6</title>
+    <title>LangSift Direct v5.7</title>
     <style>
         :root {
             --bg-color: #fdfbf7;
@@ -180,7 +180,7 @@
                     <div style="font-size:24px;">🟩</div>
                 </div>
                 <div class="game-card-launcher" onclick="openContextualOverlay('findword')">
-                    <div><h3>Mots Cachés</h3><p>Trouvez les expressions clés lues.</p></div>
+                    <div><h3>Mots Cachés (Bilingue)</h3><p>Trouvez les expressions clés lues.</p></div>
                     <div style="font-size:24px;">🔍</div>
                 </div>
                 <div class="game-card-launcher" onclick="launchFlashcardSprintGame()">
@@ -257,7 +257,7 @@
             <div id="findword-scaffold" class="game-scaffolding-hint"></div>
             <div id="findword-grid-box" class="findword-grid"></div>
             <div class="word-bank-box">
-                <div class="word-bank-title">Vocabulaire ciblé :</div>
+                <div class="word-bank-title">Vocabulaire Apparié :</div>
                 <div id="findword-bank-list"></div>
             </div>
         </div>
@@ -285,7 +285,7 @@
         const wordleMaxGuesses = 6;
         let activeFindWordTargets = [];
 
-        /* FULL 25-ARTICLE PRODUCTION DATABASE ARRAY WITH RELATIVE OFFSET MARKERS */
+        /* REWIRED & FIXED 25-PIECE CORE NEWSPAPER REGISTRY */
         const nativeDatabase = {
             fr: [
                 { t: "Paris 2026: Modernisation verte des places", d: "La Mairie de Paris lance un plan de végétalisation massive pour transformer les grands axes routiers et créer des îlots de fraîcheur urbains.", age: 0 },
@@ -296,7 +296,7 @@
             ],
             de: [
                 { t: "Berlin 2026: Grüne Modernisierung", d: "Das Berliner Rathaus startet einen massiven Begrünungsplan für städtische Hauptverkehrsachsen und urbane Freiräume.", age: 0 },
-                { t: "Ausbau von Radwegen", d: "Neue geschützte Infrastrukturen und Fahrradschnellwege werden entstehen, um die umweltfreundliche Mobilität im Stadtzentrum deutlich zu verbessern.", age: 0 },
+                { t: "Ausbau von Radwegen", d: "Neue geschützte Infrastrukturen und Fahrradschnellwege werden entstehen, um die umweltfreundliche Mobiltät im Stadtzentrum deutlich zu verbessern.", age: 0 },
                 { t: "S-Bahn Streckennetzerweiterung", d: "Die Berliner Verkehrsbetriebe planen neue Linienführungen, um die Außenbezirke schneller an den zentralen Alexanderplatz anzubinden.", age: 1 },
                 { t: "Mietpreisdeckel Diskussionen", d: "Der Senat debattiert über neue gesetzliche Maßnahmen zur Stabilisierung der Wohnkosten in angesagten Vierteln wie Kreuzberg.", age: 1 },
                 { t: "Museumsinsel Sanierung", d: "Ein ehrgeiziges Restaurierungsprojekt soll die historischen Fassaden der weltberühmten Berliner Museen vor Umweltschäden schützen.", age: 2 }
@@ -309,7 +309,7 @@
                 { t: "Itämeren suojeluhanke etenee", d: "Helsinki ja Turku tiivistävät yhteistyötään rannikkovesien puhdistamiseksi ja sinilevähaittojen minimoimiseksi tulevana kesänä.", age: 2 }
             ],
             europe: [
-                { t: "Bruxelles: Normes de logement éco", d: "L'Union Européenne adopte un texte législatif crucial pour accélérer l'isolation thermique et la rénovation énergétique du parc immobilier immobilier continental.", age: 0 },
+                { t: "Bruxelles: Normes de logement éco", d: "L'Union Européenne adopte un texte législatif crucial pour accélérer l'isolation thermique et la rénovation énergétique du parc immobilier continental.", age: 0 },
                 { t: "Espace Schengen: Numérisation des visas", d: "Le Parlement européen valide le déploiement d'une plateforme unique pour centraliser les demandes d'entrée et renforcer la sécurité aux frontières.", age: 1 },
                 { t: "Pacte vert européen: Objectif 2030", d: "Les ministres de l'Environnement se réunissent pour ajuster les quotas d'émissions industrielles face aux nouvelles réalités économiques.", age: 1 },
                 { t: "Erasmus+: Budget historique en hausse", d: "Le programme d'échange universitaire emblématique reçoit un financement record pour inclure davantage d'apprentis et de jeunes professionnels.", age: 2 },
@@ -324,10 +324,20 @@
             ]
         };
 
+        /* EXPANDED RICH DICTIONARY PULLED DIRECTLY FROM THE REAL ARTICLE STRINGS */
         const localMultiLanguageDict = {
-            fr: { "vert": "green", "ville": "city", "plan": "plan", "eau": "water" },
-            de: { "grün": "green", "raum": "space", "stadt": "city", "wind": "wind" },
-            fi: { "uusi": "new", "tila": "space", "meri": "sea", "puisto": "park" }
+            fr: { 
+                "vert": "Green", "ville": "City", "places": "Squares", "plan": "Plan", 
+                "pistes": "Tracks", "reseau": "Network", "commune": "Town", "terrasses": "Patios" 
+            },
+            de: { 
+                "grün": "Green", "stadt": "City", "ausbau": "Expansion", "radwegen": "Bike Paths", 
+                "neue": "New", "linien": "Lines", "mieten": "Rents", "museen": "Museums" 
+            },
+            fi: { 
+                "uusi": "New", "vihreä": "Green", "kaupunki": "City", "baana": "Cycling Path", 
+                "metrolinja": "Metro Line", "kirjasto": "Library", "meri": "Sea", "kesä": "Summer" 
+            }
         };
 
         const gameContextWordsByLang = {
@@ -338,7 +348,6 @@
 
         const adMatrix = { 1: { header: "Coca-Cola Zéro. Sans sucre !", badge: "A1", cta: "Déjà goûté?", eng: "Without sugar." }, 2: { header: "Coca-Cola Zéro. Zéro sucre !", badge: "A2", cta: "Essayé ?", eng: "Zero sugar." }, 3: { header: "Le vrai goût de Coca-Cola, le sucre en moins.", badge: "B1", cta: "Qu'attendez-vous ?", eng: "True taste minus sugar." }, 4: { header: "Partagez l'intensité, la culpabilité en moins.", badge: "C1", cta: "Prêt ?", eng: "Intensity minus guilt." }, 5: { header: "Tout le plaisir, zero sucre.", badge: "Fluide", cta: "Testé ?", eng: "All the pleasure, zero sugar." } };
 
-        /* LOCALIZED DATE STRING MATRIX SYSTEM BASED ON SELECTIVE TIMELINES */
         const dateLocalizationMatrix = {
             fr: { prefix: "Mis à jour :", today: "Aujourd'hui", yesterday: "Hier", daysAgo: "Il y a %d jours" },
             de: { prefix: "Aktualisiert:", today: "Heute", yesterday: "Gestern", daysAgo: "Vor %d Tagen" },
@@ -386,13 +395,23 @@
 
         function rotateNewsCarousel() { currentCarouselBatchIndex = (currentCarouselBatchIndex === 0) ? 1 : 0; renderFeedModules(); }
 
+        /* THE REPAIRED PIPELINE GENERATOR BUILD */
         function generateMultiFeedMatrix() {
-            newsArticlesCache = []; let globalId = 0;
+            newsArticlesCache = []; 
+            let globalId = 0;
+            
             ['local', 'europe', 'world'].forEach(sec => {
                 const src = (sec === 'local') ? nativeDatabase[activeLanguageHub] : nativeDatabase[sec];
-                if(src) {
+                if (src && Array.isArray(src)) {
                     src.forEach(item => {
-                        newsArticlesCache.push({ id: globalId, section: sec, title: item.t, text: item.d, age: item.age || 0, payloads: {} });
+                        newsArticlesCache.push({ 
+                            id: globalId, 
+                            section: sec, 
+                            title: item.t, 
+                            text: item.d, 
+                            age: item.age || 0, 
+                            payloads: {} 
+                        });
                         globalId++;
                     });
                 }
@@ -402,10 +421,25 @@
 
         function renderFeedModules() {
             ['local', 'europe', 'world'].forEach(sec => {
-                const box = document.getElementById(`panel-${sec}`); if(!box) return; box.innerHTML = '';
-                const items = newsArticlesCache.filter(a => a.section === sec).slice(currentCarouselBatchIndex*5, (currentCarouselBatchIndex*5)+5);
+                const box = document.getElementById(`panel-${sec}`); 
+                if (!box) return; 
+                box.innerHTML = '';
+                
+                const allSectionItems = newsArticlesCache.filter(a => a.section === sec);
+                let items = [];
+                
+                // CRITICAL BOUNDARY CEILING FIX: Bypasses slicing if records are within limit
+                if (allSectionItems.length <= 5) {
+                    items = allSectionItems;
+                } else {
+                    let startIdx = currentCarouselBatchIndex * 3;
+                    if (startIdx >= allSectionItems.length) startIdx = 0;
+                    items = allSectionItems.slice(startIdx, startIdx + 3);
+                }
+                
                 items.forEach(art => {
-                    const card = document.createElement('div'); card.className = 'content-card';
+                    const card = document.createElement('div'); 
+                    card.className = 'content-card';
                     card.onclick = () => runAiPipeline(art.id);
                     
                     const dateStamp = getLocalizedDateString(art.age);
@@ -585,43 +619,72 @@
             if (wordleCurrentRow >= wordleMaxGuesses) showToast(`Terminé. Mot: ${wordleTargetWord}`);
         }
 
+        /* UPGRADED: BI-DIRECTIONAL FIND-A-WORD MATRIX CONSTRUCTOR */
         function initContextualFindWord() {
             const sourceVocabulary = localMultiLanguageDict[activeLanguageHub] || localMultiLanguageDict['fr'];
-            activeFindWordTargets = Object.keys(sourceVocabulary).map(k => k.toUpperCase()).slice(0, 3);
+            const keys = Object.keys(sourceVocabulary);
+            
+            // Randomly shuffle vocabulary keys from the active article dictionary
+            const shuffledKeys = keys.sort(() => 0.5 - Math.random());
+            activeFindWordTargets = shuffledKeys.slice(0, 3).map(k => k.toUpperCase());
 
             const hintBox = document.getElementById('findword-scaffold');
-            const bankBox = document.getElementById('findword-bank-list'); bankBox.innerHTML = '';
+            const bankBox = document.getElementById('findword-bank-list'); 
+            bankBox.innerHTML = '';
 
+            // Render explicit bi-directional layout hooks
             if (selectedLevelIndex <= 2) {
-                hintBox.innerHTML = `<b>💡 Support A1/A2:</b> Repérez les lettres.`;
-                activeFindWordTargets.forEach(w => bankBox.innerHTML += `<span class="bank-item" id="ctx-bi-${w}">${w}</span>`);
+                hintBox.innerHTML = `<b>💡 Support A1/A2:</b> Search for foreign words directly. Grid matches items exactly.`;
+                activeFindWordTargets.forEach(w => {
+                    const EnglishMeaning = sourceVocabulary[w.toLowerCase()];
+                    bankBox.innerHTML += `<span class="bank-item" id="ctx-bi-${w}">${EnglishMeaning} — <b>${w}</b></span>`;
+                });
             } else {
-                hintBox.innerHTML = `<b>🧠 Défi ${levels[selectedLevelIndex]}:</b> Trouvez le mot correspondant à l'anglais.`;
-                activeFindWordTargets.forEach(w => bankBox.innerHTML += `<span class="bank-item" id="ctx-bi-${w}">"${sourceVocabulary[w.toLowerCase()]}"</span>`);
+                hintBox.innerHTML = `<b>🧠 Défi ${levels[selectedLevelIndex]}:</b> Reverse-Translation! Grid contains target language translation.`;
+                activeFindWordTargets.forEach(w => {
+                    const EnglishMeaning = sourceVocabulary[w.toLowerCase()];
+                    bankBox.innerHTML += `<span class="bank-item" id="ctx-bi-${w}">Find meaning of: <b>"${EnglishMeaning}"</b></span>`;
+                });
             }
 
-            const gridBox = document.getElementById('findword-grid-box'); gridBox.innerHTML = '';
+            const gridBox = document.getElementById('findword-grid-box'); 
+            gridBox.innerHTML = '';
             const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            
+            // Generate matrix cells
             for(let i=0; i<48; i++) {
-                const cell = document.createElement('div'); cell.className = 'findword-cell';
+                const cell = document.createElement('div'); 
+                cell.className = 'findword-cell';
                 cell.innerText = letters[Math.floor(Math.random() * 26)];
                 cell.onclick = function() { this.classList.toggle('selected'); evaluateFindWordGrid(); };
                 gridBox.appendChild(cell);
             }
+            
+            // Embed targeted keywords directly into the grid array dynamically
             const cells = gridBox.querySelectorAll('.findword-cell');
-            if(activeFindWordTargets.length > 0 && cells.length > 8) {
-                let firstWord = activeFindWordTargets[0];
-                for(let j=0; j<firstWord.length; j++) { if(cells[j]) cells[j].innerText = firstWord[j]; }
-            }
+            let cellOffset = 0;
+            activeFindWordTargets.forEach(targetWord => {
+                if (cellOffset + targetWord.length < cells.length) {
+                    for(let j=0; j<targetWord.length; j++) {
+                        cells[cellOffset + j].innerText = targetWord[j];
+                    }
+                    cellOffset += 16; // Shift row offsets to avoid intersecting overwrites
+                }
+            });
         }
 
         function evaluateFindWordGrid() {
             const cells = document.getElementById('findword-grid-box').querySelectorAll('.findword-cell.selected');
-            let built = ""; cells.forEach(c => built += c.innerText);
+            let built = ""; 
+            cells.forEach(c => built += c.innerText);
+            
             activeFindWordTargets.forEach(t => {
                 if(built.includes(t) || t === built) {
                     const item = document.getElementById(`ctx-bi-${t}`);
-                    if(item && !item.classList.contains('found')) { item.classList.add('found'); showToast(`🎯 Trouvé : ${t}!`); }
+                    if(item && !item.classList.contains('found')) { 
+                        item.classList.add('found'); 
+                        showToast(`🎯 Trouvé / Matched: ${t}!`); 
+                    }
                 }
             });
         }
