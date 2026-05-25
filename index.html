@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LangSift Direct v5.5</title>
+    <title>LangSift Direct v5.6</title>
     <style>
         :root {
             --bg-color: #fdfbf7;
@@ -39,9 +39,11 @@
 
         .action-bar { display: flex; justify-content: center; margin-bottom: 15px; gap: 10px; }
         .refresh-btn { background-color: var(--card-bg); border: 1px solid var(--accent-light); color: var(--accent-color); padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; }
+        
         .content-card { background-color: var(--card-bg); border-radius: 12px; padding: 16px; box-shadow: 0 3px 10px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.02); cursor: pointer; }
         .content-card h3 { margin: 0 0 6px 0; font-size: 15px; line-height: 1.35; }
-        .content-card p { margin: 0; font-size: 12px; color: var(--text-muted); line-height: 1.4; }
+        .content-card p { margin: 0 0 10px 0; font-size: 12px; color: var(--text-muted); line-height: 1.4; }
+        .card-meta-row { display: flex; justify-content: space-between; align-items: center; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: #a09892; border-top: 1px dashed rgba(0,0,0,0.05); padding-top: 8px; }
         
         .reader-header { position: fixed; top: 0; left: 0; right: 0; background-color: var(--bg-color); padding: 14px 20px; box-shadow: 0 3px 15px rgba(0,0,0,0.07); display: flex; flex-direction: column; align-items: center; z-index: 1000; border-bottom: 1px solid rgba(0,0,0,0.05); }
         .nav-row { display: flex; width: 100%; max-width: 500px; justify-content: space-between; align-items: center; margin-bottom: 10px; }
@@ -52,22 +54,21 @@
         .ticks { display: flex; justify-content: space-between; width: 100%; font-size: 10px; font-weight: bold; color: #888; }
         
         .reader-content { margin-top: 145px; width: 100%; }
-        .story-title { font-family: Georgia, serif; font-size: 24px; margin-bottom: 18px; line-height: 1.3; font-weight: bold; }
+        .story-title { font-family: Georgia, serif; font-size: 24px; margin-bottom: 8px; line-height: 1.3; font-weight: bold; }
+        .story-timeline-stamp { font-size: 11px; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.8px; margin-bottom: 20px; font-weight: bold; }
         .text-block p { font-size: 17px; line-height: 1.9; margin-bottom: 22px; text-align: justify; }
         .reader-content span.w { cursor: pointer; padding: 0 2px; border-radius: 3px; transition: background 0.15s ease; }
         .reader-content span.w:hover { background-color: var(--accent-light); }
 
-        /* POST-ARTICLE GATEWAY INTERFACE */
         .gateway-card { background-color: #f5f1e9; border: 2px dashed var(--accent-color); border-radius: 16px; padding: 20px; margin: 30px 0; text-align: center; }
         .gateway-card h4 { margin: 0 0 6px 0; font-family: Georgia, serif; font-size: 16px; }
         .gateway-card p { margin: 0 0 15px 0; font-size: 12px; color: var(--text-muted); }
         .gateway-btn-group { display: flex; gap: 10px; justify-content: center; }
         .game-trigger-btn { background-color: var(--accent-color); color: white; border: none; padding: 10px 16px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; box-shadow: 0 3px 8px rgba(140,120,83,0.3); }
 
-        /* CONTEXTUAL MODAL SYSTEM */
         .game-overlay-modal { display: none; position: fixed; top: 135px; bottom: 65px; left: 0; right: 0; background: var(--card-bg); z-index: 2000; box-shadow: 0 -10px 30px rgba(0,0,0,0.15); border-radius: 24px 24px 0 0; padding: 24px; overflow-y: auto; box-sizing: border-box; }
+        .game-scaffolding-hint { background-color: rgba(140, 120, 83, 0.1); border-left: 3px solid var(--accent-color); padding: 10px; border-radius: 4px; font-size: 12px; margin-bottom: 15px; font-style: italic; line-height: 1.4; }
         
-        /* UNIFIED GAMES MENU */
         .game-menu-container { display: flex; flex-direction: column; gap: 12px; }
         .game-card-launcher { background: white; border: 1px solid rgba(0,0,0,0.06); border-radius: 14px; padding: 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; box-shadow: 0 3px 10px rgba(0,0,0,0.02); }
         .game-card-launcher h3 { margin: 0 0 4px 0; font-size: 16px; font-family: Georgia, serif; }
@@ -77,7 +78,6 @@
         .eng-toggle-btn { display: block; margin: 25px auto; background: none; border: 1px solid var(--accent-color); color: var(--accent-color); padding: 8px 18px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; }
         .english-translation-panel { background-color: #f3f0ea; border-left: 4px solid var(--accent-color); padding: 16px; font-size: 14.5px; color: #444; line-height: 1.6; white-space: pre-line; display: none; margin-bottom: 35px; border-radius: 0 8px 8px 0; }
         
-        /* BRAND AD DESIGN */
         .brand-ad-card { position: relative; min-height: 150px; border-radius: 16px; overflow: hidden; margin: 35px 0; box-shadow: 0 8px 24px rgba(0,0,0,0.15); background-color: #000; }
         .brand-ad-bg-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&q=80&w=600'); background-size: cover; background-position: center; z-index: 1; }
         .brand-ad-gradient-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.5) 60%, rgba(0,0,0,0.3) 100%); z-index: 2; }
@@ -93,7 +93,6 @@
         .spinner { border: 4px solid rgba(0,0,0,0.1); width: 36px; height: 36px; border-radius: 50%; border-left-color: var(--accent-color); animation: spin 1s linear infinite; margin: 0 auto 15px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        /* INTEGRATED FLASHCARD GAME SPRINT DESIGN */
         .flashcard-container { display: flex; flex-direction: column; align-items: center; width: 100%; }
         .card-counter { font-size: 13px; color: var(--text-muted); margin-bottom: 12px; }
         .flashcard { width: 100%; max-width: 340px; height: 180px; background-color: var(--card-bg); border-radius: 16px; box-shadow: 0 6px 20px rgba(0,0,0,0.05); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; box-sizing: border-box; position: relative; cursor: pointer; border: 1px solid rgba(0,0,0,0.03); }
@@ -106,15 +105,15 @@
         .btn-unknown { background-color: var(--accent-color); }
         .empty-deck { text-align: center; color: var(--text-muted); padding: 40px; }
         
-        /* WORDLE INTERNAL GRID */
         .wordle-grid { display: flex; flex-direction: column; gap: 5px; align-items: center; margin-bottom: 15px; }
         .wordle-row { display: flex; gap: 5px; }
         .wordle-cell { width: 38px; height: 38px; border: 2px solid #e2e2e2; border-radius: 4px; display: flex; justify-content: center; align-items: center; font-size: 16px; font-weight: bold; text-transform: uppercase; }
         .wordle-cell.correct { background-color: var(--correct-color); border-color: var(--correct-color); color: white; }
         .wordle-cell.present { background-color: var(--present-color); border-color: var(--present-color); color: white; }
         .wordle-cell.absent { background-color: var(--absent-color); border-color: var(--absent-color); color: white; }
+        .game-input-row { display: flex; gap: 8px; justify-content: center; margin-top: 10px; }
+        .game-text-input { padding: 10px; width: 130px; text-transform: uppercase; text-align: center; font-weight: bold; font-size: 16px; border: 1px solid var(--accent-light); border-radius: 8px; outline: none; }
 
-        /* FIND-A-WORD GRID */
         .findword-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; max-width: 320px; margin: 0 auto 15px auto; }
         .findword-cell { background: #f7f5f0; height: 34px; display: flex; justify-content: center; align-items: center; font-size: 13px; font-weight: bold; border-radius: 4px; cursor: pointer; user-select: none; }
         .findword-cell.selected { background-color: var(--accent-color); color: white; }
@@ -210,6 +209,7 @@
                 
                 <div id="reader-dynamic-body-wrapper">
                     <div id="reader-title-display" class="story-title"></div>
+                    <div id="reader-timeline-display" class="story-timeline-stamp"></div>
                     <div id="reader-body-display" class="text-block"></div>
                     
                     <div class="brand-ad-label">Sponsorisé — Coca-Cola Zéro</div>
@@ -285,12 +285,43 @@
         const wordleMaxGuesses = 6;
         let activeFindWordTargets = [];
 
+        /* FULL 25-ARTICLE PRODUCTION DATABASE ARRAY WITH RELATIVE OFFSET MARKERS */
         const nativeDatabase = {
-            fr: [{ t: "Paris 2026: Modernisation verte des places", d: "La Mairie de Paris lance un plan de végétalisation massive pour transformer les axes routiers." }, { t: "Pistes cyclables intra-muros", d: "De nouveaux aménagements protégés vont voir le jour pour les déplacements écologiques." }],
-            de: [{ t: "Berlin 2026: Grüne Modernisierung", d: "Das Berliner Rathaus startet einen massiven Begrünungsplan für städtische Hauptverkehrsachsen." }, { t: "Ausbau von Radwegen", d: "Neue geschützte Infrastrukturen werden entstehen, um die Mobilität im Zentrum zu verbessern." }],
-            fi: [{ t: "Helsinki 2026: Vihreä uudistus", d: "Helsingin kaupunki aloittaa massiivisen viherryttämisohjelman muuttaakseen urbaaneja pääväyliä." }, { t: "Pyöräteiden laajentaminen keskustassa", d: "Uusia suojattuja reittejä rakennetaan sujuvoittamaan ympäristöystävällistä liikkumista." }],
-            europe: [{ t: "Bruxelles: Normes de logement", d: "L'Union Européenne adopte un texte pour accélérer l'isolation thermique continentale." }],
-            world: [{ t: "Transition globale: Hausse du solaire", d: "Les rapports internationaux indiquent un basculement historique vers les énergies renouvelables." }]
+            fr: [
+                { t: "Paris 2026: Modernisation verte des places", d: "La Mairie de Paris lance un plan de végétalisation massive pour transformer les grands axes routiers et créer des îlots de fraîcheur urbains.", age: 0 },
+                { t: "Pistes cyclables intra-muros", d: "De nouveaux aménagements protégés et des corridors cyclables express vont voir le jour pour encourager les déplacements écologiques au cœur de la capitale.", age: 0 },
+                { t: "Rénovation du réseau RER", d: "Île-de-France Mobilités annonce des investissements majeurs pour moderniser la signalisation et augmenter la fréquence des rames aux heures de pointe.", age: 1 },
+                { t: "Les terrasses estivales réglementées", d: "La nouvelle charte de la ville de Paris impose des limites strictes sur les horaires et les nuisances sonores pour concilier commerce et calme résidentiel.", age: 1 },
+                { t: "JO Paris: L'héritage des infrastructures", d: "Deux ans après l'événement, le bilan officiel montre une revitalisation spectaculaire des quartiers de Seine-Saint-Denis et des transports publics.", age: 2 }
+            ],
+            de: [
+                { t: "Berlin 2026: Grüne Modernisierung", d: "Das Berliner Rathaus startet einen massiven Begrünungsplan für städtische Hauptverkehrsachsen und urbane Freiräume.", age: 0 },
+                { t: "Ausbau von Radwegen", d: "Neue geschützte Infrastrukturen und Fahrradschnellwege werden entstehen, um die umweltfreundliche Mobilität im Stadtzentrum deutlich zu verbessern.", age: 0 },
+                { t: "S-Bahn Streckennetzerweiterung", d: "Die Berliner Verkehrsbetriebe planen neue Linienführungen, um die Außenbezirke schneller an den zentralen Alexanderplatz anzubinden.", age: 1 },
+                { t: "Mietpreisdeckel Diskussionen", d: "Der Senat debattiert über neue gesetzliche Maßnahmen zur Stabilisierung der Wohnkosten in angesagten Vierteln wie Kreuzberg.", age: 1 },
+                { t: "Museumsinsel Sanierung", d: "Ein ehrgeiziges Restaurierungsprojekt soll die historischen Fassaden der weltberühmten Berliner Museen vor Umweltschäden schützen.", age: 2 }
+            ],
+            fi: [
+                { t: "Helsinki 2026: Vihreä uudistus", d: "Helsingin kaupunki aloittaa massiivisen viherryttämisohjelman muuttaakseen urbaaneja pääväyliä ja rakentaakseen uusia taskupuistoja.", age: 0 },
+                { t: "Pyöräteiden laajentaminen keskustassa", d: "Uusia suojattuja pyöräilyreittejä ja Baana-verkoston laajennuksia rakennetaan sujuvoittamaan ympäristöystävällistä liikkumista talvellakin.", age: 0 },
+                { t: "Länsimetron jatkeen uudet vuorot", d: "HSL lisää metrolinjojen kapasiteettia Espoon ja Helsingin välillä vastaamaan kasvaneeseen matkustajakysyntään.", age: 1 },
+                { t: "Keskustakirjasto Oodin menestys", d: "Arkkitehtuuripalkittu kohtaamispaikka rikkoo kävijäennätyksiä ja laajentaa digitaalisten palveluiden valikoimaansa asukkaille.", age: 1 },
+                { t: "Itämeren suojeluhanke etenee", d: "Helsinki ja Turku tiivistävät yhteistyötään rannikkovesien puhdistamiseksi ja sinilevähaittojen minimoimiseksi tulevana kesänä.", age: 2 }
+            ],
+            europe: [
+                { t: "Bruxelles: Normes de logement éco", d: "L'Union Européenne adopte un texte législatif crucial pour accélérer l'isolation thermique et la rénovation énergétique du parc immobilier immobilier continental.", age: 0 },
+                { t: "Espace Schengen: Numérisation des visas", d: "Le Parlement européen valide le déploiement d'une plateforme unique pour centraliser les demandes d'entrée et renforcer la sécurité aux frontières.", age: 1 },
+                { t: "Pacte vert européen: Objectif 2030", d: "Les ministres de l'Environnement se réunissent pour ajuster les quotas d'émissions industrielles face aux nouvelles réalités économiques.", age: 1 },
+                { t: "Erasmus+: Budget historique en hausse", d: "Le programme d'échange universitaire emblématique reçoit un financement record pour inclure davantage d'apprentis et de jeunes professionnels.", age: 2 },
+                { t: "Zone Euro: Régulation des crypto-actifs", d: "La Banque Centrale Européenne publie un cadre strict pour encadrer les transactions numériques et prévenir la volatilité systémique.", age: 2 }
+            ],
+            world: [
+                { t: "Transition globale: Hausse du solaire", d: "Les derniers rapports internationaux indiquent un basculement historique vers les énergies renouvelables, porteur de millions d'emplois.", age: 0 },
+                { t: "Sommet sur le climat: Clôture des débats", d: "Les dirigeants mondiaux s'accordent sur un traité contraignant pour limiter la pollution plastique dans les océans d'ici à 2040.", age: 0 },
+                { t: "Nouvelle-Zélande: Reforestation massive", d: "Un projet d'envergure nationale vise à planter un milliard d'arbres autochtones pour restaurer la biodiversité et stabiliser les sols.", age: 1 },
+                { t: "Technologie: Course à l'informatique quantique", d: "Les laboratoires de la Silicon Valley et d'Asie annoncent des percées majeures qui pourraient révolutionner la cryptographie mondiale.", age: 1 },
+                { t: "Exploration spatiale: Cap sur Mars", d: "Les agences internationales coordonnent leurs efforts pour concevoir des habitats capables de supporter des missions habitées de longue durée.", age: 3 }
+            ]
         };
 
         const localMultiLanguageDict = {
@@ -305,7 +336,21 @@
             fi: [ { w: "UUSI", h_en: "Opposite of old.", h_nat: "Vanhan vastakohta." }, { w: "MERI", h_en: "The sea.", h_nat: "Suuri suolaisen veden alue." } ]
         };
 
-        const adMatrix = { 1: { header: "Coca-Cola Zéro. Sans sucre !", badge: "A1", cta: "Déjà goûté?", eng: "Without sugar." }, 2: { header: "Coca-Cola Zéro. Zéro sucre !", badge: "A2", cta: "Essayé ?", eng: "Zero sugar." }, 3: { header: "Le vrai goût de Coca-Cola, le sucre en moins.", badge: "B1", cta: "Qu'attendez-vous ?", eng: "True taste minus sugar." }, 4: { header: "Partagez l'intensité, la culpabilité en moins.", badge: "C1", cta: "Prêt ?", eng: "Intensity minus guilt." }, 5: { header: "Tout le plaisir, zéro sucre.", badge: "Fluide", cta: "Testé ?", eng: "All the pleasure, zero sugar." } };
+        const adMatrix = { 1: { header: "Coca-Cola Zéro. Sans sucre !", badge: "A1", cta: "Déjà goûté?", eng: "Without sugar." }, 2: { header: "Coca-Cola Zéro. Zéro sucre !", badge: "A2", cta: "Essayé ?", eng: "Zero sugar." }, 3: { header: "Le vrai goût de Coca-Cola, le sucre en moins.", badge: "B1", cta: "Qu'attendez-vous ?", eng: "True taste minus sugar." }, 4: { header: "Partagez l'intensité, la culpabilité en moins.", badge: "C1", cta: "Prêt ?", eng: "Intensity minus guilt." }, 5: { header: "Tout le plaisir, zero sucre.", badge: "Fluide", cta: "Testé ?", eng: "All the pleasure, zero sugar." } };
+
+        /* LOCALIZED DATE STRING MATRIX SYSTEM BASED ON SELECTIVE TIMELINES */
+        const dateLocalizationMatrix = {
+            fr: { prefix: "Mis à jour :", today: "Aujourd'hui", yesterday: "Hier", daysAgo: "Il y a %d jours" },
+            de: { prefix: "Aktualisiert:", today: "Heute", yesterday: "Gestern", daysAgo: "Vor %d Tagen" },
+            fi: { prefix: "Päivitetty:", today: "Tänään", yesterday: "Eilen", daysAgo: "%d päivää sitten" }
+        };
+
+        function getLocalizedDateString(ageInDays) {
+            const loc = dateLocalizationMatrix[activeLanguageHub] || dateLocalizationMatrix['fr'];
+            if (ageInDays === 0) return `${loc.prefix} ${loc.today}`;
+            if (ageInDays === 1) return `${loc.prefix} ${loc.yesterday}`;
+            return `${loc.prefix} ${loc.daysAgo.replace('%d', ageInDays)}`;
+        }
 
         function getApiKey() {
             let key = localStorage.getItem('GEMINI_KEY');
@@ -347,7 +392,7 @@
                 const src = (sec === 'local') ? nativeDatabase[activeLanguageHub] : nativeDatabase[sec];
                 if(src) {
                     src.forEach(item => {
-                        newsArticlesCache.push({ id: globalId, section: sec, title: item.t, text: item.d, payloads: {} });
+                        newsArticlesCache.push({ id: globalId, section: sec, title: item.t, text: item.d, age: item.age || 0, payloads: {} });
                         globalId++;
                     });
                 }
@@ -362,7 +407,16 @@
                 items.forEach(art => {
                     const card = document.createElement('div'); card.className = 'content-card';
                     card.onclick = () => runAiPipeline(art.id);
-                    card.innerHTML = `<h3>${art.title}</h3><p>${art.text}</p>`;
+                    
+                    const dateStamp = getLocalizedDateString(art.age);
+                    card.innerHTML = `
+                        <h3>${art.title}</h3>
+                        <p>${art.text}</p>
+                        <div class="card-meta-row">
+                            <span>⚡ Direct Live</span>
+                            <span>${dateStamp}</span>
+                        </div>
+                    `;
                     box.appendChild(card);
                 });
             });
@@ -439,6 +493,7 @@
             if(!data) return;
 
             document.getElementById('reader-title-display').innerText = data.title;
+            document.getElementById('reader-timeline-display').innerText = getLocalizedDateString(selectedArticle.age);
 
             let parserDummy = document.createElement('div'); parserDummy.innerHTML = data.text_block;
             let paragraphs = parserDummy.querySelectorAll('p');
@@ -451,7 +506,6 @@
                     if (token.trim().length === 0) { markup += token; } 
                     else {
                         let cleanWord = token.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?"']/g,"");
-                        // ⚡ FIX: We construct a clean phrase snippet context for context-aware validation later
                         let surroundingContext = p.innerText.substring(Math.max(0, p.innerText.indexOf(token) - 30), Math.min(p.innerText.length, p.innerText.indexOf(token) + 40));
                         markup += `<span class="w" data-lookup="${cleanWord}" data-context="...${surroundingContext.trim()}...">${token}</span>`;
                     }
@@ -466,7 +520,6 @@
             document.getElementById('ad-cta-display').innerText = ad.cta;
             document.getElementById('reader-translation-panel').innerText = data.english_translation;
             
-            /* ⚡ TOAST LOGIC RETENTION & CORRECTION MATRIX BUILDER */
             document.querySelectorAll('.reader-content span.w').forEach(el => {
                 el.onclick = function(e) {
                     e.stopPropagation();
@@ -573,7 +626,6 @@
             });
         }
 
-        /* 🎴 NEW SPRINT GAME MODULE: FLASHCARDS INTEGRATED INTO COIN JEUX */
         function launchFlashcardSprintGame() {
             const zone = document.getElementById('flashcard-game-runtime-zone');
             if (vocabularyList.length === 0) {
