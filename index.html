@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LangSift Direct v5.2</title>
+    <title>LangSift Direct v5.5</title>
     <style>
         :root {
             --bg-color: #fdfbf7;
@@ -14,55 +14,26 @@
             --accent-light: #eaddca;
             --success-color: #2e7d32;
             --nav-bg: #ffffff;
+            --correct-color: #6cab64;
+            --present-color: #c9b458;
+            --absent-color: #787c7e;
         }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Georgia, serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; }
-        .app-container { max-width: 500px; width: 100%; min-height: 100vh; box-sizing: border-box; padding: 20px 20px 110px 20px; }
+        .app-container { max-width: 500px; width: 100%; min-height: 100vh; box-sizing: border-box; padding: 20px 20px 110px 20px; position: relative; }
         .menu-view { display: none; }
         .menu-view.active { display: block; }
         .app-header { margin-top: 10px; margin-bottom: 15px; text-align: center; }
         .app-header h1 { font-size: 26px; margin: 0; font-family: Georgia, serif; }
         .app-header p { color: var(--text-muted); margin: 4px 0 0 0; font-size: 13px; }
         
-        /* PREMIUM SLIDING SETTINGS DRAWER PANEL */
-        .settings-panel {
-            background-color: #f5f1e9;
-            border-radius: 14px;
-            padding: 16px;
-            margin-bottom: 20px;
-            border: 1px solid var(--accent-light);
-            display: none;
-        }
-        .settings-panel h3 { margin: 0 0 12px 0; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-color); }
+        .settings-panel { background-color: #f5f1e9; border-radius: 14px; padding: 16px; margin-bottom: 20px; border: 1px solid var(--accent-light); display: none; }
+        .settings-panel h3 { margin: 0 0 12px 0; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; }
         .settings-row { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
-        .settings-row label { font-size: 12px; font-weight: bold; color: var(--text-muted); }
-        .settings-select { padding: 10px; border-radius: 8px; border: 1px solid var(--accent-light); background: white; font-size: 13px; font-weight: bold; color: var(--text-color); width: 100%; box-sizing: border-box; outline: none; }
+        .settings-select { padding: 10px; border-radius: 8px; border: 1px solid var(--accent-light); background: white; font-size: 13px; font-weight: bold; width: 100%; box-sizing: border-box; outline: none; }
 
-        .feed-tabs-container {
-            display: flex;
-            background: rgba(140, 120, 83, 0.08);
-            padding: 4px;
-            border-radius: 25px;
-            margin: 20px 0;
-            gap: 4px;
-        }
-        .feed-tab-btn {
-            flex: 1;
-            background: none;
-            border: none;
-            padding: 10px 2px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-            color: var(--text-muted);
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-align: center;
-        }
-        .feed-tab-btn.active {
-            background: var(--card-bg);
-            color: var(--text-color);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-        }
+        .feed-tabs-container { display: flex; background: rgba(140, 120, 83, 0.08); padding: 4px; border-radius: 25px; margin: 20px 0; gap: 4px; }
+        .feed-tab-btn { flex: 1; background: none; border: none; padding: 10px 2px; border-radius: 20px; font-size: 12px; font-weight: bold; color: var(--text-muted); cursor: pointer; text-align: center; }
+        .feed-tab-btn.active { background: var(--card-bg); color: var(--text-color); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
         .feed-panel { display: none; }
         .feed-panel.active { display: flex; flex-direction: column; gap: 12px; }
 
@@ -82,77 +53,82 @@
         
         .reader-content { margin-top: 145px; width: 100%; }
         .story-title { font-family: Georgia, serif; font-size: 24px; margin-bottom: 18px; line-height: 1.3; font-weight: bold; }
-        
         .text-block p { font-size: 17px; line-height: 1.9; margin-bottom: 22px; text-align: justify; }
         .reader-content span.w { cursor: pointer; padding: 0 2px; border-radius: 3px; transition: background 0.15s ease; }
         .reader-content span.w:hover { background-color: var(--accent-light); }
-        .reader-content span.w:active { background-color: #d8c4a0; }
+
+        /* POST-ARTICLE GATEWAY INTERFACE */
+        .gateway-card { background-color: #f5f1e9; border: 2px dashed var(--accent-color); border-radius: 16px; padding: 20px; margin: 30px 0; text-align: center; }
+        .gateway-card h4 { margin: 0 0 6px 0; font-family: Georgia, serif; font-size: 16px; }
+        .gateway-card p { margin: 0 0 15px 0; font-size: 12px; color: var(--text-muted); }
+        .gateway-btn-group { display: flex; gap: 10px; justify-content: center; }
+        .game-trigger-btn { background-color: var(--accent-color); color: white; border: none; padding: 10px 16px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; box-shadow: 0 3px 8px rgba(140,120,83,0.3); }
+
+        /* CONTEXTUAL MODAL SYSTEM */
+        .game-overlay-modal { display: none; position: fixed; top: 135px; bottom: 65px; left: 0; right: 0; background: var(--card-bg); z-index: 2000; box-shadow: 0 -10px 30px rgba(0,0,0,0.15); border-radius: 24px 24px 0 0; padding: 24px; overflow-y: auto; box-sizing: border-box; }
+        
+        /* UNIFIED GAMES MENU */
+        .game-menu-container { display: flex; flex-direction: column; gap: 12px; }
+        .game-card-launcher { background: white; border: 1px solid rgba(0,0,0,0.06); border-radius: 14px; padding: 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; box-shadow: 0 3px 10px rgba(0,0,0,0.02); }
+        .game-card-launcher h3 { margin: 0 0 4px 0; font-size: 16px; font-family: Georgia, serif; }
+        .game-card-launcher p { margin: 0; font-size: 12px; color: var(--text-muted); }
+        .game-badge-counter { background: var(--accent-light); color: var(--accent-color); padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; }
 
         .eng-toggle-btn { display: block; margin: 25px auto; background: none; border: 1px solid var(--accent-color); color: var(--accent-color); padding: 8px 18px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; }
         .english-translation-panel { background-color: #f3f0ea; border-left: 4px solid var(--accent-color); padding: 16px; font-size: 14.5px; color: #444; line-height: 1.6; white-space: pre-line; display: none; margin-bottom: 35px; border-radius: 0 8px 8px 0; }
         
-        .brand-ad-card { 
-            position: relative; 
-            min-height: 200px; 
-            border-radius: 16px; 
-            overflow: hidden; 
-            margin: 35px 0; 
-            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-            background-color: #000;
-        }
-        .brand-ad-bg-image {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-image: url('https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&q=80&w=600');
-            background-size: cover;
-            background-position: center;
-            z-index: 1;
-        }
-        .brand-ad-gradient-overlay {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.5) 60%, rgba(0,0,0,0.3) 100%);
-            z-index: 2;
-        }
-        .brand-ad-content {
-            position: relative;
-            z-index: 3;
-            padding: 24px;
-            color: white;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            min-height: 200px;
-            box-sizing: border-box;
-        }
-        .brand-ad-label { font-size: 9px; color: #aaa; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; text-align: center; }
-        .ad-badge { align-self: flex-start; background: #e60000; color: white; font-size: 10px; font-weight: bold; padding: 4px 10px; border-radius: 20px; transform: rotate(-2deg); text-transform: uppercase; letter-spacing: 0.5px; }
-        .ad-header { font-family: Georgia, serif; font-size: 19px; line-height: 1.4; margin: 20px 0 15px 0; text-shadow: 0 2px 4px rgba(0,0,0,0.6); font-weight: bold; }
-        .ad-footer-row { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 12px; }
-        .ad-cta { font-size: 13px; font-style: italic; color: #ddd; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
-        .ad-tag-btn { background: #e60000; color: white; padding: 6px 14px; border-radius: 20px; font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 2px 6px rgba(230,0,0,0.4); }
+        /* BRAND AD DESIGN */
+        .brand-ad-card { position: relative; min-height: 150px; border-radius: 16px; overflow: hidden; margin: 35px 0; box-shadow: 0 8px 24px rgba(0,0,0,0.15); background-color: #000; }
+        .brand-ad-bg-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&q=80&w=600'); background-size: cover; background-position: center; z-index: 1; }
+        .brand-ad-gradient-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.5) 60%, rgba(0,0,0,0.3) 100%); z-index: 2; }
+        .brand-ad-content { position: relative; z-index: 3; padding: 20px; color: white; display: flex; flex-direction: column; justify-content: space-between; min-height: 150px; box-sizing: border-box; }
+        .brand-ad-label { font-size: 9px; color: #aaa; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px; text-align: center; }
+        .ad-badge { align-self: flex-start; background: #e60000; color: white; font-size: 10px; font-weight: bold; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; }
+        .ad-header { font-family: Georgia, serif; font-size: 16px; margin: 8px 0; }
+        .ad-footer-row { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 8px; }
+        .ad-cta { font-size: 12px; font-style: italic; color: #ddd; }
+        .ad-tag-btn { background: #e60000; color: white; padding: 6px 14px; border-radius: 20px; font-size: 10px; font-weight: bold; text-transform: uppercase; }
         
         .loading-screen { display: none; text-align: center; padding: 50px 20px; font-style: italic; color: var(--text-muted); }
         .spinner { border: 4px solid rgba(0,0,0,0.1); width: 36px; height: 36px; border-radius: 50%; border-left-color: var(--accent-color); animation: spin 1s linear infinite; margin: 0 auto 15px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        .flashcard-container { display: flex; flex-direction: column; align-items: center; margin-top: 15px; }
+        /* INTEGRATED FLASHCARD GAME SPRINT DESIGN */
+        .flashcard-container { display: flex; flex-direction: column; align-items: center; width: 100%; }
         .card-counter { font-size: 13px; color: var(--text-muted); margin-bottom: 12px; }
-        .flashcard { width: 100%; max-width: 340px; height: 180px; background-color: var(--card-bg); border-radius: 16px; box-shadow: 0 6px 20px rgba(0,0,0,0.05); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; box-sizing: border-box; position: relative; cursor: pointer; }
+        .flashcard { width: 100%; max-width: 340px; height: 180px; background-color: var(--card-bg); border-radius: 16px; box-shadow: 0 6px 20px rgba(0,0,0,0.05); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; box-sizing: border-box; position: relative; cursor: pointer; border: 1px solid rgba(0,0,0,0.03); }
         .flashcard .word-surface { font-size: 24px; font-weight: bold; margin-bottom: 8px; }
-        .flashcard .word-translation { font-size: 17px; color: var(--accent-color); font-style: italic; display: none; }
+        .flashcard .word-context { font-size: 13px; color: var(--text-muted); font-style: italic; padding: 0 10px; margin-top: 6px; line-height: 1.4; }
         .card-hint { position: absolute; bottom: 12px; font-size: 10px; color: #aaa; text-transform: uppercase; }
-        .card-controls { display: flex; gap: 15px; margin-top: 20px; width: 100%; max-width: 340px; }
-        .card-btn { flex: 1; padding: 12px; border-radius: 25px; border: none; font-weight: bold; color: white; cursor: pointer; }
+        .card-controls { display: flex; gap: 12px; margin-top: 20px; width: 100%; max-width: 340px; }
+        .card-btn { flex: 1; padding: 12px; border-radius: 25px; border: none; font-weight: bold; color: white; cursor: pointer; font-size: 13px; }
         .btn-know { background-color: var(--success-color); }
         .btn-unknown { background-color: var(--accent-color); }
         .empty-deck { text-align: center; color: var(--text-muted); padding: 40px; }
         
+        /* WORDLE INTERNAL GRID */
+        .wordle-grid { display: flex; flex-direction: column; gap: 5px; align-items: center; margin-bottom: 15px; }
+        .wordle-row { display: flex; gap: 5px; }
+        .wordle-cell { width: 38px; height: 38px; border: 2px solid #e2e2e2; border-radius: 4px; display: flex; justify-content: center; align-items: center; font-size: 16px; font-weight: bold; text-transform: uppercase; }
+        .wordle-cell.correct { background-color: var(--correct-color); border-color: var(--correct-color); color: white; }
+        .wordle-cell.present { background-color: var(--present-color); border-color: var(--present-color); color: white; }
+        .wordle-cell.absent { background-color: var(--absent-color); border-color: var(--absent-color); color: white; }
+
+        /* FIND-A-WORD GRID */
+        .findword-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; max-width: 320px; margin: 0 auto 15px auto; }
+        .findword-cell { background: #f7f5f0; height: 34px; display: flex; justify-content: center; align-items: center; font-size: 13px; font-weight: bold; border-radius: 4px; cursor: pointer; user-select: none; }
+        .findword-cell.selected { background-color: var(--accent-color); color: white; }
+        .word-bank-box { background: #faf9f5; padding: 12px; border-radius: 8px; font-size: 13px; border: 1px solid rgba(0,0,0,0.04); }
+        .word-bank-title { font-weight: bold; margin-bottom: 6px; font-size: 11px; text-transform: uppercase; color: var(--text-muted); }
+        .bank-item { display: inline-block; background: #fff; padding: 4px 8px; margin: 3px; border-radius: 12px; border: 1px solid var(--accent-light); font-size: 11px; }
+        .bank-item.found { text-decoration: line-through; opacity: 0.4; background: #e2ede2; }
+
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 65px; background-color: var(--nav-bg); border-top: 1px solid rgba(0,0,0,0.06); display: flex; justify-content: space-around; align-items: center; z-index: 900; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; background: none; border: none; color: #aaa; font-size: 11px; font-weight: bold; width: 33.3%; cursor: pointer; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; background: none; border: none; color: #aaa; font-size: 11px; font-weight: bold; width: 50%; cursor: pointer; }
         .nav-item.active { color: var(--accent-color); }
         .nav-item-icon { font-size: 18px; margin-bottom: 2px; }
-        .toast { position: fixed; bottom: 80px; background: #2c2520; color: #fff; padding: 10px 18px; border-radius: 20px; font-size: 13px; display: none; z-index: 2000; text-align: center; max-width: 80%; }
+        .toast { position: fixed; bottom: 80px; background: #2c2520; color: #fff; padding: 10px 18px; border-radius: 20px; font-size: 13px; display: none; z-index: 3000; text-align: center; max-width: 80%; }
+        .jit-level-spinner { display: none; text-align: center; padding: 30px; font-style: italic; color: var(--text-muted); }
     </style>
 </head>
 <body>
@@ -161,16 +137,14 @@
         <div id="view-news" class="menu-view active">
             <div class="app-header">
                 <h1>LangSift Direct</h1>
-                <p id="app-subtitle-label">Analyse multilingue et flux publicitaires CEFR</p>
+                <p>Journal d'actualités & Hub de Jeux Intégrés</p>
             </div>
-            
             <div class="action-bar">
-                <button class="refresh-btn" onclick="toggleSettingsDrawer()">⚙️ Réglages / Settings</button>
+                <button class="refresh-btn" onclick="toggleSettingsDrawer()">⚙️ Réglages</button>
                 <button class="refresh-btn" onclick="rotateNewsCarousel()">🔄 Permuter (Batch)</button>
             </div>
-
             <div id="settings-drawer" class="settings-panel">
-                <h3>Configuration de l'application</h3>
+                <h3>Configuration Globale</h3>
                 <div class="settings-row">
                     <label>Profil de langue cible & Hub Localisé :</label>
                     <select id="setting-language-hub" class="settings-select" onchange="handleLanguageHubChange()">
@@ -179,80 +153,119 @@
                         <option value="fi">🇫🇮 Helsinki (Suomi)</option>
                     </select>
                 </div>
-                <button class="refresh-btn" style="width:100%; color:#c62828; border-color:#rgba(0,0,0,0.1);" onclick="clearApiKey()">🔑 Reset Gemini API Key</button>
+                <button class="refresh-btn" style="width:100%; color:#c62828; border-color:rgba(0,0,0,0.1);" onclick="clearApiKey()">🔑 Reset Gemini API Key</button>
             </div>
+            <div id="loading-spinner-block" class="loading-screen"><div class="spinner"></div><i id="spinner-msg">Analyse linguistique...</i></div>
             
-            <div id="loading-spinner-block" class="loading-screen">
-                <div class="spinner"></div>
-                <div id="spinner-text-msg">Analyse linguistique et génération du texte calibré...</div>
-            </div>
-
             <div id="news-feeds-canvas">
                 <div class="feed-tabs-container">
                     <button id="tab-local" class="feed-tab-btn active" onclick="switchFeedPanel('local')">📍 Actu Locale</button>
                     <button id="tab-europe" class="feed-tab-btn" onclick="switchFeedPanel('europe')">🇪🇺 Europe</button>
                     <button id="tab-world" class="feed-tab-btn" onclick="switchFeedPanel('world')">🌍 Monde</button>
                 </div>
-
                 <div id="panel-local" class="feed-panel active"></div>
                 <div id="panel-europe" class="feed-panel"></div>
                 <div id="panel-world" class="feed-panel"></div>
             </div>
         </div>
 
-        <div id="view-flashcards" class="menu-view">
+        <div id="view-games" class="menu-view">
             <div class="app-header">
-                <h1>Mon Vocabulaire</h1>
-                <p>Mots enregistrés depuis vos lectures</p>
+                <h1>Le Coin Jeux</h1>
+                <p>Puzzles contextuels et révisions ludiques</p>
             </div>
-            <div id="deck-wrapper"></div>
+            
+            <div class="game-menu-container">
+                <div class="game-card-launcher" onclick="openContextualOverlay('wordle')">
+                    <div><h3>Le Mot (Wordle)</h3><p>Devinez le mot de l'actu du jour.</p></div>
+                    <div style="font-size:24px;">🟩</div>
+                </div>
+                <div class="game-card-launcher" onclick="openContextualOverlay('findword')">
+                    <div><h3>Mots Cachés</h3><p>Trouvez les expressions clés lues.</p></div>
+                    <div style="font-size:24px;">🔍</div>
+                </div>
+                <div class="game-card-launcher" onclick="launchFlashcardSprintGame()">
+                    <div><h3>Sprint Vocabulaire</h3><p>Testez vos mots sauvegardés au fil des lectures.</p></div>
+                    <div class="game-badge-counter" id="hub-card-count-badge">0</div>
+                </div>
+            </div>
+
+            <div id="flashcard-game-runtime-zone" style="margin-top:25px;"></div>
         </div>
 
         <div id="view-reader" class="menu-view">
             <div class="reader-header">
                 <div class="nav-row">
-                    <button class="back-btn" onclick="exitReaderView()">✕ Retour</button>
+                    <button class="back-btn" onclick="exitReaderView()">✕ Quitter</button>
                     <div class="slider-label">NIVEAU CEFR: <span id="level-tag">A1</span></div>
                 </div>
                 <div class="slider-container">
                     <input type="range" id="level-slider" min="1" max="5" value="1" step="1">
-                    <div class="ticks">
-                        <span>A1</span><span>A2</span><span>B1</span><span>C1</span><span>Fluide</span>
-                    </div>
+                    <div class="ticks"><span>A1</span><span>A2</span><span>B1</span><span>C1</span><span>Fluide</span></div>
                 </div>
             </div>
-
+            
             <div class="reader-content">
-                <div id="reader-title-display" class="story-title"></div>
-                <div id="reader-body-display" class="text-block"></div>
+                <div id="jit-loading-indicator" class="jit-level-spinner"><div class="spinner" style="width:24px; height:24px;"></div>Adaptation linguistique JIT...</div>
                 
-                <div class="brand-ad-label">Sponsorisé — Coca-Cola Zéro</div>
-                <div id="brand-ad-placement" class="brand-ad-card">
-                    <div class="brand-ad-bg-image"></div>
-                    <div class="brand-ad-gradient-overlay"></div>
-                    <div class="brand-ad-content">
-                        <div id="ad-badge-display" class="ad-badge"></div>
-                        <div id="ad-header-display" class="ad-header"></div>
-                        <div class="ad-footer-row">
-                            <div id="ad-cta-display" class="ad-cta"></div>
-                            <div class="ad-tag-btn">Coca-Cola Zéro</div>
+                <div id="reader-dynamic-body-wrapper">
+                    <div id="reader-title-display" class="story-title"></div>
+                    <div id="reader-body-display" class="text-block"></div>
+                    
+                    <div class="brand-ad-label">Sponsorisé — Coca-Cola Zéro</div>
+                    <div id="brand-ad-placement" class="brand-ad-card">
+                        <div class="brand-ad-bg-image"></div><div class="brand-ad-gradient-overlay"></div>
+                        <div class="brand-ad-content">
+                            <div id="ad-badge-display" class="ad-badge"></div><div id="ad-header-display" class="ad-header"></div>
+                            <div class="ad-footer-row"><div id="ad-cta-display" class="ad-cta"></div><div class="ad-tag-btn">Coca-Cola Zéro</div></div>
                         </div>
                     </div>
-                </div>
 
-                <button class="eng-toggle-btn" onclick="toggleTranslationBox()">Afficher la traduction / Show English</button>
-                <div id="reader-translation-panel" class="english-translation-panel"></div>
+                    <div class="gateway-card">
+                        <h4>🎉 Lecture Terminée !</h4>
+                        <p>Validez vos acquis instantanément avec un défi basé sur ce texte.</p>
+                        <div class="gateway-btn-group">
+                            <button class="game-trigger-btn" onclick="openContextualOverlay('wordle')">🟩 Jouer Le Mot</button>
+                            <button class="game-trigger-btn" onclick="openContextualOverlay('findword')">🔍 Mots Cachés</button>
+                        </div>
+                    </div>
+
+                    <button class="eng-toggle-btn" onclick="toggleTranslationBox()">Afficher la traduction / Show English</button>
+                    <div id="reader-translation-panel" class="english-translation-panel"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="modal-game-wordle" class="game-overlay-modal">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <b style="font-family:Georgia,serif; font-size:16px;">Le Mot Contextuel</b>
+                <button class="back-btn" onclick="closeContextualOverlay('wordle')">✕ Fermer</button>
+            </div>
+            <div id="wordle-scaffold" class="game-scaffolding-hint"></div>
+            <div id="wordle-grid-box" class="wordle-grid"></div>
+            <div class="game-input-row">
+                <input type="text" id="wordle-typing-field" class="game-text-input" maxlength="5" placeholder="MOT">
+                <button class="refresh-btn" onclick="submitWordleGuess()">Valider</button>
+            </div>
+        </div>
+
+        <div id="modal-game-findword" class="game-overlay-modal">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <b style="font-family:Georgia,serif; font-size:16px;">Mots Cachés Direct</b>
+                <button class="back-btn" onclick="closeContextualOverlay('findword')">✕ Fermer</button>
+            </div>
+            <div id="findword-scaffold" class="game-scaffolding-hint"></div>
+            <div id="findword-grid-box" class="findword-grid"></div>
+            <div class="word-bank-box">
+                <div class="word-bank-title">Vocabulaire ciblé :</div>
+                <div id="findword-bank-list"></div>
             </div>
         </div>
     </div>
 
     <div class="bottom-nav">
-        <button class="nav-item active" onclick="switchActiveTab('view-news', this)">
-            <div class="nav-item-icon">📰</div><div>Actualités</div>
-        </button>
-        <button class="nav-item" onclick="switchActiveTab('view-flashcards', this)">
-            <div class="nav-item-icon">🎴</div><div>Flashcards (<span id="global-card-count">0</span>)</div>
-        </button>
+        <button id="nav-news" class="nav-item active" onclick="switchActiveTab('view-news', this)"><div class="nav-item-icon">📰</div><div>Actualités</div></button>
+        <button id="nav-games" class="nav-item" onclick="switchActiveTab('view-games', this)"><div class="nav-item-icon">🎮</div><div>Jeux & Vocab</div></button>
     </div>
 
     <div id="toast" class="toast"></div>
@@ -264,127 +277,47 @@
         let selectedArticle = null;
         let activeCardIndex = 0;
         let currentCarouselBatchIndex = 0; 
-        let activeLanguageHub = "fr"; // Default configuration target tracking
+        let activeLanguageHub = "fr"; 
         const levels = { 1: "A1", 2: "A2", 3: "B1", 4: "C1", 5: "Fluide" };
 
-        /* MULTI-TIER GEOGRAPHIC MATRIX DATABASE ENGINE */
+        let wordleTargetWord = "VERT";
+        let wordleCurrentRow = 0;
+        const wordleMaxGuesses = 6;
+        let activeFindWordTargets = [];
+
         const nativeDatabase = {
-            fr: [
-                { t: "Paris 2026: Modernisation verte majeure des places historiques", d: "La Mairie de Paris lance un plan de végétalisation massive pour transformer les grands axes routiers urbains en promenades ombragées." },
-                { t: "Rénovation et extension des pistes cyclables intra-muros", d: "De nouveaux aménagements protégés vont voir le jour pour fluidifier les déplacements écologiques dans le centre de la capitale." },
-                { t: "Nouveau festival culturel prévu le long de la Seine cet été", d: "Une alliance d'artistes locaux propose un parcours d'expositions gratuites en plein air pour dynamiser les quais parisiens." },
-                { t: "Inauguration d'un incubateur de start-ups écologiques à Bastille", d: "Ce nouvel espace va accueillir cinquante jeunes entreprises dédiées aux innovations technologiques environnementales." },
-                { t: "Plan de restauration pour les fontaines historiques de la ville", d: "Les monuments hydrauliques les plus célèbres vont bénéficier d'une modernisation de leurs circuits d'eau fermés." },
-                { t: "Ouverture prochaine d'un grand pôle de running au Bois de Boulogne", d: "Un centre d'accueil moderne va proposer des vestiaires, des parcours connectés et des conseils aux athlètes amateurs." },
-                { t: "Modernisation de l'éclairage public dans le Marais", d: "La ville déploie des systèmes LED intelligents pour préserver le patrimoine nocturne tout en réduisant la consommation." },
-                { t: "Exposition majeure dédiée au design urbain au Pavillon de l'Arsenal", d: "L'événement retrace un siècle d'innovations architecturales et présente les maquettes du Paris de demain." },
-                { t: "Création de potagers participatifs sur les toits des écoles", d: "Une initiative verte pour sensibiliser la jeune génération à l'agriculture urbaine et à la biodiversité." },
-                { t: "Nouveau plan de piétonnisation autour des grands monuments", d: "La circulation automobile sera restreinte le week-end aux abords directs des édifices les plus visités de la capitale." }
-            ],
-            de: [
-                { t: "Berlin 2026: Große grüne Modernisierung historischer Plätze", d: "Das Berliner Rathaus startet einen massiven Begrünungsplan, um städtische Hauptverkehrsachsen in schattige Promenaden zu verwandeln." },
-                { t: "Ausbau von geschützten Radwegen in der Innenstadt", d: "Neue geschützte Infrastrukturen werden entstehen, um die umweltfreundliche Mobilität im Zentrum zu verbessern." },
-                { t: "Neues Kulturfestival entlang der Spree für diesen Sommer geplant", d: "Eine Allianz lokaler Künstler bietet kostenlose Open-Air-Ausstellungen, um die Berliner Ufer zu beleben." },
-                { t: "Eröffnung eines Öko-Startup-Inkubators in Kreuzberg", d: "Dieser neue Raum wird fünfzig junge Unternehmen beherbergen, die sich mit umwelttechnologischen Innovationen befassen." },
-                { t: "Restaurierungsplan für historische Brunnen der Stadt", d: "Die berühmtesten Wassermonumente werden von einer Modernisierung ihrer geschlossenen Wasserkreisläufe profitieren." },
-                { t: "Neues großes Laufzentrum im Tiergarten öffnet bald", d: "Ein modernes Besucherzentrum wird Umkleidekabinen, vernetzte Strecken und Beratung für Amateursportler bieten." },
-                { t: "Modernisierung der Straßenbeleuchtung in Mitte", d: "Die Stadt setzt intelligente LED-Systeme ein, um das nächtliche Erbe zu bewahren und den Verbrauch zu senken." },
-                { t: "Große Ausstellung zum Thema Urban Design im Umspannwerk", d: "Die Veranstaltung zeichnet ein Jahrhundert architektonischer Innovationen nach und zeigt Modelle des Berlins von morgen." },
-                { t: "Schaffung von Gemeinschaftsgärten auf Schuldächern", d: "Eine grüne Initiative, um die junge Generation für urbane Landwirtschaft und Biodiversität zu sensibilisieren." },
-                { t: "Neuer Fußgängerzonenplan um wichtige Denkmäler", d: "Der Autoverkehr wird am Wochenende in der direkten Umgebung der meistbesuchten Gebäude eingeschränkt." }
-            ],
-            fi: [
-                { t: "Helsinki 2026: Historiallisten torien suuri vihreä uudistus", d: "Helsingin kaupunki aloittaa massiivisen viherryttämisohjelman muuttaakseen urbaaneja pääväyliä varjoisiksi kävelykaduiksi." },
-                { t: "Pyöräteiden laajentaminen ja kunnostaminen kantakaupungissa", d: "Uusia suojattuja reittejä rakennetaan sujuvoittamaan ympäristöystävällistä liikkumista pääkaupungin keskustassa." },
-                { t: "Uusi kulttuurifestivaali suunniteltu Suomenlinnan rannoille", d: "Paikallisten taiteilijoiden liitto tarjoaa ilmaisia ulkoilmanäyttelyitä merellisen Helsingin elävöittämiseksi." },
-                { t: "Ekologisten startup-yritysten hautomo avataan Kallioon", d: "Tämä uusi tila ottaa vastaan viisikymmentä nuorta yritystä, jotka keskittyvät ympäristöteknologian innovaatioihin." },
-                { t: "Kaupungin historiallisten suihkulähteiden kunnostusohjelma", d: "Kuuluisimmat vesimonumentit hyötyvät niiden suljettujen vesikiertojärjestelmien nykyaikaistamisesta." },
-                { t: "Uusi suuri juoksukeskus avataan pian Keskuspuistoon", d: "Moderni keskus tarjoaa pukuhuoneita, älykkäitä reittejä ja valmennusvinkkejä harrastajaurheilijoille." },
-                { t: "Katuvalaistuksen uudistaminen Töölössä led-teknologialla", d: "Kaupunki ottaa käyttöön älykkäitä LED-järjestelmiä säästääkseen energiaa ja suojellakseen pimeää kulttuuriperintöä." },
-                { t: "Suuri kaupunkisuunnittelun näyttely Kaapelitehtaalla", d: "Tapahtuma esittelee vuosisadan arkkitehtuurisia innovaatioita ja tulevaisuuden Helsingin pienoismalleja." },
-                { t: "Osallistuvien kasvimaiden perustaminen koulujen katoille", d: "Vihreä aloite nuoren sukupolven tietoisuuden lisäämiseksi kaupunkiviljelystä ja luonnon monimuotoisuudesta." },
-                { t: "Uusi kävelykatualueen laajennus keskeisten muistomerkkien ympärille", d: "Autoliikennettä rajoitetaan viikonloppuisin pääkaupungin vierailluimpien rakennusten välittömässä läheisyydessä." }
-            ],
-            europe: [
-                { t: "Bruxelles harmonise les normes énergétiques pour le logement", d: "L'Union Européenne adopte un texte majeur pour accélérer l'isolation thermique des bâtiments résidentiels publics." },
-                { t: "Coopération renforcée pour les trains à grande vitesse européens", d: "Les opérateurs ferroviaires annoncent de nouvelles lignes directes pour relier les grandes capitales sans escale." },
-                { t: "Sommet pour la protection de la biodiversité marine en Méditerranée", d: "Plusieurs pays côtiers s'engagent à élargir de manière stricte les zones maritimes totalement protégées." },
-                { t: "Nouveau programme de bourses pour la recherche spatiale", d: "L'Agence Spatiale Européenne va financer de nouveaux laboratoires universitaires dédiés à l'exploration robotique." },
-                { t: "Accord douanier simplifié pour les produits artisanaux régionaux", d: "Les parlements valident une directive facilitant l'exportation des savoir-faire traditionnels sur le continent." },
-                { t: "Plan européen pour la sauvegarde des forêts anciennes", d: "Une enveloppe financière dédiée va permettre de reboiser et de surveiller les parcs naturels sensibles." },
-                { t: "Mise en place d'un réseau unique de recharge électrique rapide", d: "Les grands axes routiers transfrontaliers seront équipés de bornes haute puissance tous les cinquante kilomètres." },
-                { t: "Protection renforcée pour les indications géographiques protégées", d: "L'Europe durcit les contrôles pour éviter les contrefaçons des produits du terroir sur les marchés internationaux." },
-                { t: "Création d'un orchestre philharmonique des jeunes d'Europe", d: "Cent musiciens talentueux issus de divers horizons vont participer à une grande tournée artistique continentale." },
-                { t: "Sommet de l'innovation numérique et des architectures cloud", d: "Les leaders de la tech se réunissent pour définir les standards de sécurité applicables aux données industrielles." }
-            ],
-            world: [
-                { t: "Transition globale: Hausse record des investissements solaires", d: "Les rapports internationaux indiquent un basculement historique vers les énergies renouvelables à l'échelle mondiale." },
-                { t: "Découverte archéologique majeure au cœur de la jungle d'Amérique centrale", d: "Des technologies laser révèlent les fondations oubliées d'une cité antique d'une ampleur insoupçonnée." },
-                { t: "Protocole international pour la sécurité des télécommunications", d: "Les nations s'accordent sur un traité cadre pour sécuriser les câbles sous-marins de transmission internet." },
-                { t: "Expédition scientifique réussie dans les fosses océaniques du Pacifique", d: "Des chercheurs observent des espèces vivantes uniques adaptées aux conditions de pression extrêmes." },
-                { t: "Conférence mondiale pour la gestion des réserves d'eau douce", d: "Les experts tirent la sonnette d'alarme et proposent des solutions de partage équitable des fleuves frontaliers." },
-                { t: "Succès d'une mission d'observation des astéroïdes géocroiseurs", d: "Un nouveau télescope spatial transmet des données cruciales pour cartographier les trajectoires des corps célestes." },
-                { t: "Plan mondial de lutte contre la pollution plastique des océans", d: "Une coalition industrielle s'engage à réduire la production de polymères non dégradables à usage unique." },
-                { t: "Sommet international pour le développement de la médecine préventive", d: "Les ministères partagent leurs stratégies pour anticiper les défis liés au vieillissement des populations." },
-                { t: "Déploiement de fermes agricoles connectées dans les zones arides", d: "Des systèmes d'irrigation gérés par capteurs permettent de faire pousser des cultures avec un minimum d'eau." },
-                { t: "Rapport annuel sur la stabilisation des écosystèmes forestiers tropicaux", d: "Les images satellites montrent un ralentissement encourageant de la déforestation dans les réserves majeures." }
-            ]
+            fr: [{ t: "Paris 2026: Modernisation verte des places", d: "La Mairie de Paris lance un plan de végétalisation massive pour transformer les axes routiers." }, { t: "Pistes cyclables intra-muros", d: "De nouveaux aménagements protégés vont voir le jour pour les déplacements écologiques." }],
+            de: [{ t: "Berlin 2026: Grüne Modernisierung", d: "Das Berliner Rathaus startet einen massiven Begrünungsplan für städtische Hauptverkehrsachsen." }, { t: "Ausbau von Radwegen", d: "Neue geschützte Infrastrukturen werden entstehen, um die Mobilität im Zentrum zu verbessern." }],
+            fi: [{ t: "Helsinki 2026: Vihreä uudistus", d: "Helsingin kaupunki aloittaa massiivisen viherryttämisohjelman muuttaakseen urbaaneja pääväyliä." }, { t: "Pyöräteiden laajentaminen keskustassa", d: "Uusia suojattuja reittejä rakennetaan sujuvoittamaan ympäristöystävällistä liikkumista." }],
+            europe: [{ t: "Bruxelles: Normes de logement", d: "L'Union Européenne adopte un texte pour accélérer l'isolation thermique continentale." }],
+            world: [{ t: "Transition globale: Hausse du solaire", d: "Les rapports internationaux indiquent un basculement historique vers les énergies renouvelables." }]
         };
 
-        /* CROSS-LANGUAGE COMPREHENSIVE LOCAL DICTIONARY MAP */
         const localMultiLanguageDict = {
-            fr: {
-                "ville": "city", "vert": "green", "verte": "green", "plan": "plan / map", "nouveau": "new",
-                "mairie": "city hall", "pistes": "tracks / lanes", "cyclables": "cycle paths", "centre": "center",
-                "espace": "space", "entreprises": "companies", "fontaines": "fountains", "eau": "water",
-                "bois": "woods / forest", "parcours": "route / path", "sport": "sport", "éclairage": "lighting"
-            },
-            de: {
-                "große": "large / great", "grüne": "green", "ausbau": "expansion / development", "plätze": "places / squares",
-                "rathaus": "city hall", "radwegen": "bike paths", "innenstadt": "city center", "neues": "new",
-                "kulturfestival": "cultural festival", "raum": "room / space", "unternehmen": "companies / startups",
-                "brunnen": "fountains / springs", "wasserkreisläufe": "water circuits", "laufzentrum": "running center"
-            },
-            fi: {
-                "suuri": "grand / large", "vihreä": "green", "uudistus": "reform / renewal", "torien": "squares / markets",
-                "kaupunki": "city / town", "pyöräteiden": "cycle paths", "laajentaminen": "expansion", "kantakaupungissa": "inner city",
-                "uusi": "new", "kulttuurifestivaali": "cultural festival", "tila": "space / room", "hautomo": "incubator"
-            }
+            fr: { "vert": "green", "ville": "city", "plan": "plan", "eau": "water" },
+            de: { "grün": "green", "raum": "space", "stadt": "city", "wind": "wind" },
+            fi: { "uusi": "new", "tila": "space", "meri": "sea", "puisto": "park" }
         };
 
-        const adMatrix = {
-            1: { header: "Partagez le goût de Coca-Cola. Sans sucre !", badge: "Nouveau goût !", cta: "Déjà goûté ?", eng: "[A1 Ad] Share the taste of Coca-Cola. Without sugar! / New taste! / Tried it?" },
-            2: { header: "Partagez le bon goût de Coca-Cola. Zéro sucre !", badge: "Nouvelle recette !", cta: "L'avez-vous essayé ?", eng: "[A2 Ad] Share the good taste... / New recipe! / Have you tried it?" },
-            3: { header: "Partagez le vrai goût de Coca-Cola, le sucre en moins.", badge: "Nouvelle Formule !", cta: "Qu'attendez-vous pour y goûter ?", eng: "[B1 Ad] Share the true taste... / New Formula! / What are you waiting for?" },
-            4: { header: "Partagez toute l'intensité de Coca-Cola, la culpabilité en moins.", badge: "Saveur réinventée !", cta: "Prêt à tenter l'expérience ?", eng: "[C1 Ad] Share all the intensity... / Re-invented flavor! / Ready for the experience?" },
-            5: { header: "Partagez le goût unique de Coca-Cola. Tout le plaisir, zéro sucre.", badge: "Pure intensité !", cta: "L'avez-vous testé ?", eng: "[Fluide Ad] Share the unique taste... / All the pleasure, zero sugar. / Tested it?" }
+        const gameContextWordsByLang = {
+            fr: [ { w: "VERT", h_en: "The color Paris is turning green.", h_nat: "La couleur de la nature." }, { w: "VILLE", h_en: "An urban metropolitan center.", h_nat: "Un grand centre urbain." } ],
+            de: [ { w: "GRÜN", h_en: "The color of environmental progress.", h_nat: "Die Farbe von Natur." }, { w: "STADT", h_en: "An urban environment.", h_nat: "Ein urbanes Gebiet." } ],
+            fi: [ { w: "UUSI", h_en: "Opposite of old.", h_nat: "Vanhan vastakohta." }, { w: "MERI", h_en: "The sea.", h_nat: "Suuri suolaisen veden alue." } ]
         };
+
+        const adMatrix = { 1: { header: "Coca-Cola Zéro. Sans sucre !", badge: "A1", cta: "Déjà goûté?", eng: "Without sugar." }, 2: { header: "Coca-Cola Zéro. Zéro sucre !", badge: "A2", cta: "Essayé ?", eng: "Zero sugar." }, 3: { header: "Le vrai goût de Coca-Cola, le sucre en moins.", badge: "B1", cta: "Qu'attendez-vous ?", eng: "True taste minus sugar." }, 4: { header: "Partagez l'intensité, la culpabilité en moins.", badge: "C1", cta: "Prêt ?", eng: "Intensity minus guilt." }, 5: { header: "Tout le plaisir, zéro sucre.", badge: "Fluide", cta: "Testé ?", eng: "All the pleasure, zero sugar." } };
 
         function getApiKey() {
             let key = localStorage.getItem('GEMINI_KEY');
-            if (!key) {
-                key = prompt("🔒 Clé API Google AI Studio requise pour l'analyse en direct :");
-                if (key) localStorage.setItem('GEMINI_KEY', key);
-            }
+            if (!key) { key = prompt("🔒 Clé API Google AI Studio requise :"); if (key) localStorage.setItem('GEMINI_KEY', key); }
             return key;
         }
-
-        function clearApiKey() {
-            localStorage.removeItem('GEMINI_KEY');
-            alert("Clé supprimée.");
-            location.reload();
-        }
-
-        function toggleSettingsDrawer() {
-            const drawer = document.getElementById('settings-drawer');
-            drawer.style.display = (drawer.style.display === 'block') ? 'none' : 'block';
-        }
-
+        function clearApiKey() { localStorage.removeItem('GEMINI_KEY'); alert("Clé supprimée."); location.reload(); }
+        function toggleSettingsDrawer() { const d = document.getElementById('settings-drawer'); d.style.display = (d.style.display === 'block') ? 'none' : 'block'; }
+        
         function handleLanguageHubChange() {
             activeLanguageHub = document.getElementById('setting-language-hub').value;
-            const countryLabels = { fr: "📍 Paris (Français)", de: "🇩🇪 Berlin (Deutsch)", fi: "🇫🇮 Helsinki (Suomi)" };
             document.getElementById('tab-local').innerText = `📍 Actu ${activeLanguageHub.toUpperCase()}`;
-            showToast(`Profil configuré sur : ${countryLabels[activeLanguageHub]}`);
             generateMultiFeedMatrix();
         }
 
@@ -393,128 +326,87 @@
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
             element.classList.add('active');
-            if (tabId === 'view-flashcards') renderFlashcards();
+            if (tabId === 'view-games') {
+                document.getElementById('hub-card-count-badge').innerText = vocabularyList.length;
+                document.getElementById('flashcard-game-runtime-zone').innerHTML = ''; 
+            }
         }
 
         function switchFeedPanel(panelKey) {
             document.querySelectorAll('.feed-tab-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.feed-panel').forEach(p => p.classList.remove('active'));
-            
             document.getElementById(`tab-${panelKey}`).classList.add('active');
             document.getElementById(`panel-${panelKey}`).classList.add('active');
         }
 
-        function rotateNewsCarousel() {
-            currentCarouselBatchIndex = (currentCarouselBatchIndex === 0) ? 1 : 0;
-            showToast(`🔄 Permutation : Affichage des articles ${currentCarouselBatchIndex === 0 ? "1 à 5" : "6 à 10"}`);
-            renderFeedModules();
-        }
+        function rotateNewsCarousel() { currentCarouselBatchIndex = (currentCarouselBatchIndex === 0) ? 1 : 0; renderFeedModules(); }
 
         function generateMultiFeedMatrix() {
-            newsArticlesCache = [];
-            let globalId = 0;
-
-            // Load localized profile assets alongside global segments
-            ['local', 'europe', 'world'].forEach(sectionKey => {
-                const sourceArray = (sectionKey === 'local') ? nativeDatabase[activeLanguageHub] : nativeDatabase[sectionKey];
-                
-                sourceArray.forEach(item => {
-                    newsArticlesCache.push({
-                        id: globalId,
-                        section: sectionKey,
-                        title: item.t,
-                        text: item.d,
-                        payload: null
+            newsArticlesCache = []; let globalId = 0;
+            ['local', 'europe', 'world'].forEach(sec => {
+                const src = (sec === 'local') ? nativeDatabase[activeLanguageHub] : nativeDatabase[sec];
+                if(src) {
+                    src.forEach(item => {
+                        newsArticlesCache.push({ id: globalId, section: sec, title: item.t, text: item.d, payloads: {} });
+                        globalId++;
                     });
-                    globalId++;
-                });
+                }
             });
-
             renderFeedModules();
         }
 
         function renderFeedModules() {
-            document.getElementById('panel-local').innerHTML = '';
-            document.getElementById('panel-europe').innerHTML = '';
-            document.getElementById('panel-world').innerHTML = '';
-
-            const startIndex = currentCarouselBatchIndex * 5;
-            const endIndex = startIndex + 5;
-
-            ['local', 'europe', 'world'].forEach(sectionKey => {
-                const targetBox = document.getElementById(`panel-${sectionKey}`);
-                const sectionItems = newsArticlesCache.filter(a => a.section === sectionKey);
-                const slicedBatch = sectionItems.slice(startIndex, endIndex);
-
-                slicedBatch.forEach(articleObj => {
-                    const card = document.createElement('div');
-                    card.className = 'content-card';
-                    card.onclick = () => runAiPipeline(articleObj.id);
-                    card.innerHTML = `<h3>${articleObj.title}</h3><p>${articleObj.text}</p>`;
-                    targetBox.appendChild(card);
+            ['local', 'europe', 'world'].forEach(sec => {
+                const box = document.getElementById(`panel-${sec}`); if(!box) return; box.innerHTML = '';
+                const items = newsArticlesCache.filter(a => a.section === sec).slice(currentCarouselBatchIndex*5, (currentCarouselBatchIndex*5)+5);
+                items.forEach(art => {
+                    const card = document.createElement('div'); card.className = 'content-card';
+                    card.onclick = () => runAiPipeline(art.id);
+                    card.innerHTML = `<h3>${art.title}</h3><p>${art.text}</p>`;
+                    box.appendChild(card);
                 });
             });
         }
 
         async function runAiPipeline(id) {
-            const key = getApiKey();
-            if (!key) return;
+            const key = getApiKey(); if (!key) return;
+            const article = newsArticlesCache.find(a => a.id === id); selectedArticle = article;
+            const currentTierLabel = levels[selectedLevelIndex];
 
-            const article = newsArticlesCache.find(a => a.id === id);
-            selectedArticle = article;
-
-            if (article.payload) { openReader(); return; }
+            if (article.payloads[currentTierLabel]) { openReader(); return; }
 
             document.getElementById('news-feeds-canvas').style.display = 'none';
             document.getElementById('loading-spinner-block').style.display = 'block';
 
-            // CRITICAL: DYNAMIC LANGUAGE INSTRUCTION LAYER INJECTED VIA SETTINGS SELECTION
-            const languageNames = { fr: "French", de: "German", fi: "Finnish" };
-            const targetLanguageName = (article.section === 'local') ? languageNames[activeLanguageHub] : "French";
+            await fetchTierPayload(article, currentTierLabel, key);
 
-            const promptText = `
-            Context: Title: ${article.title}. Text: ${article.text}
-            Task: Re-author this context text into exactly 3 complete, long, detailed, and comprehensive narrative paragraphs for EACH of these 5 language tiers: A1, A2, B1, C1, Fluide.
-            CRITICAL: The generated stories MUST be written entirely in ${targetLanguageName}.
-            Even the A1 and A2 tiers MUST be long and substantive text layouts (at least 6-8 full sentences per paragraph), using simple structural phrasing appropriate for that tier, but offering maximum reading length.
-            Provide matching English translations for each tier layout block.
-            Return ONLY a raw JSON structure matching this blueprint without markdown formatting:
-            {
-              "title": "${article.title}",
-              "A1": "<p>...</p><p>...</p><p>...</p>",
-              "A2": "<p>...</p><p>...</p><p>...</p>",
-              "B1": "<p>...</p><p>...</p><p>...</p>",
-              "C1": "<p>...</p><p>...</p><p>...</p>",
-              "Fluide": "<p>...</p><p>...</p><p>...</p>",
-              "Eng_A1": "English translation...", "Eng_A2": "English translation...", "Eng_B1": "English translation...", "Eng_C1": "English translation...", "Eng_Fluide": "English translation..."
-            }`;
+            document.getElementById('news-feeds-canvas').style.display = 'block';
+            document.getElementById('loading-spinner-block').style.display = 'none';
+            openReader();
+        }
+
+        async function fetchTierPayload(article, tier, apiKey) {
+            const languageNames = { fr: "French", de: "German", fi: "Finnish" };
+            const targetLang = (article.section === 'local') ? languageNames[activeLanguageHub] : "French";
+
+            const promptText = `Context: Title: ${article.title}. Text: ${article.text}
+            Task: Write exactly 3 long paragraphs for the text matching CEFR level ${tier} in continuous native ${targetLang}. 
+            Also provide the plain English translation of this text block.
+            Return ONLY a raw JSON structure matching this exact template without markdown wrappers:
+            {"title": "${article.title}", "text_block": "<p>...</p><p>...</p><p>...</p>", "english_translation": "..."}`;
 
             try {
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`, {
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: promptText }] }],
-                        generationConfig: { responseMimeType: "application/json" }
-                    })
+                    body: JSON.stringify({ contents: [{ parts: [{ text: promptText }] }], generationConfig: { responseMimeType: "application/json" } })
                 });
-
                 const data = await res.json();
-                let cleanJsonString = data.candidates[0].content.parts[0].text.trim();
-                
-                if(cleanJsonString.startsWith("```json")) {
-                    cleanJsonString = cleanJsonString.replace(/^```json/, "").replace(/```$/, "");
-                }
-
-                article.payload = JSON.parse(cleanJsonString);
-                
-                document.getElementById('news-feeds-canvas').style.display = 'block';
-                document.getElementById('loading-spinner-block').style.display = 'none';
-                openReader();
+                let cleanStr = data.candidates[0].content.parts[0].text.trim();
+                if(cleanStr.startsWith("```json")) cleanStr = cleanStr.replace(/^```json/, "").replace(/```$/, "");
+                article.payloads[tier] = JSON.parse(cleanStr);
             } catch (e) {
-                alert("Erreur d'analyse IA. Assurez-vous d'utiliser une clé API valide.");
-                document.getElementById('news-feeds-canvas').style.display = 'block';
-                document.getElementById('loading-spinner-block').style.display = 'none';
+                console.error("JIT Fetch Error", e);
             }
         }
 
@@ -523,99 +415,205 @@
             document.getElementById('view-reader').classList.add('active');
             renderContent();
         }
+        function exitReaderView() { document.getElementById('view-reader').classList.remove('active'); document.getElementById('view-news').classList.add('active'); }
 
-        function exitReaderView() {
-            document.getElementById('view-reader').classList.remove('active');
-            document.getElementById('view-news').classList.add('active');
+        async function handleLevelSliderChange(val) {
+            selectedLevelIndex = parseInt(val);
+            const currentTierLabel = levels[selectedLevelIndex];
+            document.getElementById('level-tag').innerText = currentTierLabel;
+
+            if(!selectedArticle.payloads[currentTierLabel]) {
+                const key = getApiKey();
+                document.getElementById('reader-dynamic-body-wrapper').style.opacity = '0.3';
+                document.getElementById('jit-loading-indicator').style.display = 'block';
+                await fetchTierPayload(selectedArticle, currentTierLabel, key);
+                document.getElementById('jit-loading-indicator').style.display = 'none';
+                document.getElementById('reader-dynamic-body-wrapper').style.opacity = '1';
+            }
+            renderContent();
         }
 
         function renderContent() {
-            const data = selectedArticle.payload;
-            const key = levels[selectedLevelIndex];
-            document.getElementById('level-tag').innerText = key;
+            const currentTierLabel = levels[selectedLevelIndex];
+            const data = selectedArticle.payloads[currentTierLabel];
+            if(!data) return;
+
             document.getElementById('reader-title-display').innerText = data.title;
 
-            let originalHtml = data[key];
-            let parserDummy = document.createElement('div');
-            parserDummy.innerHTML = originalHtml;
-            
+            let parserDummy = document.createElement('div'); parserDummy.innerHTML = data.text_block;
             let paragraphs = parserDummy.querySelectorAll('p');
-            let builtOutputHtml = "";
-
-            // Determine dict domain namespace
-            const activeDictLang = (selectedArticle.section === 'local') ? activeLanguageHub : 'fr';
-            const currentDictionaryNamespace = localMultiLanguageDict[activeDictLang] || localMultiLanguageDict['fr'];
-
+            let builtHtml = "";
+            
             paragraphs.forEach(p => {
-                let paragraphText = p.innerText;
-                let wordsArray = paragraphText.split(/(\s+)/);
-                let interactiveWordsMarkup = "";
-
+                let wordsArray = p.innerText.split(/(\s+)/);
+                let markup = "";
                 wordsArray.forEach(token => {
-                    if (token.trim().length === 0) {
-                        interactiveWordsMarkup += token; 
-                    } else {
+                    if (token.trim().length === 0) { markup += token; } 
+                    else {
                         let cleanWord = token.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?"']/g,"");
-                        let standardLower = cleanWord.toLowerCase();
-                        let targetTranslation = currentDictionaryNamespace[standardLower] || "Study Term";
-
-                        interactiveWordsMarkup += `<span class="w" data-lookup="${cleanWord}" data-translation="${targetTranslation}">${token}</span>`;
+                        // ⚡ FIX: We construct a clean phrase snippet context for context-aware validation later
+                        let surroundingContext = p.innerText.substring(Math.max(0, p.innerText.indexOf(token) - 30), Math.min(p.innerText.length, p.innerText.indexOf(token) + 40));
+                        markup += `<span class="w" data-lookup="${cleanWord}" data-context="...${surroundingContext.trim()}...">${token}</span>`;
                     }
                 });
-                builtOutputHtml += `<p>${interactiveWordsMarkup}</p>`;
+                builtHtml += `<p>${markup}</p>`;
             });
 
-            document.getElementById('reader-body-display').innerHTML = builtOutputHtml;
-
+            document.getElementById('reader-body-display').innerHTML = builtHtml;
             const ad = adMatrix[selectedLevelIndex];
             document.getElementById('ad-header-display').innerHTML = ad.header;
             document.getElementById('ad-badge-display').innerText = ad.badge;
             document.getElementById('ad-cta-display').innerText = ad.cta;
-
-            document.getElementById('reader-translation-panel').innerText = `${data["Eng_" + key]}\n\n===========================\n📊 PUBLICITÉ METRICS:\n${ad.eng}`;
+            document.getElementById('reader-translation-panel').innerText = data.english_translation;
             
+            /* ⚡ TOAST LOGIC RETENTION & CORRECTION MATRIX BUILDER */
             document.querySelectorAll('.reader-content span.w').forEach(el => {
                 el.onclick = function(e) {
                     e.stopPropagation();
-                    const surfaceWord = this.getAttribute('data-lookup');
-                    const translationValue = this.getAttribute('data-translation');
+                    const surf = this.getAttribute('data-lookup'); 
+                    const ctx = this.getAttribute('data-context');
+                    showToast(`🎴 Saved to Game Deck: <b>${surf}</b>`);
                     
-                    showToast(`💡 <b>${surfaceWord}</b> enregistré dans les Flashcards !`);
-                    
-                    if(!vocabularyList.find(v => v.fr.toLowerCase() === surfaceWord.toLowerCase())) {
-                        vocabularyList.push({ fr: surfaceWord, en: translationValue });
-                        document.getElementById('global-card-count').innerText = vocabularyList.length;
+                    if(!vocabularyList.find(v => v.target.toLowerCase() === surf.toLowerCase())) {
+                        vocabularyList.push({ target: surf, context: ctx });
+                        document.getElementById('hub-card-count-badge').innerText = vocabularyList.length;
                     }
                 };
             });
         }
 
-        function toggleTranslationBox() {
-            const p = document.getElementById('reader-translation-panel');
-            p.style.display = (p.style.display === 'block') ? 'none' : 'block';
+        function toggleTranslationBox() { const p = document.getElementById('reader-translation-panel'); p.style.display = (p.style.display === 'block') ? 'none' : 'block'; }
+
+        function openContextualOverlay(gameKey) {
+            document.getElementById(`modal-game-${gameKey}`).style.display = 'block';
+            if (gameKey === 'wordle') initContextualWordle();
+            if (gameKey === 'findword') initContextualFindWord();
         }
 
-        function renderFlashcards() {
-            const w = document.getElementById('deck-wrapper');
+        function closeContextualOverlay(gameKey) { document.getElementById(`modal-game-${gameKey}`).style.display = 'none'; }
+
+        function initContextualWordle() {
+            const pools = gameContextWordsByLang[activeLanguageHub] || gameContextWordsByLang['fr'];
+            const randomPick = pools[Math.floor(Math.random() * pools.length)];
+            wordleTargetWord = randomPick.w.toUpperCase(); wordleCurrentRow = 0;
+
+            const hintBox = document.getElementById('wordle-scaffold');
+            if (selectedLevelIndex <= 2) {
+                hintBox.innerHTML = `<b>💡 Support CEFR (A1/A2):</b> Clue: ${randomPick.h_en}`;
+            } else {
+                hintBox.innerHTML = `<b>🧠 Défi CEFR (${levels[selectedLevelIndex]}):</b> Clue: ${randomPick.h_nat}`;
+            }
+
+            const gridBox = document.getElementById('wordle-grid-box'); gridBox.innerHTML = '';
+            for (let i = 0; i < wordleMaxGuesses; i++) {
+                const row = document.createElement('div'); row.className = 'wordle-row';
+                for (let j = 0; j < wordleTargetWord.length; j++) {
+                    const cell = document.createElement('div'); cell.className = 'wordle-cell'; cell.id = `ctx-w-cell-${i}-${j}`;
+                    row.appendChild(cell);
+                }
+                gridBox.appendChild(row);
+            }
+        }
+
+        function submitWordleGuess() {
+            const field = document.getElementById('wordle-typing-field');
+            let guess = field.value.trim().toUpperCase();
+            if (guess.length !== wordleTargetWord.length) { showToast("⚠️ Longueur incorrecte."); return; }
+
+            for (let j = 0; j < wordleTargetWord.length; j++) {
+                const cell = document.getElementById(`ctx-w-cell-${wordleCurrentRow}-${j}`);
+                cell.innerText = guess[j];
+                if (guess[j] === wordleTargetWord[j]) cell.classList.add('correct');
+                else if (wordleTargetWord.includes(guess[j])) cell.classList.add('present');
+                else cell.classList.add('absent');
+            }
+            if (guess === wordleTargetWord) { showToast("🎉 Gagné !"); field.value = ''; return; }
+            wordleCurrentRow++; field.value = '';
+            if (wordleCurrentRow >= wordleMaxGuesses) showToast(`Terminé. Mot: ${wordleTargetWord}`);
+        }
+
+        function initContextualFindWord() {
+            const sourceVocabulary = localMultiLanguageDict[activeLanguageHub] || localMultiLanguageDict['fr'];
+            activeFindWordTargets = Object.keys(sourceVocabulary).map(k => k.toUpperCase()).slice(0, 3);
+
+            const hintBox = document.getElementById('findword-scaffold');
+            const bankBox = document.getElementById('findword-bank-list'); bankBox.innerHTML = '';
+
+            if (selectedLevelIndex <= 2) {
+                hintBox.innerHTML = `<b>💡 Support A1/A2:</b> Repérez les lettres.`;
+                activeFindWordTargets.forEach(w => bankBox.innerHTML += `<span class="bank-item" id="ctx-bi-${w}">${w}</span>`);
+            } else {
+                hintBox.innerHTML = `<b>🧠 Défi ${levels[selectedLevelIndex]}:</b> Trouvez le mot correspondant à l'anglais.`;
+                activeFindWordTargets.forEach(w => bankBox.innerHTML += `<span class="bank-item" id="ctx-bi-${w}">"${sourceVocabulary[w.toLowerCase()]}"</span>`);
+            }
+
+            const gridBox = document.getElementById('findword-grid-box'); gridBox.innerHTML = '';
+            const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            for(let i=0; i<48; i++) {
+                const cell = document.createElement('div'); cell.className = 'findword-cell';
+                cell.innerText = letters[Math.floor(Math.random() * 26)];
+                cell.onclick = function() { this.classList.toggle('selected'); evaluateFindWordGrid(); };
+                gridBox.appendChild(cell);
+            }
+            const cells = gridBox.querySelectorAll('.findword-cell');
+            if(activeFindWordTargets.length > 0 && cells.length > 8) {
+                let firstWord = activeFindWordTargets[0];
+                for(let j=0; j<firstWord.length; j++) { if(cells[j]) cells[j].innerText = firstWord[j]; }
+            }
+        }
+
+        function evaluateFindWordGrid() {
+            const cells = document.getElementById('findword-grid-box').querySelectorAll('.findword-cell.selected');
+            let built = ""; cells.forEach(c => built += c.innerText);
+            activeFindWordTargets.forEach(t => {
+                if(built.includes(t) || t === built) {
+                    const item = document.getElementById(`ctx-bi-${t}`);
+                    if(item && !item.classList.contains('found')) { item.classList.add('found'); showToast(`🎯 Trouvé : ${t}!`); }
+                }
+            });
+        }
+
+        /* 🎴 NEW SPRINT GAME MODULE: FLASHCARDS INTEGRATED INTO COIN JEUX */
+        function launchFlashcardSprintGame() {
+            const zone = document.getElementById('flashcard-game-runtime-zone');
             if (vocabularyList.length === 0) {
-                w.innerHTML = `<div class="empty-deck"><p>Votre carnet de vocabulaire est vide. Touchez n'importe quel mot d'un article pour commencer.</p></div>`;
-                return;
+                zone.innerHTML = `<div class="empty-deck"><p>Votre carnet de sprint est vide. Touchez des mots dans les articles pour alimenter le deck !</p></div>`; return;
             }
             if (activeCardIndex >= vocabularyList.length) activeCardIndex = 0;
             const card = vocabularyList[activeCardIndex];
-            w.innerHTML = `
+            
+            zone.innerHTML = `
                 <div class="flashcard-container">
-                    <div class="card-counter">Mot ${activeCardIndex + 1} / ${vocabularyList.length}</div>
-                    <div class="flashcard" onclick="document.getElementById('fc-back').style.display = (document.getElementById('fc-back').style.display === 'block') ? 'none' : 'block'">
-                        <div class="word-surface">${card.fr}</div>
-                        <div class="word-translation" id="fc-back">${card.en}</div>
-                        <div class="card-hint">Tapez pour retourner la carte</div>
+                    <div class="card-counter">Sprint Vocabulaire: Mot ${activeCardIndex + 1} / ${vocabularyList.length}</div>
+                    <div class="flashcard" onclick="toggleSprintContextSentence()">
+                        <div class="word-surface">${card.target}</div>
+                        <div class="word-context" id="sprint-context-box" style="display:none;">${card.context}</div>
+                        <div class="card-hint" id="sprint-hint-text">Tapez pour voir le contexte original</div>
                     </div>
                     <div class="card-controls">
-                        <button class="card-btn btn-unknown" onclick="activeCardIndex++; renderFlashcards();">Je ne sais pas</button>
-                        <button class="card-btn btn-know" onclick="vocabularyList.splice(activeCardIndex, 1); document.getElementById('global-card-count').innerText = vocabularyList.length; renderFlashcards();">Je sais ✅</button>
+                        <button class="card-btn btn-unknown" onclick="activeCardIndex++; launchFlashcardSprintGame();">À revoir 🔄</button>
+                        <button class="card-btn btn-know" onclick="archiveSprintWord(${activeCardIndex});">Acquis ✅</button>
                     </div>
                 </div>`;
+        }
+
+        function toggleSprintContextSentence() {
+            const box = document.getElementById('sprint-context-box');
+            const hint = document.getElementById('sprint-hint-text');
+            if (box.style.display === 'none') {
+                box.style.display = 'block';
+                hint.innerText = "Touchez à nouveau pour masquer";
+            } else {
+                box.style.display = 'none';
+                hint.innerText = "Tapez pour voir le contexte original";
+            }
+        }
+
+        function archiveSprintWord(index) {
+            vocabularyList.splice(index, 1);
+            document.getElementById('hub-card-count-badge').innerText = vocabularyList.length;
+            showToast("🎯 Mot validé et archivé !");
+            launchFlashcardSprintGame();
         }
 
         function showToast(msg) {
@@ -624,8 +622,7 @@
         }
 
         document.getElementById('level-slider').addEventListener('input', function() {
-            selectedLevelIndex = parseInt(this.value);
-            renderContent();
+            handleLevelSliderChange(this.value);
         });
 
         window.onload = function() { generateMultiFeedMatrix(); };
