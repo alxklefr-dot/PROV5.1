@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LangSift Direct v6.0</title>
+    <title>LangSift Direct v6.2</title>
     <style>
         :root {
             --bg-color: #fdfbf7;
@@ -57,7 +57,6 @@
         .story-timeline-stamp { font-size: 11px; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.8px; margin-bottom: 20px; font-weight: bold; }
         .text-block p { font-size: 17px; line-height: 1.9; margin-bottom: 22px; text-align: justify; }
         
-        /* CLICKABLE WORD HIGHLIGHTS */
         .reader-content span.w { cursor: pointer; padding: 0 2px; border-radius: 3px; transition: background 0.15s ease; border-bottom: 1px dotted rgba(140,120,83,0.4); }
         .reader-content span.w:hover { background-color: var(--accent-light); color: black; }
 
@@ -67,31 +66,16 @@
         .gateway-btn-group { display: flex; gap: 10px; justify-content: center; }
         .game-trigger-btn { background-color: var(--accent-color); color: white; border: none; padding: 10px 16px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; box-shadow: 0 3px 8px rgba(140,120,83,0.3); }
 
-        .game-overlay-modal { display: none; position: fixed; top: 135px; bottom: 65px; left: 0; right: 0; background: var(--card-bg); z-index: 2000; box-shadow: 0 -10px 30px rgba(0,0,0,0.15); border-radius: 24px 24px 0 0; padding: 24px; overflow-y: auto; box-sizing: border-box; }
-        .game-scaffolding-hint { background-color: rgba(140, 120, 83, 0.1); border-left: 3px solid var(--accent-color); padding: 10px; border-radius: 4px; font-size: 12px; margin-bottom: 15px; font-style: italic; line-height: 1.4; }
+        /* RELIABLE VISUAL SPONSOR AD LAYOUT BOX */
+        .brand-ad-card { position: relative; min-height: 140px; border-radius: 14px; overflow: hidden; margin: 30px 0; box-shadow: 0 5px 15px rgba(0,0,0,0.12); background-color: #1a1a1a; }
+        .brand-ad-bg-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; z-index: 1; opacity: 0.4; }
+        .brand-ad-content { position: relative; z-index: 3; padding: 16px; color: white; display: flex; flex-direction: column; justify-content: space-between; min-height: 140px; box-sizing: border-box; }
+        .ad-badge { align-self: flex-start; background: var(--accent-color); color: white; font-size: 10px; font-weight: bold; padding: 3px 8px; border-radius: 10px; text-transform: uppercase; }
+        .ad-header { font-size: 13.5px; margin: 8px 0; line-height: 1.45; color: #f5f5f5; font-weight: 500; }
+        .ad-footer-row { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 8px; }
+        .ad-cta { font-size: 11px; font-weight: bold; color: var(--accent-light); text-decoration: underline; }
+        .ad-brand-pill { background: rgba(255,255,255,0.25); color: white; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: bold; }
         
-        .game-menu-container { display: flex; flex-direction: column; gap: 12px; }
-        .game-card-launcher { background: white; border: 1px solid rgba(0,0,0,0.06); border-radius: 14px; padding: 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; box-shadow: 0 3px 10px rgba(0,0,0,0.02); }
-        .game-card-launcher h3 { margin: 0 0 4px 0; font-size: 16px; font-family: Georgia, serif; }
-        .game-card-launcher p { margin: 0; font-size: 12px; color: var(--text-muted); }
-        .game-badge-counter { background: var(--accent-light); color: var(--accent-color); padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; }
-
-        .eng-toggle-btn { display: block; margin: 25px auto; background: none; border: 1px solid var(--accent-color); color: var(--accent-color); padding: 8px 18px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; }
-        .english-translation-panel { background-color: #f3f0ea; border-left: 4px solid var(--accent-color); padding: 16px; font-size: 14.5px; color: #444; line-height: 1.6; white-space: pre-line; display: none; margin-bottom: 35px; border-radius: 0 8px 8px 0; }
-        
-        /* PREMIUM BRAND ADS STYLING */
-        .brand-ad-card { position: relative; min-height: 160px; border-radius: 16px; overflow: hidden; margin: 35px 0; box-shadow: 0 8px 24px rgba(0,0,0,0.18); background-color: #111; border: 1px solid rgba(0,0,0,0.1); }
-        .brand-ad-bg-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; z-index: 1; opacity: 0.85; }
-        .brand-ad-gradient-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.6) 60%, rgba(0,0,0,0.4) 100%); z-index: 2; }
-        .brand-ad-content { position: relative; z-index: 3; padding: 20px; color: white; display: flex; flex-direction: column; justify-content: space-between; min-height: 160px; box-sizing: border-box; }
-        .brand-ad-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px; text-align: center; font-weight: bold; }
-        .ad-badge { align-self: flex-start; background: var(--accent-color); color: white; font-size: 10px; font-weight: bold; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .ad-header { font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-size: 14px; margin: 10px 0; line-height: 1.5; color: #f5f5f5; }
-        .ad-footer-row { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 10px; margin-top: 5px; }
-        .ad-cta { font-size: 12px; font-weight: bold; color: var(--accent-light); text-decoration: underline; }
-        .ad-brand-pill { background: rgba(255,255,255,0.2); color: white; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; }
-        
-        /* DICTIONARY MODAL POPUP */
         .dict-modal { display: none; position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%); width: calc(100% - 40px); max-width: 460px; background: #2c2520; color: #fff; padding: 16px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 4000; box-sizing: border-box; }
         .dict-title { font-size: 18px; font-weight: bold; margin-bottom: 4px; color: var(--accent-light); display: flex; justify-content: space-between; }
         .dict-translation { font-size: 14px; font-style: italic; margin-bottom: 8px; color: #ddd; }
@@ -108,7 +92,6 @@
         .card-controls { display: flex; gap: 12px; margin-top: 20px; width: 100%; max-width: 340px; }
         .card-btn { flex: 1; padding: 12px; border-radius: 25px; border: none; font-weight: bold; color: white; cursor: pointer; font-size: 13px; }
         .btn-unknown { background-color: var(--accent-color); }
-        .empty-deck { text-align: center; color: var(--text-muted); padding: 40px; }
         
         .wordle-grid { display: flex; flex-direction: column; gap: 5px; align-items: center; margin-bottom: 15px; }
         .wordle-row { display: flex; gap: 5px; }
@@ -133,6 +116,8 @@
         .nav-item-icon { font-size: 18px; margin-bottom: 2px; }
         .toast { position: fixed; bottom: 80px; background: #2c2520; color: #fff; padding: 10px 18px; border-radius: 20px; font-size: 13px; display: none; z-index: 3000; text-align: center; max-width: 80%; }
         .jit-level-spinner { display: none; text-align: center; padding: 30px; font-style: italic; color: var(--text-muted); }
+        .eng-toggle-btn { display: block; margin: 25px auto; background: none; border: 1px solid var(--accent-color); color: var(--accent-color); padding: 8px 18px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; }
+        .english-translation-panel { background-color: #f3f0ea; border-left: 4px solid var(--accent-color); padding: 16px; font-size: 14.5px; color: #444; line-height: 1.6; white-space: pre-line; display: none; margin-bottom: 35px; border-radius: 0 8px 8px 0; }
     </style>
 </head>
 <body>
@@ -176,28 +161,25 @@
         <div id="view-games" class="menu-view">
             <div class="app-header">
                 <h1>Le Coin Jeux</h1>
-                <p id="game-subtitle-text">Puzzles contextuels et révisions ludiques</p>
+                <p>Puzzles contextuels et révisions ludiques</p>
             </div>
-
             <div class="game-scaffolding-hint" style="border-left-color: var(--success-color); background: rgba(108,171,100,0.08); margin-bottom:20px;">
                 <b>💡 Guide de Jeu:</b> Tous les mots vus en lecture ou présents dans les annonces sponsors sont inclus comme cibles actives !
             </div>
-            
             <div class="game-menu-container">
                 <div class="game-card-launcher" onclick="openContextualOverlay('wordle')">
-                    <div><h3 id="lbl-g1-title">Le Mot (Wordle)</h3><p id="lbl-g1-desc">Devinez le mot de l'actu du jour.</p></div>
+                    <div><h3>Le Mot (Wordle)</h3><p>Devinez le mot de l'actu du jour.</p></div>
                     <div style="font-size:24px;">🟩</div>
                 </div>
                 <div class="game-card-launcher" onclick="openContextualOverlay('findword')">
-                    <div><h3 id="lbl-g2-title">Mots Cachés (Bilingue)</h3><p id="lbl-g2-desc">Trouvez les expressions clés lues.</p></div>
+                    <div><h3>Mots Cachés (Bilingue)</h3><p>Trouvez les expressions clés lues.</p></div>
                     <div style="font-size:24px;">🔍</div>
                 </div>
                 <div class="game-card-launcher" onclick="launchFlashcardSprintGame()">
-                    <div><h3 id="lbl-g3-title">Sprint Vocabulaire</h3><p id="lbl-g3-desc">Testez vos mots sauvegardés au fil des lectures.</p></div>
+                    <div><h3>Sprint Vocabulaire</h3><p>Testez vos mots sauvegardés au fil des lectures.</p></div>
                     <div class="game-badge-counter" id="hub-card-count-badge">0</div>
                 </div>
             </div>
-
             <div id="flashcard-game-runtime-zone" style="margin-top:25px;"></div>
         </div>
 
@@ -219,32 +201,31 @@
                 <div id="reader-dynamic-body-wrapper">
                     <div id="reader-title-display" class="story-title"></div>
                     <div id="reader-timeline-display" class="story-timeline-stamp"></div>
-                    <div id="reader-body-display" class="text-block"></div>
                     
-                    <div id="ad-top-sponsor-label" class="brand-ad-label">Sponsorisé</div>
                     <div id="brand-ad-placement" class="brand-ad-card">
                         <div class="brand-ad-bg-image" id="ad-background-asset"></div>
-                        <div class="brand-ad-gradient-overlay"></div>
                         <div class="brand-ad-content">
-                            <div id="ad-badge-display" class="ad-badge">PROMO</div>
-                            <div id="ad-header-display" class="ad-header">TEXT AD LOADING...</div>
+                            <div id="ad-badge-display" class="ad-badge">SPONSOR</div>
+                            <div id="ad-header-display" class="ad-header">Loading simple localized copy...</div>
                             <div class="ad-footer-row">
-                                <div id="ad-cta-display" class="ad-cta">En savoir plus</div>
+                                <div id="ad-cta-display" class="ad-cta">Savoir plus</div>
                                 <div class="ad-brand-pill" id="ad-brand-pill">Brand</div>
                             </div>
                         </div>
                     </div>
 
+                    <div id="reader-body-display" class="text-block"></div>
+
                     <div class="gateway-card">
-                        <h4 id="lbl-completion-title">🎉 Lecture Terminée !</h4>
-                        <p id="lbl-completion-desc">Validez vos acquis instantanément avec un défi basé sur ce texte.</p>
+                        <h4>🎉 Lecture Terminée !</h4>
+                        <p>Validez vos acquis instantanément avec un défi basé sur ce texte.</p>
                         <div class="gateway-btn-group">
-                            <button class="game-trigger-btn" id="lbl-btn-g1" onclick="openContextualOverlay('wordle')">🟩 Jouer Le Mot</button>
-                            <button class="game-trigger-btn" id="lbl-btn-g2" onclick="openContextualOverlay('findword')">🔍 Mots Cachés</button>
+                            <button class="game-trigger-btn" onclick="openContextualOverlay('wordle')">🟩 Jouer Le Mot</button>
+                            <button class="game-trigger-btn" onclick="openContextualOverlay('findword')">🔍 Mots Cachés</button>
                         </div>
                     </div>
 
-                    <button class="eng-toggle-btn" id="lbl-toggle-eng-btn" onclick="toggleTranslationBox()">Afficher la traduction / Show English</button>
+                    <button class="eng-toggle-btn" onclick="toggleTranslationBox()">Afficher la traduction / Show English</button>
                     <div id="reader-translation-panel" class="english-translation-panel"></div>
                 </div>
             </div>
@@ -252,26 +233,26 @@
 
         <div id="modal-game-wordle" class="game-overlay-modal">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                <b id="lbl-modal-g1-header" style="font-family:Georgia,serif; font-size:16px;">Le Mot Contextuel</b>
+                <b style="font-family:Georgia,serif; font-size:16px;">Le Mot Contextuel</b>
                 <button class="back-btn" onclick="closeContextualOverlay('wordle')">✕</button>
             </div>
             <div id="wordle-scaffold" class="game-scaffolding-hint"></div>
             <div id="wordle-grid-box" class="wordle-grid"></div>
             <div class="game-input-row">
                 <input type="text" id="wordle-typing-field" class="game-text-input" maxlength="5" placeholder="MOT">
-                <button class="refresh-btn" id="lbl-wordle-submit" onclick="submitWordleGuess()">Valider</button>
+                <button class="refresh-btn" onclick="submitWordleGuess()">Valider</button>
             </div>
         </div>
 
         <div id="modal-game-findword" class="game-overlay-modal">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                <b id="lbl-modal-g2-header" style="font-family:Georgia,serif; font-size:16px;">Mots Cachés Direct</b>
+                <b style="font-family:Georgia,serif; font-size:16px;">Mots Cachés Direct</b>
                 <button class="back-btn" onclick="closeContextualOverlay('findword')">✕</button>
             </div>
             <div id="findword-scaffold" class="game-scaffolding-hint"></div>
             <div id="findword-grid-box" class="findword-grid"></div>
             <div class="word-bank-box">
-                <div class="word-bank-title" id="lbl-findword-bank-title">Vocabulaire Apparié :</div>
+                <div class="word-bank-title">Vocabulaire Apparié :</div>
                 <div id="findword-bank-list"></div>
             </div>
         </div>
@@ -284,8 +265,8 @@
     </div>
 
     <div class="bottom-nav">
-        <button id="nav-news" class="nav-item active" onclick="switchActiveTab('view-news', this)"><div class="nav-item-icon">📰</div><div id="lbl-nav-news">Actualités</div></button>
-        <button id="nav-games" class="nav-item" onclick="switchActiveTab('view-games', this)"><div class="nav-item-icon">🎮</div><div id="lbl-nav-games">Jeux & Vocab</div></button>
+        <button id="nav-news" class="nav-item active" onclick="switchActiveTab('view-news', this)"><div class="nav-item-icon">📰</div><div>Actualités</div></button>
+        <button id="nav-games" class="nav-item" onclick="switchActiveTab('view-games', this)"><div class="nav-item-icon">🎮</div><div>Jeux & Vocab</div></button>
     </div>
 
     <div id="toast" class="toast"></div>
@@ -304,14 +285,6 @@
         const wordleMaxGuesses = 6;
         let activeFindWordTargets = [];
 
-        const nativeInterfaceLexicon = {
-            fr: { navNews: "Actualités", navGames: "Jeux & Vocab", gameSubtitle: "Puzzles contextuels et révisions ludiques" },
-            de: { navNews: "Nachrichten", navGames: "Spiele Hub", gameSubtitle: "Kontextuelle Rätsel" },
-            fi: { navNews: "Uutiset", navGames: "Pelit & Sanasto", gameSubtitle: "Kontekstuaaliset pelit" },
-            es: { navNews: "Noticias", navGames: "Zona de Juegos", gameSubtitle: "Rompecabezas contextuales" }
-        };
-
-        /* STRICT COMPLIANCE: 3 PARIS, 1 EUROPE, 1 WORLD */
         const nativeDatabase = {
             fr: [
                 { t: "Paris 2026: Végétalisation des grands boulevards", d: "La Mairie de Paris lance un plan massif pour transformer les axes routiers en forêts urbaines. Ce projet va amener de la fraîcheur verte en ville.", age: 0 },
@@ -326,7 +299,7 @@
             fi: [
                 { t: "Helsinki 2026: Esplanadin vihreä kasvo", d: "Helsingin kaupunki aloittaa uuden ohjelman taskupuistojen rakentamiseksi keskustaan.", age: 0 },
                 { t: "Baana-verkoston talvikunnossapito paranee", d: "Uutta teknologiaa otetaan käyttöön pyöräväylien sulana pitämiseksi ympäri vuoden.", age: 0 },
-                { t: "Raitiovaunulinjojen laajennus käynnistyy", d: "Helsinki investoi sähköiseen joukkoliikenteeseen liittäen uusia kaupunginosia verkkoon.", age: 1 }
+                { t: "Raitiovaunulinjojen laajennus käynnistyy", d: "Helsinki investoi sähköiseen joukkoliikenessen liittäen uusia kaupunginosia verkkoon.", age: 1 }
             ],
             es: [
                 { t: "Madrid 2026: Remodelación verde de plazas", d: "El Ayuntamiento activa un plan de reforestación para transformar avenidas en corredores bioclimáticos.", age: 0 },
@@ -341,7 +314,6 @@
             ]
         };
 
-        /* LOCAL BACKUP GENERATOR DICTIONARY FOR PRE-POPULATING WITHOUT FAILURE */
         const localMultiLanguageDict = {
             "végétalisation": "Greening/Planting", "grands": "Large/Grand", "boulevards": "Boulevards", "mairie": "City Hall", "massif": "Massive",
             "axes": "Axes/Roads", "routiers": "Roadways", "forêts": "Forests", "urbaines": "Urban", "projet": "Project", "amener": "To bring",
@@ -357,12 +329,12 @@
             es: [ { w: "VERDE", h_en: "Green profile.", h_nat: "El color de la vegetación." }, { w: "COCHE", h_en: "Car.", h_nat: "Vehículo con motor." } ]
         };
 
-        /* PREMIUM BRAND ADS CAMPAIGNS MARKETING MATRIX */
+        /* REWRITTEN A1-ACCESSIBLE SIMPLIFIED AD COPY PLATFORM */
         const adMatrix = {
-            fr: { header: "Découvrez le goût unique du nouveau Coca-Cola Zéro Citron. Tout le plaisir rafraîchissant, <b>sans</b> sucre et avec une touche de <b>citron</b> pressé. Servir très frais avec des glaçons.", badge: "Sponsorisé", cta: "Savourer l'instant", brand: "Coke Zéro Sugar", img: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&q=80&w=600" },
-            de: { header: "Bereit für das nächste Level? Der neue BMW CE 04 bringt dich elektrisch, geräuschlos und extrem <b>schnell</b> durch die <b>Stadt</b>. Erlebe urbane Mobilität völlig neu.", badge: "Anzeige", cta: "Probefahrt buchen", brand: "BMW Motorrad", img: "https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&q=80&w=600" },
-            fi: { header: "Tee kahvihetkestäsi parempi. Kaada kuppiisi täyteläistä Oatly Barista -kaurajuomaa. Se vaahtoutuu täydellisesti. Kokeile tätä <b>uutta</b> suosikkia ilman tavallista <b>maitoa</b>.", badge: "Mainos", cta: "Lue lisää", brand: "Oatly Barista", img: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&q=80&w=600" },
-            es: { header: "Muévete sin límites por el centro. El nuevo SEAT Ibiza es el <b>coche</b> híbrido ideal para devorar la <b>ciudad</b> cuidando el medio ambiente. La conducción urbana es <b>verde</b>.", badge: "Patrocinado", cta: "Configurar ahora", brand: "SEAT España", img: "https://images.unsplash.com/photo-1617788138017-80ad40651399?auto=format&fit=crop&q=80&w=600" }
+            fr: { header: "Tu aimes le bon goût ? Regarde le nouveau <b>Coca-Cola Zéro Citron</b> ! C'est frais, c'est bon, et il n'y a pas de sucre. Un vrai plaisir simple pour la journée.", badge: "Annonce A1", cta: "Acheter maintenant", brand: "Coca-Cola", img: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&q=80&w=600" },
+            de: { header: "Fährst du gern durch die <b>Stadt</b>? Der neue <b>BMW CE 04</b> ist voll elektrisch, super <b>schnell</b> und leise. Das ist die neue Mobilität für dich.", badge: "Anzeige A1", cta: "Hier sehen", brand: "BMW Motorrad", img: "https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&q=80&w=600" },
+            fi: { header: "Juotko hyvää kahvia? Ota uusi <b>Oatly Barista</b>! Se on hyvää kaurajuomaa ilman tavallista <b>maitoa</b>. Kokeile heti tänään.", badge: "Mainos A1", cta: "Katso tästä", brand: "Oatly", img: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&q=80&w=600" },
+            es: { header: "¿Necesitas un buen <b>coche</b> para la <b>ciudad</b>? El nuevo SEAT Ibiza es híbrido, económico y muy <b>verde</b>. Conduce de forma fácil y limpia hoy.", badge: "Anuncio A1", cta: "Ver detalles", brand: "SEAT", img: "https://images.unsplash.com/photo-1617788138017-80ad40651399?auto=format&fit=crop&q=80&w=600" }
         };
 
         function getApiKey() { return localStorage.getItem('GEMINI_KEY'); }
@@ -397,21 +369,18 @@
             document.getElementById(`panel-${panelKey}`).classList.add('active');
         }
 
-        /* GUARANTEED MATRIX LAYOUT CONFIGURATION */
+        /* HARD-TARGETED 3 LOCAL / 1 EUROPE / 1 WORLD SEED MATRIX MAPPER */
         function generateMultiFeedMatrix() {
             newsArticlesCache = []; 
             
-            // 1. Gather precisely the 3 Local articles matching the selected track
             const localSource = nativeDatabase[activeLanguageHub] || nativeDatabase['fr'];
             localSource.forEach((item, index) => {
                 newsArticlesCache.push({ id: `local-${index}`, section: 'local', title: item.t, text: item.d, age: item.age, payloads: {} });
             });
 
-            // 2. Gather precisely 1 Europe article
             const europeSource = nativeDatabase['europe'][0];
             newsArticlesCache.push({ id: 'europe-0', section: 'europe', title: europeSource.t, text: europeSource.d, age: europeSource.age, payloads: {} });
 
-            // 3. Gather precisely 1 World article
             const worldSource = nativeDatabase['world'][0];
             newsArticlesCache.push({ id: 'world-0', section: 'world', title: worldSource.t, text: worldSource.d, age: worldSource.age, payloads: {} });
 
@@ -420,39 +389,40 @@
         }
 
         function renderFeedModules() {
-            ['local', 'europe', 'world'].forEach(sec => {
-                const box = document.getElementById(`panel-${sec}`); 
-                if (!box) return; 
-                box.innerHTML = '';
+            const localBox = document.getElementById('panel-local');
+            const europeBox = document.getElementById('panel-europe');
+            const worldBox = document.getElementById('panel-world');
+            
+            if (localBox) localBox.innerHTML = '';
+            if (europeBox) europeBox.innerHTML = '';
+            if (worldBox) worldBox.innerHTML = '';
+            
+            newsArticlesCache.forEach(art => {
+                const card = document.createElement('div'); 
+                card.className = 'content-card';
+                card.onclick = () => openArticleReaderView(art.id);
                 
-                const items = newsArticlesCache.filter(a => a.section === sec);
-                items.forEach(art => {
-                    const card = document.createElement('div'); 
-                    card.className = 'content-card';
-                    card.onclick = () => openArticleReaderView(art.id);
-                    
-                    card.innerHTML = `
-                        <h3>${art.title}</h3>
-                        <p>${art.text}</p>
-                        <div class="card-meta-row">
-                            <span>⚡ Direct Live</span>
-                            <span>Mis à jour : Aujourd'hui</span>
-                        </div>
-                    `;
-                    box.appendChild(card);
-                });
+                card.innerHTML = `
+                    <h3>${art.title}</h3>
+                    <p>${art.text}</p>
+                    <div class="card-meta-row">
+                        <span>⚡ En Direct</span>
+                        <span>Mis à jour : Aujourd'hui</span>
+                    </div>
+                `;
+                
+                if (art.section === 'local' && localBox) { localBox.appendChild(card); } 
+                else if (art.section === 'europe' && europeBox) { europeBox.appendChild(card); } 
+                else if (art.section === 'world' && worldBox) { worldBox.appendChild(card); }
             });
         }
 
         function triggerAnticipatoryPreload() {
-            const key = getApiKey();
-            if (!key) return;
-            newsArticlesCache.forEach(art => {
-                if (!art.payloads["A1"]) fetchTierPayload(art, "A1", key);
-            });
+            const key = getApiKey(); if (!key) return;
+            newsArticlesCache.forEach(art => { if (!art.payloads["A1"]) fetchTierPayload(art, "A1", key); });
         }
 
-        /* ANTI-HANG JIT COMPILER PIPELINE */
+        /* ROBUST LONG TEXT SEEDING GENERATOR BLOCK */
         async function openArticleReaderView(id) {
             const article = newsArticlesCache.find(a => a.id === id); 
             selectedArticle = article;
@@ -461,12 +431,14 @@
             document.getElementById('view-news').classList.remove('active');
             document.getElementById('view-reader').classList.add('active');
 
-            // PRE-SEED LOCAL COPY SO TEXT NEVER TURNS BLANK OR STICKS ON "GÉNÉRATION..."
+            // PRE-SEED COMPREHENSIVE LONGER PARAGRAPHS RATHER THAN ONE-LINERS
             if (!article.payloads[currentTierLabel]) {
                 article.payloads[currentTierLabel] = {
                     title: article.title,
-                    text_block: `<p>${article.text}</p><p>La modernisation continue d'être observée avec beaucoup d'intérêt à travers toute la métropole.</p>`,
-                    english_translation: `${article.title} - Global infrastructure and eco-friendly structural changes are scaling rapidly.`
+                    text_block: `<p>${article.text} Ce changement important transforme le quotidien de notre communauté locale ce mois-ci.</p>
+                                 <p>Les résidents expriment un avis très positif sur ces nouvelles transformations structurelles et environnementales. Les équipes de coordination travaillent chaque jour sur le terrain pour avancer rapidement.</p>
+                                 <p>À long terme, cette initiative va inspirer d'autres capitales européennes confrontées aux mêmes défis de modernisation globale.</p>`,
+                    english_translation: `${article.title}\n\nThis key change transforms daily operations for our local community this month.\n\nResidents express a very positive opinion on these structural updates. Coordination teams work on-site daily to move forward quickly.\n\nIn the long run, this initiative will inspire other European capitals facing the same modernization challenges.`
                 };
                 
                 const key = getApiKey();
@@ -483,9 +455,9 @@
             const languageNames = { fr: "French", de: "German", fi: "Finnish", es: "Spanish" };
             const targetLang = (article.section === 'local') ? languageNames[activeLanguageHub] : "French";
 
-            const promptText = `Context Title: ${article.title}. Text: ${article.text}
-            Task: Write exactly 3 standard paragraphs matching CEFR level ${tier} in natural ${targetLang}. 
-            Provide the English translation. Return ONLY clean JSON code block structure:
+            const promptText = `Context Title: ${article.title}. Summary: ${article.text}
+            Task: Write exactly 3 substantial paragraphs matching CEFR level ${tier} in completely natural ${targetLang}. Ensure long-form educational article length.
+            Provide the accurate English translation. Return ONLY clean JSON format:
             {"title": "${article.title}", "text_block": "<p>...</p><p>...</p><p>...</p>", "english_translation": "..."}`;
 
             try {
@@ -498,7 +470,7 @@
                 let cleanStr = data.candidates[0].content.parts[0].text.trim();
                 if(cleanStr.startsWith("```json")) cleanStr = cleanStr.replace(/^```json/, "").replace(/```$/, "");
                 article.payloads[tier] = JSON.parse(cleanStr);
-                renderContent(); // Re-render once streaming completes successfully
+                renderContent();
             } catch (e) {
                 console.log("Using deterministic standard fallback profiles", e);
             }
@@ -544,17 +516,22 @@
 
             document.getElementById('reader-body-display').innerHTML = builtHtml;
             
-            /* CRITICAL FIX: AD ENGINE ADDS VISIBLE COPIED TEXT DIRECTLY INSIDE INJECTOR ELEMENTS */
+            /* FORCE AD RENDERING PIPELINE INDEPENDENTLY ON EVERY TRANSITION */
             const adData = adMatrix[activeLanguageHub] || adMatrix['fr'];
-            document.getElementById('ad-header-display').innerHTML = adData.header;
-            document.getElementById('ad-badge-display').innerText = adData.badge;
-            document.getElementById('ad-cta-display').innerText = adData.cta;
-            document.getElementById('ad-brand-pill').innerText = adData.brand;
-            document.getElementById('ad-background-asset').style.backgroundImage = `url('${adData.img}')`;
+            const adHeaderEl = document.getElementById('ad-header-display');
+            const adBadgeEl = document.getElementById('ad-badge-display');
+            const adCtaEl = document.getElementById('ad-cta-display');
+            const adBrandEl = document.getElementById('ad-brand-pill');
+            const adBgEl = document.getElementById('ad-background-asset');
+
+            if (adHeaderEl) adHeaderEl.innerHTML = adData.header;
+            if (adBadgeEl) adBadgeEl.innerText = adData.badge;
+            if (adCtaEl) adCtaEl.innerText = adData.cta;
+            if (adBrandEl) adBrandEl.innerText = adData.brand;
+            if (adBgEl) adBgEl.style.backgroundImage = `url('${adData.img}')`;
             
             document.getElementById('reader-translation-panel').innerText = data.english_translation;
             
-            // WORD TRANSLATION INTERCEPT FEATURE HOOKS
             document.querySelectorAll('.reader-content span.w').forEach(el => {
                 el.onclick = function(e) {
                     e.stopPropagation();
@@ -565,7 +542,6 @@
             });
         }
 
-        /* INTERMEDIARY LIVE TRANSLATION OVERLAY FEATURE FUNCTIONS */
         function openDictionaryPopup(word, sentence) {
             const cleanedKey = word.toLowerCase();
             let matchedTranslation = localMultiLanguageDict[cleanedKey] || "Definition entry available in global hub database";
@@ -575,7 +551,6 @@
             document.getElementById('dict-context-display').innerText = sentence;
             document.getElementById('dictionary-popup-card').style.display = 'block';
             
-            // Log target into notebook
             if(!vocabularyList.find(v => v.target.toLowerCase() === cleanedKey)) {
                 vocabularyList.push({ target: word, context: sentence });
                 showToast(`🎴 Sauvegardé: ${word}`);
@@ -616,7 +591,7 @@
         }
 
         function initContextualFindWord() {
-            activeFindWordTargets = ["VERT", "VILLE", "PROJET", "ZÉRO"];
+            activeFindWordTargets = ["VERT", "VILLE", "PROJET"];
             const bankBox = document.getElementById('findword-bank-list'); bankBox.innerHTML = '';
             activeFindWordTargets.forEach(w => { bankBox.innerHTML += `<span class="bank-item" id="ctx-bi-${w}"><b>${w}</b></span>`; });
             const gridBox = document.getElementById('findword-grid-box'); gridBox.innerHTML = '';
