@@ -3,52 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LangSift Direct v5.5</title>
+    <title>LangSift Direct - Fully Recovered</title>
     <style>
-        :root { --bg-color: #fdfbf7; --card-bg: #ffffff; --text-color: #2c2520; --text-muted: #6e655f; --accent-color: #8c7853; --accent-light: #eaddca; --success-color: #2e7d32; --nav-bg: #ffffff; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Georgia, serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; }
-        .app-container { max-width: 500px; width: 100%; min-height: 100vh; box-sizing: border-box; padding: 20px 20px 110px 20px; }
+        :root { --bg-color: #fdfbf7; --card-bg: #ffffff; --text-color: #2c2520; --text-muted: #6e655f; --accent-color: #8c7853; --accent-light: #eaddca; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px; }
+        .app-container { max-width: 500px; margin: auto; }
         .menu-view { display: none; } .menu-view.active { display: block; }
-        .app-header { margin-top: 10px; margin-bottom: 15px; text-align: center; }
-        .settings-panel { background-color: #f5f1e9; border-radius: 14px; padding: 16px; margin-bottom: 20px; border: 1px solid var(--accent-light); display: none; }
-        .refresh-btn { background-color: var(--card-bg); border: 1px solid var(--accent-light); color: var(--accent-color); padding: 10px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 5px; }
-        .content-card { background-color: var(--card-bg); border-radius: 12px; padding: 16px; box-shadow: 0 3px 10px rgba(0,0,0,0.03); margin-bottom: 12px; cursor: pointer; }
-        .reader-header { position: fixed; top: 0; left: 0; right: 0; background-color: var(--bg-color); padding: 20px; z-index: 1000; border-bottom: 1px solid #eee; }
-        .reader-content { margin-top: 80px; }
+        .content-card { background: var(--card-bg); padding: 16px; border-radius: 12px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); cursor: pointer; }
+        .refresh-btn { background: white; border: 1px solid var(--accent-light); padding: 10px; width: 100%; border-radius: 20px; cursor: pointer; margin-bottom: 10px; }
+        .reader-header { padding-bottom: 20px; border-bottom: 1px solid #ddd; margin-bottom: 20px; }
     </style>
 </head>
 <body>
 
     <div class="app-container">
         <div id="view-news" class="menu-view active">
-            <div class="app-header"><h1>LangSift Direct</h1></div>
-            
-            <button class="refresh-btn" onclick="toggleSettingsDrawer()">⚙️ Réglages</button>
-            <div id="settings-drawer" class="settings-panel">
-                <button id="dev-mode-btn" class="refresh-btn" onclick="toggleDevMode()" style="color: #c62828;">Mode Développeur: OFF</button>
-                <button class="refresh-btn" onclick="clearApiKey()">🔑 Reset API Key</button>
+            <h1>LangSift Direct</h1>
+            <button class="refresh-btn" onclick="document.getElementById('settings').style.display='block'">⚙️ Réglages</button>
+            <div id="settings" style="display:none; background:#eee; padding:10px; border-radius:10px;">
+                <button id="dev-mode-btn" class="refresh-btn" onclick="toggleDevMode()"></button>
             </div>
-            
-            <div id="news-feeds-canvas">
-                <div id="panel-local" class="feed-panel active"></div>
-            </div>
+            <div id="feed-container"></div>
         </div>
 
         <div id="view-reader" class="menu-view">
-            <div class="reader-header"><button onclick="exitReaderView()">✕ Fermer</button></div>
-            <div class="reader-content">
-                <h2 id="reader-title"></h2>
-                <div id="reader-body"></div>
-            </div>
+            <div class="reader-header"><button onclick="exitReaderView()">✕ Retour</button></div>
+            <h2 id="reader-title"></h2>
+            <div id="reader-body"></div>
         </div>
     </div>
 
     <script>
-        // --- 1. STATE & SEED DATA ---
-        let isDevMode = localStorage.getItem('DEV_MODE') === 'true';
-        const seedArticles = [
-            { id: 1, title: "Le Grand Paris 2026", text: "Découvrez les nouveaux projets urbains." },
-            { id: 2, title: "L'énergie solaire en hausse", text: "Une analyse des tendances énergétiques." },
-            { id: 3, title: "Sommet climatique global", text: "Les leaders mondiaux se réunissent." }
+        // --- 1. DATA SOURCE ---
+        const nativeDatabase = [
+            { id: 1, t: "Paris 2026", d: "La ville de Paris lance un plan vert majeur." },
+            { id: 2, t: "Pistes cyclables", d: "De nouvelles pistes protégées arrivent." },
+            { id: 3, t: "UE Énergie", d: "L'UE adopte des normes énergétiques." },
+            { id: 4, t: "Climat", d: "Hausse record des investissements solaires." }
         ];
-        let newsArticlesCache = seedArticles;
+
+        let isDevMode = localStorage.getItem('DEV_MODE') === 'true';
+
+        // --- 2. INITIALIZATION ---
+        function initApp() {
+            const btn = document.getElementById('dev-mode-btn');
+            btn.innerText = `Mode Développeur: ${isDevMode ? 'ON (Mock)' : 'OFF (Live)'}`;
+            
+            const container = document.getElementById('feed-container');
+            container.innerHTML = '';
+            
+            nativeDatabase.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'content-card';
+                card.innerHTML = `<h3>${item.t}</h3><p>${item.d}</p>`;
+                card.onclick = () => runAiPipeline(item);
+                container.appendChild(card);
+            });
+        }
+
+        // --- 3. PIPELINE ---
+        async function runAiPipeline(articleData) {
+            // Check Dev Mode First
+            if (isDevMode) {
+                articleData.payload = {
+                    title: articleData.t,
+                    A1: `<p>Contenu simulé pour: <b>${articleData.t}</b>. L'API est désactivée.</p>`
+                };
+                openReader(articleData);
+                return;
+            }
+
+            // Live Mode logic
+            const key = localStorage.getItem('GEMINI_KEY');
+            if (!key) { alert("Clé API manquante. Activez le mode Dev pour tester."); return; }
+            
+            // Placeholder for your API fetch
+            console.log("Live fetch attempted...");
+        }
+
+        // --- 4. NAVIGATION ---
+        function openReader(art) {
+            document.getElementById('view-news').classList.remove('active');
+            document.getElementById('view-reader').classList.add('active');
+            document.getElementById('reader-title').innerText = art.payload.title;
+            document.getElementById('reader-body').innerHTML = art.payload.A1;
+        }
+
+        function exitReaderView() {
+            document.getElementById('view-reader').classList.remove('active');
+            document.getElementById('view-news').classList.add('active');
+        }
+
+        function toggleDevMode() {
+            isDevMode = !isDevMode;
+            localStorage.setItem('DEV_MODE', isDevMode);
+            location.reload();
+        }
+
+        window.onload = initApp;
+    </script>
+</body>
+</html>
