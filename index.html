@@ -3,56 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LangSift Direct - Recovered</title>
+    <title>LangSift Direct - Cache-First</title>
     <style>
-        :root { --bg-color: #fdfbf7; --accent-color: #8c7853; --card-bg: #ffffff; }
-        body { font-family: sans-serif; background: var(--bg-color); margin: 0; padding-bottom: 70px; }
-        .app-container { max-width: 500px; margin: auto; padding: 20px; }
+        :root { --accent-color: #8c7853; }
+        body { font-family: sans-serif; background: #fdfbf7; margin: 0; padding: 20px; }
+        .app-container { max-width: 500px; margin: auto; }
         .menu-view { display: none; } .menu-view.active { display: block; }
-        .content-card { background: var(--card-bg); padding: 15px; border-radius: 12px; margin-bottom: 10px; cursor: pointer; border: 1px solid #eee; }
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; max-width: 500px; background: white; display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #ddd; }
-        .nav-btn { background: none; border: none; cursor: pointer; color: var(--accent-color); font-weight: bold; }
-        .brand-ad { background: #000; color: white; padding: 20px; border-radius: 16px; margin: 20px 0; }
+        .content-card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 10px; cursor: pointer; border: 1px solid #eee; }
+        .status-badge { font-size: 10px; padding: 4px 8px; border-radius: 10px; background: #e0e0e0; }
+        .nav-btn { background: none; border: none; cursor: pointer; color: var(--accent-color); font-weight: bold; padding: 10px; }
     </style>
 </head>
 <body>
 
     <div class="app-container">
-        <div id="view-news" class="menu-view active">
-            <h1>LangSift Direct</h1>
-            <button onclick="toggleSettings()">⚙️ Réglages</button>
-            <div id="settings" style="display:none; padding:10px; background:#f0f0f0;">
-                <button id="dev-mode-btn" onclick="toggleDevMode()"></button>
+        <div id="settings" style="display:none; padding:15px; background:#f0f0f0; border-radius:10px; margin-bottom:20px;">
+            <button id="dev-mode-btn" onclick="toggleDevMode()"></button>
+            <div id="api-monitor" style="margin-top:10px;">
+                <span class="status-badge">API Status: <span id="api-status">IDLE</span></span>
             </div>
-            <div id="feed-container"></div>
         </div>
 
-        <div id="view-reader" class="menu-view">
-            <button onclick="exitReader()">✕ Retour</button>
-            <div id="reader-content">
-                <h2 id="reader-title"></h2>
-                <div id="cefr-controls">
-                    <input type="range" id="level-slider" min="1" max="5" value="1">
-                    <span id="level-label">A1</span>
-                </div>
-                <div id="reader-body"></div>
-                <div class="brand-ad">Coca-Cola Zéro - Open Happiness</div>
-                <button onclick="toggleTranslation()">Afficher Traduction</button>
-                <div id="translation-panel" style="display:none;"></div>
-            </div>
+        <div id="view-news" class="menu-view active">
+            <h1>LangSift Direct</h1>
+            <button onclick="document.getElementById('settings').style.display=(document.getElementById('settings').style.display==='block'?'none':'block')">⚙️ Réglages</button>
+            <div id="feed-container"></div>
         </div>
     </div>
 
-    <nav class="bottom-nav">
-        <button class="nav-btn" onclick="switchTab('view-news')">📰 News</button>
-        <button class="nav-btn">🎴 Vocab</button>
-    </nav>
-
     <script>
         const db = [
-            { id: 1, section: 'local', t: "Paris 2026", d: "Projets verts." },
+            { id: 1, section: 'france', t: "Paris 2026", d: "Projets verts." },
             { id: 2, section: 'europe', t: "UE Énergie", d: "Nouvelles normes." },
-            { id: 3, section: 'world', t: "Climat", d: "Investissements solaires." }
+            { id: 3, section: 'global', t: "Climat", d: "Investissements solaires." }
         ];
 
         let isDevMode = localStorage.getItem('DEV_MODE') === 'true';
@@ -63,53 +46,45 @@
             db.forEach(item => {
                 const div = document.createElement('div');
                 div.className = 'content-card';
-                div.innerHTML = `<h3>${item.t}</h3><p>${item.d}</p>`;
+                div.innerHTML = `<h3>[${item.section.toUpperCase()}] ${item.t}</h3><p>${item.d}</p>`;
                 div.onclick = () => runAiPipeline(item);
                 feed.appendChild(div);
             });
         }
 
         async function runAiPipeline(art) {
+            const status = document.getElementById('api-status');
+            
             // 1. CACHE CHECK
             const cached = localStorage.getItem(`art_${art.id}`);
             if (cached) {
-                art.payload = JSON.parse(cached);
-                openReader(art);
+                status.innerText = "CACHED";
+                console.log("Loading from storage...");
                 return;
             }
 
-            // 2. DEV MODE MOCK
+            // 2. DEV MODE
             if (isDevMode) {
+                status.innerText = "MOCKING";
                 art.payload = { title: art.t, A1: "Contenu simulé." };
                 localStorage.setItem(`art_${art.id}`, JSON.stringify(art.payload));
-                openReader(art);
                 return;
             }
 
             // 3. LIVE FETCH
-            alert("Mode Live: Fetching from Gemini...");
-        }
-
-        function openReader(art) {
-            document.getElementById('view-news').className = 'menu-view';
-            document.getElementById('view-reader').className = 'menu-view active';
-            document.getElementById('reader-title').innerText = art.payload.title;
-            document.getElementById('reader-body').innerHTML = art.payload.A1;
-        }
-
-        function exitReader() {
-            document.getElementById('view-news').className = 'menu-view active';
-            document.getElementById('view-reader').className = 'menu-view';
+            status.innerText = "FETCHING...";
+            try {
+                // YOUR API CALL GOES HERE
+                // await fetch(...).then(...)
+                status.innerText = "LIVE DATA";
+            } catch (e) {
+                status.innerText = "ERROR";
+            }
         }
 
         function toggleDevMode() {
             localStorage.setItem('DEV_MODE', !isDevMode);
             location.reload();
-        }
-
-        function toggleSettings() {
-            const s = document.getElementById('settings');
-            s.style.display = s.style.display === 'block' ? 'none' : 'block';
         }
 
         window.onload = initApp;
