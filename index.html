@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LangSift Direct v5.7</title>
+    <title>LangSift Direct v5.8</title>
     <style>
         :root {
             --bg-color: #fdfbf7;
@@ -150,6 +150,7 @@
                         <option value="fr">🇫🇷 Paris (Français)</option>
                         <option value="de">🇩🇪 Berlin (Deutsch)</option>
                         <option value="fi">🇫🇮 Helsinki (Suomi)</option>
+                        <option value="es">🇪🇸 Madrid (Español)</option>
                     </select>
                 </div>
                 <button class="refresh-btn" style="width:100%; color:#c62828; border-color:rgba(0,0,0,0.1);" onclick="clearApiKey()">🔑 Reset Gemini API Key</button>
@@ -171,20 +172,24 @@
         <div id="view-games" class="menu-view">
             <div class="app-header">
                 <h1>Le Coin Jeux</h1>
-                <p>Puzzles contextuels et révisions ludiques</p>
+                <p id="game-subtitle-text">Puzzles contextuels et révisions ludiques</p>
+            </div>
+
+            <div class="game-scaffolding-hint" style="border-left-color: var(--success-color); background: rgba(108,171,100,0.08); margin-bottom:20px;">
+                <b>💡 Guide de Jeu:</b> Tous les textes lus de l'application—y compris le vocabulaire, les expressions ciblées et <u>les mots contenus dans les publicités sponsors</u>—sont inclus comme cibles actives dans les jeux !
             </div>
             
             <div class="game-menu-container">
                 <div class="game-card-launcher" onclick="openContextualOverlay('wordle')">
-                    <div><h3>Le Mot (Wordle)</h3><p>Devinez le mot de l'actu du jour.</p></div>
+                    <div><h3 id="lbl-g1-title">Le Mot (Wordle)</h3><p id="lbl-g1-desc">Devinez le mot de l'actu du jour.</p></div>
                     <div style="font-size:24px;">🟩</div>
                 </div>
                 <div class="game-card-launcher" onclick="openContextualOverlay('findword')">
-                    <div><h3>Mots Cachés (Bilingue)</h3><p>Trouvez les expressions clés lues.</p></div>
+                    <div><h3 id="lbl-g2-title">Mots Cachés (Bilingue)</h3><p id="lbl-g2-desc">Trouvez les expressions clés lues.</p></div>
                     <div style="font-size:24px;">🔍</div>
                 </div>
                 <div class="game-card-launcher" onclick="launchFlashcardSprintGame()">
-                    <div><h3>Sprint Vocabulaire</h3><p>Testez vos mots sauvegardés au fil des lectures.</p></div>
+                    <div><h3 id="lbl-g3-title">Sprint Vocabulaire</h3><p id="lbl-g3-desc">Testez vos mots sauvegardés au fil des lectures.</p></div>
                     <div class="game-badge-counter" id="hub-card-count-badge">0</div>
                 </div>
             </div>
@@ -212,25 +217,25 @@
                     <div id="reader-timeline-display" class="story-timeline-stamp"></div>
                     <div id="reader-body-display" class="text-block"></div>
                     
-                    <div class="brand-ad-label">Sponsorisé — Coca-Cola Zéro</div>
+                    <div id="ad-top-sponsor-label" class="brand-ad-label">Sponsorisé</div>
                     <div id="brand-ad-placement" class="brand-ad-card">
                         <div class="brand-ad-bg-image"></div><div class="brand-ad-gradient-overlay"></div>
                         <div class="brand-ad-content">
                             <div id="ad-badge-display" class="ad-badge"></div><div id="ad-header-display" class="ad-header"></div>
-                            <div class="ad-footer-row"><div id="ad-cta-display" class="ad-cta"></div><div class="ad-tag-btn">Coca-Cola Zéro</div></div>
+                            <div class="ad-footer-row"><div id="ad-cta-display" class="ad-cta"></div><div class="ad-tag-btn" id="ad-brand-pill">Coca-Cola</div></div>
                         </div>
                     </div>
 
                     <div class="gateway-card">
-                        <h4>🎉 Lecture Terminée !</h4>
-                        <p>Validez vos acquis instantanément avec un défi basé sur ce texte.</p>
+                        <h4 id="lbl-completion-title">🎉 Lecture Terminée !</h4>
+                        <p id="lbl-completion-desc">Validez vos acquis instantanément avec un défi basé sur ce texte.</p>
                         <div class="gateway-btn-group">
-                            <button class="game-trigger-btn" onclick="openContextualOverlay('wordle')">🟩 Jouer Le Mot</button>
-                            <button class="game-trigger-btn" onclick="openContextualOverlay('findword')">🔍 Mots Cachés</button>
+                            <button class="game-trigger-btn" id="lbl-btn-g1" onclick="openContextualOverlay('wordle')">🟩 Jouer Le Mot</button>
+                            <button class="game-trigger-btn" id="lbl-btn-g2" onclick="openContextualOverlay('findword')">🔍 Mots Cachés</button>
                         </div>
                     </div>
 
-                    <button class="eng-toggle-btn" onclick="toggleTranslationBox()">Afficher la traduction / Show English</button>
+                    <button class="eng-toggle-btn" id="lbl-toggle-eng-btn" onclick="toggleTranslationBox()">Afficher la traduction / Show English</button>
                     <div id="reader-translation-panel" class="english-translation-panel"></div>
                 </div>
             </div>
@@ -238,34 +243,34 @@
 
         <div id="modal-game-wordle" class="game-overlay-modal">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                <b style="font-family:Georgia,serif; font-size:16px;">Le Mot Contextuel</b>
-                <button class="back-btn" onclick="closeContextualOverlay('wordle')">✕ Fermer</button>
+                <b id="lbl-modal-g1-header" style="font-family:Georgia,serif; font-size:16px;">Le Mot Contextuel</b>
+                <button class="back-btn" onclick="closeContextualOverlay('wordle')">✕</button>
             </div>
             <div id="wordle-scaffold" class="game-scaffolding-hint"></div>
             <div id="wordle-grid-box" class="wordle-grid"></div>
             <div class="game-input-row">
                 <input type="text" id="wordle-typing-field" class="game-text-input" maxlength="5" placeholder="MOT">
-                <button class="refresh-btn" onclick="submitWordleGuess()">Valider</button>
+                <button class="refresh-btn" id="lbl-wordle-submit" onclick="submitWordleGuess()">Valider</button>
             </div>
         </div>
 
         <div id="modal-game-findword" class="game-overlay-modal">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                <b style="font-family:Georgia,serif; font-size:16px;">Mots Cachés Direct</b>
-                <button class="back-btn" onclick="closeContextualOverlay('findword')">✕ Fermer</button>
+                <b id="lbl-modal-g2-header" style="font-family:Georgia,serif; font-size:16px;">Mots Cachés Direct</b>
+                <button class="back-btn" onclick="closeContextualOverlay('findword')">✕</button>
             </div>
             <div id="findword-scaffold" class="game-scaffolding-hint"></div>
             <div id="findword-grid-box" class="findword-grid"></div>
             <div class="word-bank-box">
-                <div class="word-bank-title">Vocabulaire Apparié :</div>
+                <div class="word-bank-title" id="lbl-findword-bank-title">Vocabulaire Apparié :</div>
                 <div id="findword-bank-list"></div>
             </div>
         </div>
     </div>
 
     <div class="bottom-nav">
-        <button id="nav-news" class="nav-item active" onclick="switchActiveTab('view-news', this)"><div class="nav-item-icon">📰</div><div>Actualités</div></button>
-        <button id="nav-games" class="nav-item" onclick="switchActiveTab('view-games', this)"><div class="nav-item-icon">🎮</div><div>Jeux & Vocab</div></button>
+        <button id="nav-news" class="nav-item active" onclick="switchActiveTab('view-news', this)"><div class="nav-item-icon">📰</div><div id="lbl-nav-news">Actualités</div></button>
+        <button id="nav-games" class="nav-item" onclick="switchActiveTab('view-games', this)"><div class="nav-item-icon">🎮</div><div id="lbl-nav-games">Jeux & Vocab</div></button>
     </div>
 
     <div id="toast" class="toast"></div>
@@ -285,7 +290,15 @@
         const wordleMaxGuesses = 6;
         let activeFindWordTargets = [];
 
-        /* REWIRED & FIXED 25-PIECE CORE NEWSPAPER REGISTRY */
+        /* RICH SYSTEM NATIVE TRANSLATION MAPPER */
+        const nativeInterfaceLexicon = {
+            fr: { navNews: "Actualités", navGames: "Jeux & Vocab", gameSubtitle: "Puzzles contextuels et révisions ludiques", g1Title: "Le Mot (Wordle)", g1Desc: "Devinez le mot de l'actu du jour.", g2Title: "Mots Cachés", g2Desc: "Trouvez les expressions clés lues.", g3Title: "Sprint Vocabulaire", g3Desc: "Testez vos mots sauvegardés.", readerCompleteTitle: "🎉 Lecture Terminée !", readerCompleteDesc: "Validez vos acquis avec un défi.", btnG1: "🟩 Jouer Le Mot", btnG2: "🔍 Mots Cachés", btnToggleEng: "Afficher la traduction / Show English", m1Header: "Le Mot Contextuel", m2Header: "Mots Cachés Direct", wordleSubmit: "Valider", bankTitle: "Vocabulaire Apparié :" },
+            de: { navNews: "Nachrichten", navGames: "Spiele Hub", gameSubtitle: "Kontextuelle Rätsel und spielerisches Üben", g1Title: "Das Wort (Wordle)", g1Desc: "Errate das Wort des Tages.", g2Title: "Wortsuche", g2Desc: "Finden Sie gelesene Schlüsselwörter.", g3Title: "Vokabel-Sprint", g3Desc: "Testen Sie gespeicherte Wörter.", readerCompleteTitle: "🎉 Lesen abgeschlossen!", readerCompleteDesc: "Testen Sie Ihr Wissen mit einem Spiel.", btnG1: "🟩 Das Wort spielen", btnG2: "🔍 Wortsuche öffnen", btnToggleEng: "Übersetzung anzeigen / Show English", m1Header: "Kontextuelles Wort", m2Header: "Direkte Wortsuche", wordleSubmit: "Prüfen", bankTitle: "Gefundene Vokabeln:" },
+            fi: { navNews: "Uutiset", navGames: "Pelit & Sanasto", gameSubtitle: "Kontekstuaaliset pelit ja harjoitukset", g1Title: "Sana (Wordle)", g1Desc: "Arvaa päivän uutissana.", g2Title: "Sanaetsintä", g2Desc: "Etsi tekstistä avainsanoja.", g3Title: "Sanastosprintti", g3Desc: "Testaa tallennettuja sanoja.", readerCompleteTitle: "🎉 Lukeminen suoritettu!", readerCompleteDesc: "Vahvista oppimasi pelitilassa.", btnG1: "🟩 Pelaa Sanaa", btnG2: "🔍 Sanaetsintä", btnToggleEng: "Näytä käännös / Show English", m1Header: "Kontekstuaalinen Sana", m2Header: "Sanaetsintäruudukko", wordleSubmit: "Tarkista", bankTitle: "Yhdistetyt Sanat:" },
+            es: { navNews: "Noticias", navGames: "Zona de Juegos", gameSubtitle: "Rompecabezas contextuales y repaso lúdico", g1Title: "La Palabra (Wordle)", g1Desc: "Adivina la palabra clave del día.", g2Title: "Sopa de Letras", g2Desc: "Encuentra expresiones clave leídas.", g3Title: "Sprint de Vocabulario", g3Desc: "Prueba tus palabras guardadas.", readerCompleteTitle: "🎉 ¡Lectura Terminada!", readerCompleteDesc: "Valida lo aprendido con un desafío.", btnG1: "🟩 Jugar La Palabra", btnG2: "🔍 Sopa de Letras", btnToggleEng: "Mostrar traducción / Show English", m1Header: "La Palabra Contextual", m2Header: "Sopa de Letras Directa", wordleSubmit: "Validar", bankTitle: "Vocabulario Emparejado:" }
+        };
+
+        /* 30-PIECE COMPREHENSIVE CORE REGISTRY (ADDED SPANISH MADRID HUB) */
         const nativeDatabase = {
             fr: [
                 { t: "Paris 2026: Modernisation verte des places", d: "La Mairie de Paris lance un plan de végétalisation massive pour transformer les grands axes routiers et créer des îlots de fraîcheur urbains.", age: 0 },
@@ -296,7 +309,7 @@
             ],
             de: [
                 { t: "Berlin 2026: Grüne Modernisierung", d: "Das Berliner Rathaus startet einen massiven Begrünungsplan für städtische Hauptverkehrsachsen und urbane Freiräume.", age: 0 },
-                { t: "Ausbau von Radwegen", d: "Neue geschützte Infrastrukturen und Fahrradschnellwege werden entstehen, um die umweltfreundliche Mobiltät im Stadtzentrum deutlich zu verbessern.", age: 0 },
+                { t: "Ausbau von Radwegen", d: "Neue geschützte Infrastrukturen und Fahrradschnellwege werden entstehen, um die umweltfreundliche Mobilität im Stadtzentrum deutlich zu verbessern.", age: 0 },
                 { t: "S-Bahn Streckennetzerweiterung", d: "Die Berliner Verkehrsbetriebe planen neue Linienführungen, um die Außenbezirke schneller an den zentralen Alexanderplatz anzubinden.", age: 1 },
                 { t: "Mietpreisdeckel Diskussionen", d: "Der Senat debattiert über neue gesetzliche Maßnahmen zur Stabilisierung der Wohnkosten in angesagten Vierteln wie Kreuzberg.", age: 1 },
                 { t: "Museumsinsel Sanierung", d: "Ein ehrgeiziges Restaurierungsprojekt soll die historischen Fassaden der weltberühmten Berliner Museen vor Umweltschäden schützen.", age: 2 }
@@ -308,12 +321,19 @@
                 { t: "Keskustakirjasto Oodin menestys", d: "Arkkitehtuuripalkittu kohtaamispaikka rikkoo kävijäennätyksiä ja laajentaa digitaalisten palveluiden valikoimaansa asukkaille.", age: 1 },
                 { t: "Itämeren suojeluhanke etenee", d: "Helsinki ja Turku tiivistävät yhteistyötään rannikkovesien puhdistamiseksi ja sinilevähaittojen minimoimiseksi tulevana kesänä.", age: 2 }
             ],
+            es: [
+                { t: "Madrid 2026: Remodelación de plazas", d: "El Ayuntamiento de Madrid activa un plan de reforestación urbana para transformar grandes avenidas en corredores bioclimáticos.", age: 0 },
+                { t: "Nuevos carriles bici conectados", d: "Se construirán carriles protegidos adicionales para facilitar la movilidad sostenible entre el centro y la periferia de la capital.", age: 0 },
+                { t: "Modernización del Metro de Madrid", d: "Se anuncia la renovación de trenes y la automatización de la línea 6 para mejorar las frecuencias de paso en horas punta.", age: 1 },
+                { t: "Regulación de terrazas y veladores", d: "La nueva normativa limita los horarios nocturnos de la hostelería para garantizar el descanso de los vecinos del distrito centro.", age: 1 },
+                { t: "Ampliación de Madrid Río", d: "El proyecto de extensión del parque lineal sumará nuevas zonas deportivas, arbolado autóctono y carriles peatonales.", age: 2 }
+            ],
             europe: [
                 { t: "Bruxelles: Normes de logement éco", d: "L'Union Européenne adopte un texte législatif crucial pour accélérer l'isolation thermique et la rénovation énergétique du parc immobilier continental.", age: 0 },
                 { t: "Espace Schengen: Numérisation des visas", d: "Le Parlement européen valide le déploiement d'une plateforme unique pour centraliser les demandes d'entrée et renforcer la sécurité aux frontières.", age: 1 },
                 { t: "Pacte vert européen: Objectif 2030", d: "Les ministres de l'Environnement se réunissent pour ajuster les quotas d'émissions industrielles face aux nouvelles réalités économiques.", age: 1 },
                 { t: "Erasmus+: Budget historique en hausse", d: "Le programme d'échange universitaire emblématique reçoit un financement record pour inclure davantage d'apprentis et de jeunes professionnels.", age: 2 },
-                { t: "Zone Euro: Régulation des crypto-actifs", d: "La Banque Centrale Européenne publie un cadre strict pour encadrer les transactions numériques et prévenir la volatilité systémique.", age: 2 }
+                { t: "Zone Euro: Régulation des crypto-actifs", d: "La Banque Centrale Européenne conseille un cadre strict pour encadrer les transactions numériques et prévenir la volatilité systémique.", age: 2 }
             ],
             world: [
                 { t: "Transition globale: Hausse du solaire", d: "Les derniers rapports internationaux indiquent un basculement historique vers les énergies renouvelables, porteur de millions d'emplois.", age: 0 },
@@ -324,34 +344,33 @@
             ]
         };
 
-        /* EXPANDED RICH DICTIONARY PULLED DIRECTLY FROM THE REAL ARTICLE STRINGS */
         const localMultiLanguageDict = {
-            fr: { 
-                "vert": "Green", "ville": "City", "places": "Squares", "plan": "Plan", 
-                "pistes": "Tracks", "reseau": "Network", "commune": "Town", "terrasses": "Patios" 
-            },
-            de: { 
-                "grün": "Green", "stadt": "City", "ausbau": "Expansion", "radwegen": "Bike Paths", 
-                "neue": "New", "linien": "Lines", "mieten": "Rents", "museen": "Museums" 
-            },
-            fi: { 
-                "uusi": "New", "vihreä": "Green", "kaupunki": "City", "baana": "Cycling Path", 
-                "metrolinja": "Metro Line", "kirjasto": "Library", "meri": "Sea", "kesä": "Summer" 
-            }
+            fr: { "vert": "Green", "ville": "City", "places": "Squares", "plan": "Plan", "pistes": "Tracks", "reseau": "Network" },
+            de: { "grün": "Green", "stadt": "City", "ausbau": "Expansion", "radwegen": "Bike Paths", "neue": "New", "linien": "Lines" },
+            fi: { "uusi": "New", "vihreä": "Green", "kaupunki": "City", "baana": "Cycling Path", "metrolinja": "Metro Line", "meri": "Sea" },
+            es: { "verde": "Green", "ciudad": "City", "plazas": "Squares", "plan": "Plan", "carriles": "Tracks", "metro": "Subway" }
         };
 
         const gameContextWordsByLang = {
-            fr: [ { w: "VERT", h_en: "The color Paris is turning green.", h_nat: "La couleur de la nature." }, { w: "VILLE", h_en: "An urban metropolitan center.", h_nat: "Un grand centre urbain." } ],
-            de: [ { w: "GRÜN", h_en: "The color of environmental progress.", h_nat: "Die Farbe von Natur." }, { w: "STADT", h_en: "An urban environment.", h_nat: "Ein urbanes Gebiet." } ],
-            fi: [ { w: "UUSI", h_en: "Opposite of old.", h_nat: "Vanhan vastakohta." }, { w: "MERI", h_en: "The sea.", h_nat: "Suuri suolaisen veden alue." } ]
+            fr: [ { w: "VERT", h_en: "Green color.", h_nat: "La couleur de la nature." }, { w: "VILLE", h_en: "City landscape.", h_nat: "Un grand centre urbain." } ],
+            de: [ { w: "GRÜN", h_en: "Green color.", h_nat: "Die Farbe von Natur." }, { w: "STADT", h_en: "City center.", h_nat: "Ein urbanes Gebiet." } ],
+            fi: [ { w: "UUSI", h_en: "New item.", h_nat: "Vanhan vastakohta." }, { w: "MERI", h_en: "The sea.", h_nat: "Suuri suolaisen veden alue." } ],
+            es: [ { w: "VERDE", h_en: "Green profile.", h_nat: "El color de la vegetación urbana." }, { w: "METRO", h_en: "Subway network.", h_nat: "Tren subterráneo de la ciudad." } ]
         };
 
-        const adMatrix = { 1: { header: "Coca-Cola Zéro. Sans sucre !", badge: "A1", cta: "Déjà goûté?", eng: "Without sugar." }, 2: { header: "Coca-Cola Zéro. Zéro sucre !", badge: "A2", cta: "Essayé ?", eng: "Zero sugar." }, 3: { header: "Le vrai goût de Coca-Cola, le sucre en moins.", badge: "B1", cta: "Qu'attendez-vous ?", eng: "True taste minus sugar." }, 4: { header: "Partagez l'intensité, la culpabilité en moins.", badge: "C1", cta: "Prêt ?", eng: "Intensity minus guilt." }, 5: { header: "Tout le plaisir, zero sucre.", badge: "Fluide", cta: "Testé ?", eng: "All the pleasure, zero sugar." } };
+        /* INTEGRATED CONTEXTUAL AD DATA MATRIX WITH LINKED LESSON KEYWORDS */
+        const adMatrix = {
+            fr: { header: "Coca-Cola Zéro. Fraîcheur <b>VERTE</b> en <b>VILLE</b>, sans sucre !", badge: "Sponsor A1", cta: "Savourer l'instant", brand: "Coke Zéro" },
+            de: { header: "Coca-Cola Zéro. Erfrischend <b>GRÜN</b> in der <b>STADT</b>!", badge: "Sponsor A1", cta: "Jetzt probieren", brand: "Coke Zéro" },
+            fi: { header: "Coca-Cola Zéro. Täysin <b>UUSI</b> maku ilman sokeria!", badge: "Sponsor A1", cta: "Koe raikkaus", brand: "Coke Zéro" },
+            es: { header: "Coca-Cola Zéro. Sabor original, ¡cero azúcar en la <b>CIUDAD</b>!", badge: "Sponsor A1", cta: "Siente el sabor", brand: "Coke Zéro" }
+        };
 
         const dateLocalizationMatrix = {
             fr: { prefix: "Mis à jour :", today: "Aujourd'hui", yesterday: "Hier", daysAgo: "Il y a %d jours" },
             de: { prefix: "Aktualisiert:", today: "Heute", yesterday: "Gestern", daysAgo: "Vor %d Tagen" },
-            fi: { prefix: "Päivitetty:", today: "Tänään", yesterday: "Eilen", daysAgo: "%d päivää sitten" }
+            fi: { prefix: "Päivitetty:", today: "Tänään", yesterday: "Eilen", daysAgo: "%d päivää sitten" },
+            es: { prefix: "Actualizado:", today: "Hoy", yesterday: "Ayer", daysAgo: "Hace %d días" }
         };
 
         function getLocalizedDateString(ageInDays) {
@@ -359,6 +378,28 @@
             if (ageInDays === 0) return `${loc.prefix} ${loc.today}`;
             if (ageInDays === 1) return `${loc.prefix} ${loc.yesterday}`;
             return `${loc.prefix} ${loc.daysAgo.replace('%d', ageInDays)}`;
+        }
+
+        function syncNativeInterfaceLabels() {
+            const lex = nativeInterfaceLexicon[activeLanguageHub] || nativeInterfaceLexicon['fr'];
+            document.getElementById('lbl-nav-news').innerText = lex.navNews;
+            document.getElementById('lbl-nav-games').innerText = lex.navGames;
+            document.getElementById('game-subtitle-text').innerText = lex.gameSubtitle;
+            document.getElementById('lbl-g1-title').innerText = lex.g1Title;
+            document.getElementById('lbl-g1-desc').innerText = lex.g1Desc;
+            document.getElementById('lbl-g2-title').innerText = lex.g2Title;
+            document.getElementById('lbl-g2-desc').innerText = lex.g2Desc;
+            document.getElementById('lbl-g3-title').innerText = lex.g3Title;
+            document.getElementById('lbl-g3-desc').innerText = lex.g3Desc;
+            document.getElementById('lbl-completion-title').innerText = lex.readerCompleteTitle;
+            document.getElementById('lbl-completion-desc').innerText = lex.readerCompleteDesc;
+            document.getElementById('lbl-btn-g1').innerText = lex.btnG1;
+            document.getElementById('lbl-btn-g2').innerText = lex.btnG2;
+            document.getElementById('lbl-toggle-eng-btn').innerText = lex.btnToggleEng;
+            document.getElementById('lbl-modal-g1-header').innerText = lex.m1Header;
+            document.getElementById('lbl-modal-g2-header').innerText = lex.m2Header;
+            document.getElementById('lbl-wordle-submit').innerText = lex.wordleSubmit;
+            document.getElementById('lbl-findword-bank-title').innerText = lex.bankTitle;
         }
 
         function getApiKey() {
@@ -372,6 +413,7 @@
         function handleLanguageHubChange() {
             activeLanguageHub = document.getElementById('setting-language-hub').value;
             document.getElementById('tab-local').innerText = `📍 Actu ${activeLanguageHub.toUpperCase()}`;
+            syncNativeInterfaceLabels();
             generateMultiFeedMatrix();
         }
 
@@ -395,7 +437,7 @@
 
         function rotateNewsCarousel() { currentCarouselBatchIndex = (currentCarouselBatchIndex === 0) ? 1 : 0; renderFeedModules(); }
 
-        /* THE REPAIRED PIPELINE GENERATOR BUILD */
+        /* RE-ENGINEERED PRE-LOADING ENGINE PIPELINE ARCHITECTURE */
         function generateMultiFeedMatrix() {
             newsArticlesCache = []; 
             let globalId = 0;
@@ -417,6 +459,7 @@
                 }
             });
             renderFeedModules();
+            triggerAnticipatoryPreload();
         }
 
         function renderFeedModules() {
@@ -427,8 +470,6 @@
                 
                 const allSectionItems = newsArticlesCache.filter(a => a.section === sec);
                 let items = [];
-                
-                // CRITICAL BOUNDARY CEILING FIX: Bypasses slicing if records are within limit
                 if (allSectionItems.length <= 5) {
                     items = allSectionItems;
                 } else {
@@ -440,7 +481,7 @@
                 items.forEach(art => {
                     const card = document.createElement('div'); 
                     card.className = 'content-card';
-                    card.onclick = () => runAiPipeline(art.id);
+                    card.onclick = () => openArticleReaderView(art.id);
                     
                     const dateStamp = getLocalizedDateString(art.age);
                     card.innerHTML = `
@@ -456,25 +497,43 @@
             });
         }
 
-        async function runAiPipeline(id) {
-            const key = getApiKey(); if (!key) return;
-            const article = newsArticlesCache.find(a => a.id === id); selectedArticle = article;
+        /* SILENT MULTI-CORE BACKGROUND FETCH OPERATION */
+        async function triggerAnticipatoryPreload() {
+            const key = localStorage.getItem('GEMINI_KEY');
+            if (!key) return; // Silent pass if key hasn't been set yet
+            
+            // Focus preloading exclusively on primary visibility batches
+            const visibleArticles = newsArticlesCache.slice(0, 4);
+            for (let art of visibleArticles) {
+                if (!art.payloads["A1"]) fetchTierPayload(art, "A1", key);
+                if (!art.payloads["A2"]) fetchTierPayload(art, "A2", key);
+            }
+        }
+
+        /* SAFE RENDERING ENGINE ENTRY POINT METHOD */
+        async function openArticleReaderView(id) {
+            const article = newsArticlesCache.find(a => a.id === id); 
+            selectedArticle = article;
             const currentTierLabel = levels[selectedLevelIndex];
 
-            if (article.payloads[currentTierLabel]) { openReader(); return; }
+            document.getElementById('view-news').classList.remove('active');
+            document.getElementById('view-reader').classList.add('active');
 
-            document.getElementById('news-feeds-canvas').style.display = 'none';
-            document.getElementById('loading-spinner-block').style.display = 'block';
-
-            await fetchTierPayload(article, currentTierLabel, key);
-
-            document.getElementById('news-feeds-canvas').style.display = 'block';
-            document.getElementById('loading-spinner-block').style.display = 'none';
-            openReader();
+            // If requested cache tier is missing, show localized spinner and catch up
+            if (!article.payloads[currentTierLabel]) {
+                const key = getApiKey();
+                if (!key) { exitReaderView(); return; }
+                document.getElementById('reader-dynamic-body-wrapper').style.opacity = '0.1';
+                document.getElementById('jit-loading-indicator').style.display = 'block';
+                await fetchTierPayload(article, currentTierLabel, key);
+                document.getElementById('jit-loading-indicator').style.display = 'none';
+                document.getElementById('reader-dynamic-body-wrapper').style.opacity = '1';
+            }
+            renderContent();
         }
 
         async function fetchTierPayload(article, tier, apiKey) {
-            const languageNames = { fr: "French", de: "German", fi: "Finnish" };
+            const languageNames = { fr: "French", de: "German", fi: "Finnish", es: "Spanish" };
             const targetLang = (article.section === 'local') ? languageNames[activeLanguageHub] : "French";
 
             const promptText = `Context: Title: ${article.title}. Text: ${article.text}
@@ -494,15 +553,10 @@
                 if(cleanStr.startsWith("```json")) cleanStr = cleanStr.replace(/^```json/, "").replace(/```$/, "");
                 article.payloads[tier] = JSON.parse(cleanStr);
             } catch (e) {
-                console.error("JIT Fetch Error", e);
+                console.error("JIT Fetch Failure", e);
             }
         }
 
-        function openReader() {
-            document.getElementById('view-news').classList.remove('active');
-            document.getElementById('view-reader').classList.add('active');
-            renderContent();
-        }
         function exitReaderView() { document.getElementById('view-reader').classList.remove('active'); document.getElementById('view-news').classList.add('active'); }
 
         async function handleLevelSliderChange(val) {
@@ -512,7 +566,7 @@
 
             if(!selectedArticle.payloads[currentTierLabel]) {
                 const key = getApiKey();
-                document.getElementById('reader-dynamic-body-wrapper').style.opacity = '0.3';
+                document.getElementById('reader-dynamic-body-wrapper').style.opacity = '0.1';
                 document.getElementById('jit-loading-indicator').style.display = 'block';
                 await fetchTierPayload(selectedArticle, currentTierLabel, key);
                 document.getElementById('jit-loading-indicator').style.display = 'none';
@@ -548,10 +602,14 @@
             });
 
             document.getElementById('reader-body-display').innerHTML = builtHtml;
-            const ad = adMatrix[selectedLevelIndex];
-            document.getElementById('ad-header-display').innerHTML = ad.header;
-            document.getElementById('ad-badge-display').innerText = ad.badge;
-            document.getElementById('ad-cta-display').innerText = ad.cta;
+            
+            // CONTEXTUAL SPONSOR RENDERING ENGINE
+            const adData = adMatrix[activeLanguageHub] || adMatrix['fr'];
+            document.getElementById('ad-header-display').innerHTML = adData.header;
+            document.getElementById('ad-badge-display').innerText = adData.badge;
+            document.getElementById('ad-cta-display').innerText = adData.cta;
+            document.getElementById('ad-brand-pill').innerText = adData.brand;
+            
             document.getElementById('reader-translation-panel').innerText = data.english_translation;
             
             document.querySelectorAll('.reader-content span.w').forEach(el => {
@@ -559,7 +617,7 @@
                     e.stopPropagation();
                     const surf = this.getAttribute('data-lookup'); 
                     const ctx = this.getAttribute('data-context');
-                    showToast(`🎴 Saved to Game Deck: <b>${surf}</b>`);
+                    showToast(`🎴 Saved: <b>${surf}</b>`);
                     
                     if(!vocabularyList.find(v => v.target.toLowerCase() === surf.toLowerCase())) {
                         vocabularyList.push({ target: surf, context: ctx });
@@ -586,9 +644,9 @@
 
             const hintBox = document.getElementById('wordle-scaffold');
             if (selectedLevelIndex <= 2) {
-                hintBox.innerHTML = `<b>💡 Support CEFR (A1/A2):</b> Clue: ${randomPick.h_en}`;
+                hintBox.innerHTML = `<b>💡 Clue (Native):</b> Clue: ${randomPick.h_en}`;
             } else {
-                hintBox.innerHTML = `<b>🧠 Défi CEFR (${levels[selectedLevelIndex]}):</b> Clue: ${randomPick.h_nat}`;
+                hintBox.innerHTML = `<b>🧠 Clue (Target):</b> Clue: ${randomPick.h_nat}`;
             }
 
             const gridBox = document.getElementById('wordle-grid-box'); gridBox.innerHTML = '';
@@ -619,12 +677,9 @@
             if (wordleCurrentRow >= wordleMaxGuesses) showToast(`Terminé. Mot: ${wordleTargetWord}`);
         }
 
-        /* UPGRADED: BI-DIRECTIONAL FIND-A-WORD MATRIX CONSTRUCTOR */
         function initContextualFindWord() {
             const sourceVocabulary = localMultiLanguageDict[activeLanguageHub] || localMultiLanguageDict['fr'];
             const keys = Object.keys(sourceVocabulary);
-            
-            // Randomly shuffle vocabulary keys from the active article dictionary
             const shuffledKeys = keys.sort(() => 0.5 - Math.random());
             activeFindWordTargets = shuffledKeys.slice(0, 3).map(k => k.toUpperCase());
 
@@ -632,9 +687,8 @@
             const bankBox = document.getElementById('findword-bank-list'); 
             bankBox.innerHTML = '';
 
-            // Render explicit bi-directional layout hooks
             if (selectedLevelIndex <= 2) {
-                hintBox.innerHTML = `<b>💡 Support A1/A2:</b> Search for foreign words directly. Grid matches items exactly.`;
+                hintBox.innerHTML = `<b>💡 Support A1/A2:</b> Search for target words directly. Grid matches items exactly.`;
                 activeFindWordTargets.forEach(w => {
                     const EnglishMeaning = sourceVocabulary[w.toLowerCase()];
                     bankBox.innerHTML += `<span class="bank-item" id="ctx-bi-${w}">${EnglishMeaning} — <b>${w}</b></span>`;
@@ -651,7 +705,6 @@
             gridBox.innerHTML = '';
             const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
             
-            // Generate matrix cells
             for(let i=0; i<48; i++) {
                 const cell = document.createElement('div'); 
                 cell.className = 'findword-cell';
@@ -660,7 +713,6 @@
                 gridBox.appendChild(cell);
             }
             
-            // Embed targeted keywords directly into the grid array dynamically
             const cells = gridBox.querySelectorAll('.findword-cell');
             let cellOffset = 0;
             activeFindWordTargets.forEach(targetWord => {
@@ -668,7 +720,7 @@
                     for(let j=0; j<targetWord.length; j++) {
                         cells[cellOffset + j].innerText = targetWord[j];
                     }
-                    cellOffset += 16; // Shift row offsets to avoid intersecting overwrites
+                    cellOffset += 16;
                 }
             });
         }
@@ -740,7 +792,10 @@
             handleLevelSliderChange(this.value);
         });
 
-        window.onload = function() { generateMultiFeedMatrix(); };
+        window.onload = function() { 
+            syncNativeInterfaceLabels();
+            generateMultiFeedMatrix(); 
+        };
     </script>
 </body>
 </html>
