@@ -3,19 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LangSift Direct v5.4</title>
+    <title>LangSift Direct v5.5</title>
     <style>
         :root { --bg-color: #fdfbf7; --card-bg: #ffffff; --text-color: #2c2520; --text-muted: #6e655f; --accent-color: #8c7853; --accent-light: #eaddca; --success-color: #2e7d32; --nav-bg: #ffffff; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Georgia, serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; }
         .app-container { max-width: 500px; width: 100%; min-height: 100vh; box-sizing: border-box; padding: 20px 20px 110px 20px; }
         .menu-view { display: none; } .menu-view.active { display: block; }
         .app-header { margin-top: 10px; margin-bottom: 15px; text-align: center; }
-        .app-header h1 { font-size: 26px; margin: 0; font-family: Georgia, serif; }
         .settings-panel { background-color: #f5f1e9; border-radius: 14px; padding: 16px; margin-bottom: 20px; border: 1px solid var(--accent-light); display: none; }
-        .refresh-btn { background-color: var(--card-bg); border: 1px solid var(--accent-light); color: var(--accent-color); padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; margin-top: 5px; width: 100%; }
+        .refresh-btn { background-color: var(--card-bg); border: 1px solid var(--accent-light); color: var(--accent-color); padding: 10px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 5px; }
         .content-card { background-color: var(--card-bg); border-radius: 12px; padding: 16px; box-shadow: 0 3px 10px rgba(0,0,0,0.03); margin-bottom: 12px; cursor: pointer; }
-        .reader-header { position: fixed; top: 0; left: 0; right: 0; background-color: var(--bg-color); padding: 20px; z-index: 1000; }
-        .reader-content { margin-top: 100px; }
+        .reader-header { position: fixed; top: 0; left: 0; right: 0; background-color: var(--bg-color); padding: 20px; z-index: 1000; border-bottom: 1px solid #eee; }
+        .reader-content { margin-top: 80px; }
     </style>
 </head>
 <body>
@@ -24,12 +23,8 @@
         <div id="view-news" class="menu-view active">
             <div class="app-header"><h1>LangSift Direct</h1></div>
             
-            <div class="action-bar">
-                <button class="refresh-btn" onclick="toggleSettingsDrawer()">⚙️ Réglages</button>
-            </div>
-
+            <button class="refresh-btn" onclick="toggleSettingsDrawer()">⚙️ Réglages</button>
             <div id="settings-drawer" class="settings-panel">
-                <h3>Configuration</h3>
                 <button id="dev-mode-btn" class="refresh-btn" onclick="toggleDevMode()" style="color: #c62828;">Mode Développeur: OFF</button>
                 <button class="refresh-btn" onclick="clearApiKey()">🔑 Reset API Key</button>
             </div>
@@ -49,75 +44,11 @@
     </div>
 
     <script>
-        // --- STATE MANAGEMENT ---
+        // --- 1. STATE & SEED DATA ---
         let isDevMode = localStorage.getItem('DEV_MODE') === 'true';
-        let newsArticlesCache = [];
-        
-        // Update button text on load
-        document.getElementById('dev-mode-btn').innerText = `Mode Développeur: ${isDevMode ? 'ON' : 'OFF'}`;
-
-        function toggleDevMode() {
-            isDevMode = !isDevMode;
-            localStorage.setItem('DEV_MODE', isDevMode);
-            location.reload();
-        }
-
-        function getApiKey() { return localStorage.getItem('GEMINI_KEY'); }
-
-        async function runAiPipeline(id) {
-            const article = newsArticlesCache.find(a => a.id === id);
-
-            // 1. DEV MODE (Mock Data)
-            if (isDevMode) {
-                article.payload = {
-                    title: article.title,
-                    A1: "<p>Mode Développeur activé. Ceci est une réponse simulée.</p>"
-                };
-                openReader(article);
-                return;
-            }
-
-            // 2. LIVE API
-            const key = getApiKey();
-            if (!key) { alert("Clé API requise."); return; }
-            
-            try {
-                // Fetch logic here...
-                console.log("Fetching live data...");
-            } catch (e) {
-                alert("Erreur API: " + e.message);
-            }
-        }
-
-        function openReader(art) {
-            document.getElementById('view-news').classList.remove('active');
-            document.getElementById('view-reader').classList.add('active');
-            document.getElementById('reader-title').innerText = art.payload.title;
-            document.getElementById('reader-body').innerHTML = art.payload.A1;
-        }
-
-        function exitReaderView() {
-            document.getElementById('view-reader').classList.remove('active');
-            document.getElementById('view-news').classList.add('active');
-        }
-
-        function toggleSettingsDrawer() {
-            const d = document.getElementById('settings-drawer');
-            d.style.display = (d.style.display === 'block') ? 'none' : 'block';
-        }
-
-        function clearApiKey() { localStorage.removeItem('GEMINI_KEY'); location.reload(); }
-
-        // Initialization
-        newsArticlesCache = [{ id: 0, title: "Test Article", payload: null }];
-        const panel = document.getElementById('panel-local');
-        newsArticlesCache.forEach(art => {
-            const div = document.createElement('div');
-            div.className = 'content-card';
-            div.innerHTML = `<h3>${art.title}</h3>`;
-            div.onclick = () => runAiPipeline(art.id);
-            panel.appendChild(div);
-        });
-    </script>
-</body>
-</html>
+        const seedArticles = [
+            { id: 1, title: "Le Grand Paris 2026", text: "Découvrez les nouveaux projets urbains." },
+            { id: 2, title: "L'énergie solaire en hausse", text: "Une analyse des tendances énergétiques." },
+            { id: 3, title: "Sommet climatique global", text: "Les leaders mondiaux se réunissent." }
+        ];
+        let newsArticlesCache = seedArticles;
