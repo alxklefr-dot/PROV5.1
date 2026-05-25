@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LangSift Direct v6.2</title>
+    <title>LangSift Direct v6.5</title>
     <style>
         :root {
             --bg-color: #fdfbf7;
@@ -38,6 +38,7 @@
         .content-card h3 { margin: 0 0 6px 0; font-size: 15px; line-height: 1.35; }
         .content-card p { margin: 0; font-size: 12px; color: var(--text-muted); line-height: 1.4; }
         
+        /* Reader View Layout */
         .reader-header { position: fixed; top: 0; left: 0; right: 0; background-color: var(--bg-color); padding: 14px 20px; box-shadow: 0 3px 15px rgba(0,0,0,0.07); display: flex; flex-direction: column; align-items: center; z-index: 1000; border-bottom: 1px solid rgba(0,0,0,0.05); }
         .nav-row { display: flex; width: 100%; max-width: 500px; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .back-btn { background: none; border: none; font-size: 15px; color: var(--accent-color); font-weight: bold; cursor: pointer; }
@@ -53,6 +54,7 @@
         .eng-toggle-btn { display: block; margin: 25px auto; background: none; border: 1px solid var(--accent-color); color: var(--accent-color); padding: 8px 18px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; }
         .english-translation-panel { background-color: #f3f0ea; border-left: 4px solid var(--accent-color); padding: 16px; font-size: 14.5px; color: #444; line-height: 1.6; white-space: pre-line; display: none; margin-bottom: 35px; border-radius: 0 8px 8px 0; }
         
+        /* Premium Ad Module */
         .brand-ad-card { position: relative; min-height: 200px; border-radius: 16px; overflow: hidden; margin: 35px 0; box-shadow: 0 8px 24px rgba(0,0,0,0.15); background-color: #000; }
         .brand-ad-bg-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&q=80&w=600'); background-size: cover; background-position: center; z-index: 1; }
         .brand-ad-gradient-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.5) 60%, rgba(0,0,0,0.3) 100%); z-index: 2; }
@@ -89,7 +91,7 @@
                 
                 <div class="status-tracker">
                     <span>Source de données active :</span>
-                    <span id="api-status-badge" class="status-badge">CHARGEMENT</span>
+                    <span id="api-status-badge" class="status-badge">INITIALISATION</span>
                 </div>
             </div>
 
@@ -106,7 +108,7 @@
 
         <div id="view-games" class="menu-view">
             <div class="app-header"><h1>Espace Evaluation</h1></div>
-            <div class="placeholder-view">🎮 Mode Évaluation : Les exercices de validation de niveau seront chargés dynamiquement ici.</div>
+            <div class="placeholder-view">🎮 Mode Évaluation : Les exercices de validation de niveau s'afficheront ici.</div>
         </div>
 
         <div id="view-reader" class="menu-view">
@@ -156,23 +158,131 @@
     </div>
 
     <script>
-        // FEED 1: Free structural translated news matrix used when Dev Mode is "ON"
+        // --- 1. FREE MASTER DECOUPLED MATRIX DATABASE (Complete Content Packages for Dev Mode) ---
         const freeNewsFeeds = {
             france: [
-                { id: "free_fr_1", timeline: "live", t: "Plan Vert Paris 2026", d: "La transformation écologique des boulevards urbains s'accélère." },
-                { id: "free_fr_2", timeline: "live", t: "Inauguration Pistes Cyclables", d: "Réseau de voies express cyclables étendu à la petite couronne." },
-                { id: "free_fr_3", timeline: "yesterday", t: "Réforme Électrique Régionale", d: "Modernisation des infrastructures de distribution d'énergie propre." }
+                { 
+                    id: "free_fr_1", 
+                    timeline: "live", 
+                    t: "Plan Vert Paris 2026", 
+                    d: "La transformation écologique des boulevards urbains s'accélère.",
+                    payload: {
+                        title: "Plan Vert Paris 2026",
+                        A1: "<p>Paris change les rues. Il y a beaucoup d'arbres et de plantes. Les voitures ne peuvent pas passer partout. C'est bon pour l'air.</p>",
+                        Eng_A1: "Paris is changing the streets. There are many trees and plants. Cars cannot go everywhere. This is good for the air.",
+                        A2: "<p>La municipalité de Paris transforme les grands boulevards. Ils ajoutent des espaces verts et suppriment des voies pour les voitures. Les habitants aiment marcher ici.</p>",
+                        Eng_A2: "The Paris municipality is transforming the main boulevards. They are adding green spaces and removing car lanes. Residents enjoy walking here.",
+                        B1: "<p>Le projet d'urbanisme de Paris pour 2026 entre dans sa phase active. L'objectif principal est de réduire considérablement la pollution atmosphérique en remplaçant le goudron par des zones végétalisées.</p>",
+                        Eng_B1: "The Paris urban planning project for 2026 is entering its active phase. The primary goal is to significantly reduce air pollution by replacing asphalt with vegetated zones.",
+                        C1: "<p>Face aux défis climatiques contemporains, la mairie de Paris déploie une restructuration globale de sa voirie. Cette transition privilégie la biodiversité endémique au détriment des infrastructures automobiles traditionnelles.</p>",
+                        Eng_C1: "Faced with contemporary climate challenges, the Paris city hall is deploying a comprehensive restructuring of its roadways. This transition privileges endemic biodiversity over traditional automobile infrastructure.",
+                        Fluide: "<p>Véritable modèle d'adaptation métropolitaine, l'édification de ces corridors écologiques parisiens illustre une rupture paradigmatique majeure dans la gestion de l'étalement et de la densification thermique urbaine.</p>",
+                        Eng_Fluide: "A true model of metropolitan adaptation, the construction of these Parisian ecological corridors illustrates a major paradigmatic shift in the management of urban sprawl and thermal densification."
+                    }
+                },
+                { 
+                    id: "free_fr_2", 
+                    timeline: "live", 
+                    t: "Inauguration Pistes Cyclables", 
+                    d: "Réseau de voies express cyclables étendu à la petite couronne.",
+                    payload: {
+                        title: "Inauguration Pistes Cyclables",
+                        A1: "<p>Il y a de nouvelles pistes pour les vélos. Les vélos sont en sécurité maintenant. C'est facile de voyager sans voiture.</p>",
+                        Eng_A1: "There are new paths for bikes. Bikes are safe now. It is easy to travel without a car.",
+                        A2: "<p>Aujourd'hui, le maire a ouvert une grande piste cyclable. Cette voie connecte directement le centre-ville aux banlieues proches pour encourager le vélo.</p>",
+                        Eng_A2: "Today, the mayor opened a large bicycle lane. This lane directly connects the city center to nearby suburbs to encourage cycling.",
+                        B1: "<p>Le réseau de pistes cyclables s'agrandit avec l'ouverture d'un nouvel axe protégé. Les cyclistes de la petite couronne peuvent désormais rejoindre le centre en moins de vingt minutes en toute sécurité.</p>",
+                        Eng_B1: "The bicycle lane network expands with the opening of a new protected axis. Inner-suburb cyclists can now reach the center in less than twenty minutes in complete safety.",
+                        C1: "<p>L'inauguration de cette autoroute cyclable marque un tournant dans la politique de mobilité francilienne. Les infrastructures ont été repensées pour garantir une séparation stricte des flux de circulation.</p>",
+                        Eng_C1: "The inauguration of this cycling highway marks a turning point in the mobility policy of the Île-de-France region. Infrastructures have been redesigned to guarantee a strict separation of traffic flows.",
+                        Fluide: "<p>L'extension de ces voies d'accès douces au cœur du tissu urbain périphérique cristallise la volonté politique de désengorger les réseaux de transports saturés tout en favorisant l'éco-mobilité.</p>",
+                        Eng_Fluide: "The extension of these soft access routes into the heart of the peripheral urban fabric crystallizes the political will to relieve congested transport networks while promoting eco-mobility."
+                    }
+                },
+                { 
+                    id: "free_fr_3", 
+                    timeline: "yesterday", 
+                    t: "Réforme Électrique Régionale", 
+                    d: "Modernisation des infrastructures de distribution d'énergie propre.",
+                    payload: {
+                        title: "Réforme Électrique Régionale",
+                        A1: "<p>L'électricité change dans la région. L'énergie vient maintenant du soleil et du vent. C'est mieux pour la Terre.</p>",
+                        Eng_A1: "Electricity is changing in the region. Energy now comes from the sun and the wind. It is better for the Earth.",
+                        A2: "<p>La région va moderniser ses câbles électriques. Le nouveau système va distribuer uniquement de l'énergie propre aux maisons et aux usines de la zone.</p>",
+                        Eng_A2: "The region is going to modernize its electrical cables. The new system will distribute only clean energy to houses and factories in the area.",
+                        B1: "<p>Une grande réforme du réseau électrique régional a été votée hier soir. Les anciennes installations énergétiques obsolètes seront remplacées par des réseaux intelligents connectés aux parcs éoliens locaux.</p>",
+                        Eng_B1: "A major reform of the regional power grid was voted on yesterday evening. Ancient obsolete energy installations will be replaced by smart grids connected to local wind farms.",
+                        C1: "<p>Ce réajustement structurel de la distribution énergétique vise à optimiser l'intégration des énergies intermittentes. Les investissements colossaux prévus devront fluidifier l'approvisionnement régional.</p>",
+                        Eng_C1: "This structural readjustment of energy distribution aims to optimize the integration of intermittent energies. The colossal investments planned must fluidify regional supply.",
+                        Fluide: "<p>L'implémentation de ces réseaux intelligents d'électricité verte augure d'une résilience accrue face aux pics de consommation nationaux, tout en entérinant le désengagement progressif des énergies fossiles.</p>",
+                        Eng_Fluide: "The implementation of these smart grids for green electricity augurs increased resilience against national consumption peaks, while endorsing the progressive disengagement from fossil fuels."
+                    }
+                }
             ],
             europe: [
-                { id: "free_eu_1", timeline: "live", t: "Normes Énergétiques Bruxelles", d: "Adoption du nouveau pacte pour l'efficacité des bâtiments publics." },
-                { id: "free_eu_2", timeline: "yesterday", t: "Réseau Ferroviaire Européen", d: "Lancement des lignes de nuit reliant cinq capitales majeures." }
+                { 
+                    id: "free_eu_1", 
+                    timeline: "live", 
+                    t: "Normes Énergétiques Bruxelles", 
+                    d: "Adoption du nouveau pacte pour l'efficacité des bâtiments publics.",
+                    payload: {
+                        title: "Normes Énergétiques Bruxelles",
+                        A1: "<p>L'Europe dit non au gaspillage. Les grands bâtiments publics doivent fermer les lumières et utiliser moins de chauffage.</p>",
+                        Eng_A1: "Europe says no to waste. Large public buildings must turn off lights and use less heating.",
+                        A2: "<p>À Bruxelles, l'Union européenne a voté une nouvelle loi. Les bureaux administratifs doivent installer des fenêtres isolantes pour économiser beaucoup d'énergie.</p>",
+                        Eng_A2: "In Brussels, the European Union voted on a new law. Administrative offices must install insulating windows to save a lot of energy.",
+                        B1: "<p>Le Parlement européen vient de ratifier des contraintes d'isolation thermique strictes pour le parc immobilier public. Chaque État membre devra soumettre un plan de rénovation annuel.</p>",
+                        Eng_B1: "The European Parliament has just ratified strict thermal insulation constraints for the public housing stock. Each member state must submit an annual renovation plan.",
+                        C1: "<p>L'adoption de ce décret bruxellois impose une standardisation rigoureuse de l'efficience énergétique institutionnelle. Les administrations réticentes s'exposeront à de lourdes sanctions financières d'ici deux ans.</p>",
+                        Eng_C1: "The adoption of this Brussels decree imposes a rigorous standardization of institutional energy efficiency. Reluctant administrations will expose themselves to heavy financial penalties within two years.",
+                        Fluide: "<p>Ce tournant législatif communautaire marque l'avènement d'une gouvernance environnementale plus coercitive, contraignant les appareils étatiques à subordonner leurs infrastructures immobilières aux exigences de la transition écologique.</p>",
+                        Eng_Fluide: "This community legislative turning point marks the advent of a more coercive environmental governance, forcing state apparatuses to subordinate their real estate infrastructures to the demands of the ecological transition."
+                    }
+                },
+                { 
+                    id: "free_eu_2", 
+                    timeline: "yesterday", 
+                    t: "Réseau Ferroviaire Européen", 
+                    d: "Lancement des lignes de nuit reliant cinq capitales majeures.",
+                    payload: {
+                        title: "Réseau Ferroviaire Européen",
+                        A1: "<p>Il y a des nouveaux trains de nuit. Vous pouvez dormir dans le train et voyager entre de grandes villes comme Paris et Berlin.</p>",
+                        Eng_A1: "There are new night trains. You can sleep in the train and travel between big cities like Paris and Berlin.",
+                        A2: "<p>Cinq pays d'Europe ont créé des lignes de trains de nuit. Les voyageurs peuvent prendre le train le soir et se réveiller le lendemain dans une autre capitale.</p>",
+                        Eng_A2: "Five European countries have created night train lines. Travelers can take the train in the evening and wake up the next day in another capital.",
+                        B1: "<p>Le secteur ferroviaire européen se dynamise avec le retour massif des trains de nuit transfrontaliers. Ce projet ambitieux offre une alternative écologique crédible aux vols intérieurs court-courriers.</p>",
+                        Eng_B1: "The European rail sector is boosting with the massive return of cross-border night trains. This ambitious project offers a credible ecological alternative to short-haul domestic flights.",
+                        C1: "<p>L'unification opérationnelle de ces liaisons nocturnes européennes représente un défi technique majeur en termes d'interopérabilité des réseaux. Cinq capitales majeures se trouvent désormais interconnectées sans escale.</p>",
+                        Eng_C1: "The operational unification of these European nocturnal connections represents a major technical challenge in terms of network interoperability. Five major capitals find themselves interconnected without layovers.",
+                        Fluide: "<p>Le déploiement synchrone de ces corridors ferroviaires nocturnes participe activement au décloisonnement des espaces frontaliers européens, tout en s'inscrivant en faux contre l'hégémonie de l'aviation commerciale régionale.</p>",
+                        Eng_Fluide: "The synchronous deployment of these nocturnal rail corridors actively participates in the decompartmentalization of European border spaces, while acting counter to the hegemony of regional commercial aviation."
+                    }
+                }
             ],
             global: [
-                { id: "free_gl_1", timeline: "live", t: "Sommet Solaire Mondial", d: "Hausse record des investissements internationaux dans le photovoltaïque." },
-                { id: "free_gl_2", timeline: "yesterday", t: "Accord Climat Océans", d: "Signature d'un traité historique de protection des eaux internationales." }
+                { 
+                    id: "free_gl_1", 
+                    timeline: "live", 
+                    t: "Sommet Solaire Mondial", 
+                    d: "Hausse record des investissements internationaux dans le photovoltaïque.",
+                    payload: {
+                        title: "Sommet Solaire Mondial",
+                        A1: "<p>Le monde veut plus de soleil. Beaucoup de pays donnent de l'argent pour fabriquer de grands panneaux solaires partout.</p>",
+                        Eng_A1: "The world wants more sun. Many countries are giving money to make large solar panels everywhere.",
+                        A2: "<p>Pendant le sommet mondial, les présidents ont décidé de doubler le nombre de parcs solaires. Cette décision va créer des millions d'emplois verts.</p>",
+                        Eng_A2: "During the world summit, presidents decided to double the number of solar parks. This decision will create millions of green jobs.",
+                        B1: "<p>Les investissements mondiaux dans le secteur de l'énergie photovoltaïque ont atteint des sommets historiques cette semaine. Les pays en développement recevront une aide financière pour s'équiper rapidement.</p>",
+                        Eng_B1: "Global investments in the photovoltaic energy sector reached historic heights this week. Developing countries will receive financial aid to quickly equip themselves.",
+                        C1: "<p>La trajectoire financière mondiale s'oriente résolument vers la décarbonation avec l'annonce de subventions massives pour le solaire. Les experts prévoient une mutation structurelle profonde de l'industrie énergétique globale.</p>",
+                        Eng_C1: "The global financial trajectory is resolutely orienting toward decarbonization with the announcement of massive subsidies for solar power. Experts predict a profound structural mutation of the global energy industry.",
+                        Fluide: "<p>L'afflux massif de capitaux internationaux vers les technologies photovoltaïques de nouvelle génération consacre l'émancipation définitive du mix énergétique mondial vis-à-vis des marchés spéculatifs des hydrocarbures traditionnels.</p>",
+                        Eng_Fluide: "The massive influx of international capital toward new-generation photovoltaic technologies consecrates the definitive emancipation of the global energy mix from the speculative markets of traditional hydrocarbons."
+                    }
+                }
             ]
         };
 
+        // --- 2. DYNAMIC SYSTEM STATE ---
         let isDevMode = localStorage.getItem('DEV_MODE') === 'true';
         let selectedLevelIndex = 1;
         let selectedArticleData = null;
@@ -180,9 +290,10 @@
 
         function initPlatform() {
             const badge = document.getElementById('api-status-badge');
-            document.getElementById('dev-mode-btn').innerText = `Mode Développeur : ${isDevMode ? 'ACTIF (Mock Feed)' : 'INACTIF (Live API)'}`;
+            document.getElementById('dev-mode-btn').innerText = `Mode Développeur : ${isDevMode ? 'ACTIF (Mock Full Text)' : 'INACTIF (Live API)'}`;
+            document.getElementById('dev-mode-btn').style.backgroundColor = isDevMode ? '#eaddca' : '#ffffff';
             
-            badge.innerText = isDevMode ? "FEED COMPLET SANS API" : "READY FOR LIVE REQUESTS";
+            badge.innerText = isDevMode ? "DEV MODE : TEXTE DISPONIBLE" : "READY FOR LIVE REQUESTS";
             badge.style.background = isDevMode ? "#8c7853" : "#2e7d32";
             
             generateFeedUI();
@@ -215,55 +326,43 @@
             });
         }
 
-        // --- PIPELINE DE ROUTAGE DES DEUX FLUX ---
+        // --- PIPELINE TRAFFIC CONTROLLER ---
         async function runAiPipeline(article) {
             selectedArticleData = article;
             const badge = document.getElementById('api-status-badge');
             
-            // Check structural Local Cache memory first
+            // Step 1: Check storage memory cache first
             const localCache = localStorage.getItem(`cache_id_${article.id}`);
             if (localCache) {
-                badge.innerText = "MÉMOIRE CACHE REMPLACÉE";
+                badge.innerText = "MÉMOIRE CACHE UTILSÉE";
                 badge.style.background = "#2e7d32";
                 selectedArticleData.payload = JSON.parse(localCache);
                 openReaderView();
                 return;
             }
 
-            // FEED 1 ROUTE: Dev Mode active, bypass network completely
+            // Step 2: Dev Mode ON -> Loads the full multi-level package directly
             if (isDevMode) {
-                badge.innerText = "MOCK TRADUCTION INJECTÉE";
-                const mockPayload = {
-                    title: article.t,
-                    A1: `<p><b>[A1]</b> C'est un bon projet. Paris change pour l'environnement.</p>`,
-                    Eng_A1: "This is a good project. Paris changes for the environment.",
-                    A2: `<p><b>[A2]</b> La transformation progresse bien. Les habitants apprécient la verdure.</p>`,
-                    Eng_A2: "The transformation progresses well. Inhabitants appreciate the greenery.",
-                    B1: `<p><b>[B1]</b> Les mesures prises visent à réduire l'empreinte carbone urbaine d'ici la fin de l'année.</p>`,
-                    Eng_B1: "The measures taken aim to reduce the urban carbon footprint by the end of the year.",
-                    C1: `<p><b>[C1]</b> Cette restructuration architecturale s'impose pour pallier les crises écologiques métropolitaines.</p>`,
-                    Eng_C1: "This architectural restructuring is required to mitigate metropolitan ecological crises.",
-                    Fluide: `<p><b>[Fluide]</b> Véritable prouesse urbanistique, le déploiement de ces structures témoigne d'une mutation radicale.</p>`,
-                    Eng_Fluide: "A true urban planning feat, the deployment of these structures witnesses a radical mutation."
-                };
-                selectedArticleData.payload = mockPayload;
-                localStorage.setItem(`cache_id_${article.id}`, JSON.stringify(mockPayload));
+                badge.innerText = "MOCK COMPLET INJECTÉ";
+                // Inject the entire deep payload matrix associated with the clicked item
+                selectedArticleData.payload = article.payload;
+                localStorage.setItem(`cache_id_${article.id}`, JSON.stringify(article.payload));
                 openReaderView();
                 return;
             }
 
-            // FEED 2 ROUTE: Dev mode off, target the live Gemini API requests
+            // Step 3: Dev Mode OFF -> Live API Logic Gateway
             badge.innerText = "APPEL REQUÊTE API LIVE...";
             badge.style.background = "#c62828";
             
             const liveApiKey = localStorage.getItem('GEMINI_KEY');
             if (!liveApiKey) {
-                alert("Erreur: Clé absente. Activez le Mode Développeur ou configurez votre clé système.");
+                alert("Erreur: Clé absente. Activez le Mode Développeur pour utiliser le simulateur de texte intégral.");
                 badge.innerText = "ÉCHEC DE CLÉ API";
                 return;
             }
 
-            console.log("Live mode routing active. Performing request calculations...");
+            console.log("Live API connection sequence initialized...");
         }
 
         function openReaderView() {
@@ -320,7 +419,7 @@
 
         function clearSystemCache() {
             localStorage.clear();
-            alert("Cache nettoyé.");
+            alert("Cache vidé.");
             location.reload();
         }
 
