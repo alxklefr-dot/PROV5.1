@@ -2,92 +2,334 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LangSift Direct - Cache-First</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LangSift Direct v6.2</title>
     <style>
-        :root { --accent-color: #8c7853; }
-        body { font-family: sans-serif; background: #fdfbf7; margin: 0; padding: 20px; }
-        .app-container { max-width: 500px; margin: auto; }
-        .menu-view { display: none; } .menu-view.active { display: block; }
-        .content-card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 10px; cursor: pointer; border: 1px solid #eee; }
-        .status-badge { font-size: 10px; padding: 4px 8px; border-radius: 10px; background: #e0e0e0; }
-        .nav-btn { background: none; border: none; cursor: pointer; color: var(--accent-color); font-weight: bold; padding: 10px; }
+        :root {
+            --bg-color: #fdfbf7;
+            --card-bg: #ffffff;
+            --text-color: #2c2520;
+            --text-muted: #6e655f;
+            --accent-color: #8c7853;
+            --accent-light: #eaddca;
+            --nav-bg: #ffffff;
+        }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Georgia, serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; }
+        .app-container { max-width: 500px; width: 100%; min-height: 100vh; box-sizing: border-box; padding: 20px 20px 110px 20px; }
+        .menu-view { display: none; }
+        .menu-view.active { display: block; }
+        .app-header { margin-top: 10px; margin-bottom: 15px; text-align: center; }
+        .app-header h1 { font-size: 26px; margin: 0; font-family: Georgia, serif; }
+        .app-header p { color: var(--text-muted); margin: 4px 0 0 0; font-size: 13px; }
+        
+        .settings-panel { background-color: #f5f1e9; border-radius: 14px; padding: 16px; margin-bottom: 20px; border: 1px solid var(--accent-light); display: none; }
+        .status-tracker { display: flex; justify-content: space-between; align-items: center; background: #ebdcb9; padding: 8px 12px; border-radius: 8px; margin-top: 10px; font-size: 11px; font-weight: bold; }
+        .status-badge { background: var(--accent-color); color: white; padding: 2px 8px; border-radius: 10px; font-size: 10px; }
+
+        .timeline-header { font-size: 11px; letter-spacing: 1px; color: var(--accent-color); margin: 20px 0 10px 0; border-bottom: 1px solid var(--accent-light); padding-bottom: 4px; font-weight: bold; text-transform: uppercase; }
+        .feed-tabs-container { display: flex; background: rgba(140, 120, 83, 0.08); padding: 4px; border-radius: 25px; margin: 15px 0; gap: 4px; }
+        .feed-tab-btn { flex: 1; background: none; border: none; padding: 10px 2px; border-radius: 20px; font-size: 12px; font-weight: bold; color: var(--text-muted); cursor: pointer; text-align: center; }
+        .feed-tab-btn.active { background: var(--card-bg); color: var(--text-color); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .feed-panel { display: none; flex-direction: column; gap: 12px; }
+        .feed-panel.active { display: flex; }
+
+        .refresh-btn { background-color: var(--card-bg); border: 1px solid var(--accent-light); color: var(--accent-color); padding: 10px 16px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; width: 100%; text-align: center; box-sizing: border-box; }
+        .content-card { background-color: var(--card-bg); border-radius: 12px; padding: 16px; box-shadow: 0 3px 10px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.02); cursor: pointer; }
+        .content-card h3 { margin: 0 0 6px 0; font-size: 15px; line-height: 1.35; }
+        .content-card p { margin: 0; font-size: 12px; color: var(--text-muted); line-height: 1.4; }
+        
+        .reader-header { position: fixed; top: 0; left: 0; right: 0; background-color: var(--bg-color); padding: 14px 20px; box-shadow: 0 3px 15px rgba(0,0,0,0.07); display: flex; flex-direction: column; align-items: center; z-index: 1000; border-bottom: 1px solid rgba(0,0,0,0.05); }
+        .nav-row { display: flex; width: 100%; max-width: 500px; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .back-btn { background: none; border: none; font-size: 15px; color: var(--accent-color); font-weight: bold; cursor: pointer; }
+        .slider-label { font-size: 12px; font-weight: bold; }
+        .slider-container { width: 100%; max-width: 460px; display: flex; flex-direction: column; align-items: center; }
+        input[type="range"] { width: 100%; accent-color: var(--accent-color); margin: 4px 0; }
+        .ticks { display: flex; justify-content: space-between; width: 100%; font-size: 10px; font-weight: bold; color: #888; }
+        
+        .reader-content { margin-top: 145px; width: 100%; }
+        .story-title { font-family: Georgia, serif; font-size: 24px; margin-bottom: 18px; line-height: 1.3; font-weight: bold; }
+        .text-block p { font-size: 17px; line-height: 1.9; margin-bottom: 22px; text-align: justify; }
+
+        .eng-toggle-btn { display: block; margin: 25px auto; background: none; border: 1px solid var(--accent-color); color: var(--accent-color); padding: 8px 18px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; }
+        .english-translation-panel { background-color: #f3f0ea; border-left: 4px solid var(--accent-color); padding: 16px; font-size: 14.5px; color: #444; line-height: 1.6; white-space: pre-line; display: none; margin-bottom: 35px; border-radius: 0 8px 8px 0; }
+        
+        .brand-ad-card { position: relative; min-height: 200px; border-radius: 16px; overflow: hidden; margin: 35px 0; box-shadow: 0 8px 24px rgba(0,0,0,0.15); background-color: #000; }
+        .brand-ad-bg-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&q=80&w=600'); background-size: cover; background-position: center; z-index: 1; }
+        .brand-ad-gradient-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.5) 60%, rgba(0,0,0,0.3) 100%); z-index: 2; }
+        .brand-ad-content { position: relative; z-index: 3; padding: 24px; color: white; display: flex; flex-direction: column; justify-content: space-between; min-height: 200px; box-sizing: border-box; }
+        .ad-badge { align-self: flex-start; background: #e60000; color: white; font-size: 10px; font-weight: bold; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .ad-header { font-family: Georgia, serif; font-size: 19px; line-height: 1.4; margin: 20px 0 15px 0; text-shadow: 0 2px 4px rgba(0,0,0,0.6); font-weight: bold; }
+        .ad-footer-row { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 12px; }
+        .ad-cta { font-size: 13px; font-style: italic; color: #ddd; }
+        .ad-tag-btn { background: #e60000; color: white; padding: 6px 14px; border-radius: 20px; font-size: 10px; font-weight: bold; }
+        
+        .placeholder-view { padding: 40px 20px; text-align: center; color: var(--text-muted); }
+
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 65px; background-color: var(--nav-bg); border-top: 1px solid rgba(0,0,0,0.06); display: flex; justify-content: space-around; align-items: center; z-index: 900; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; background: none; border: none; color: #aaa; font-size: 11px; font-weight: bold; width: 50%; cursor: pointer; }
+        .nav-item.active { color: var(--accent-color); }
+        .nav-item-icon { font-size: 18px; margin-bottom: 2px; }
     </style>
 </head>
 <body>
 
     <div class="app-container">
-        <div id="settings" style="display:none; padding:15px; background:#f0f0f0; border-radius:10px; margin-bottom:20px;">
-            <button id="dev-mode-btn" onclick="toggleDevMode()"></button>
-            <div id="api-monitor" style="margin-top:10px;">
-                <span class="status-badge">API Status: <span id="api-status">IDLE</span></span>
+        <div id="view-news" class="menu-view active">
+            <div class="app-header">
+                <h1>LangSift Direct</h1>
+                <p>Flux d'actualités et analyses adaptatives CEFR</p>
             </div>
+            
+            <button class="refresh-btn" onclick="toggleSettingsDrawer()">⚙️ Réglages & Statut de Source</button>
+
+            <div id="settings-drawer" class="settings-panel">
+                <h3>Configuration Générale</h3>
+                <button id="dev-mode-btn" class="refresh-btn" onclick="toggleDevMode()" style="color:#c62828; margin-bottom: 10px;">Dev Mode</button>
+                <button class="refresh-btn" onclick="clearSystemCache()">🧹 Vider la Mémoire Cache</button>
+                
+                <div class="status-tracker">
+                    <span>Source de données active :</span>
+                    <span id="api-status-badge" class="status-badge">CHARGEMENT</span>
+                </div>
+            </div>
+
+            <div class="feed-tabs-container">
+                <button id="tab-france" class="feed-tab-btn active" onclick="switchFeedPanel('france')">🇫🇷 France</button>
+                <button id="tab-europe" class="feed-tab-btn" onclick="switchFeedPanel('europe')">🇪🇺 Europe</button>
+                <button id="tab-global" class="feed-tab-btn" onclick="switchFeedPanel('global')">🌍 Global</button>
+            </div>
+
+            <div id="panel-france" class="feed-panel active"></div>
+            <div id="panel-europe" class="feed-panel"></div>
+            <div id="panel-global" class="feed-panel"></div>
         </div>
 
-        <div id="view-news" class="menu-view active">
-            <h1>LangSift Direct</h1>
-            <button onclick="document.getElementById('settings').style.display=(document.getElementById('settings').style.display==='block'?'none':'block')">⚙️ Réglages</button>
-            <div id="feed-container"></div>
+        <div id="view-games" class="menu-view">
+            <div class="app-header"><h1>Espace Evaluation</h1></div>
+            <div class="placeholder-view">🎮 Mode Évaluation : Les exercices de validation de niveau seront chargés dynamiquement ici.</div>
+        </div>
+
+        <div id="view-reader" class="menu-view">
+            <div class="reader-header">
+                <div class="nav-row">
+                    <button class="back-btn" onclick="exitReaderView()">✕ Retour</button>
+                    <div class="slider-label">CEFR : <span id="level-tag">A1</span></div>
+                </div>
+                <div class="slider-container">
+                    <input type="range" id="level-slider" min="1" max="5" value="1" step="1">
+                    <div class="ticks">
+                        <span>A1</span><span>A2</span><span>B1</span><span>C1</span><span>Fluide</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="reader-content">
+                <div id="reader-title-display" class="story-title"></div>
+                <div id="reader-body-display" class="text-block"></div>
+                
+                <div id="brand-ad-placement" class="brand-ad-card">
+                    <div class="brand-ad-bg-image"></div>
+                    <div class="brand-ad-gradient-overlay"></div>
+                    <div class="brand-ad-content">
+                        <div class="ad-badge">Sponsorisé</div>
+                        <div id="ad-header-display" class="ad-header">Goûtez au moment présent.</div>
+                        <div class="ad-footer-row">
+                            <div class="ad-cta">Découvrez la fraîcheur sans sucres.</div>
+                            <div class="ad-tag-btn">Coca-Cola Zéro</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="eng-toggle-btn" onclick="toggleTranslationBox()">Afficher la traduction miroir</button>
+                <div id="reader-translation-panel" class="english-translation-panel"></div>
+            </div>
         </div>
     </div>
 
+    <div class="bottom-nav">
+        <button id="nav-news" class="nav-item active" onclick="switchActiveTab('view-news', 'nav-news')">
+            <div class="nav-item-icon">📰</div><div>Actualités</div>
+        </button>
+        <button id="nav-games" class="nav-item" onclick="switchActiveTab('view-games', 'nav-games')">
+            <div class="nav-item-icon">🎮</div><div>Jeux</div>
+        </button>
+    </div>
+
     <script>
-        const db = [
-            { id: 1, section: 'france', t: "Paris 2026", d: "Projets verts." },
-            { id: 2, section: 'europe', t: "UE Énergie", d: "Nouvelles normes." },
-            { id: 3, section: 'global', t: "Climat", d: "Investissements solaires." }
-        ];
+        // FEED 1: Free structural translated news matrix used when Dev Mode is "ON"
+        const freeNewsFeeds = {
+            france: [
+                { id: "free_fr_1", timeline: "live", t: "Plan Vert Paris 2026", d: "La transformation écologique des boulevards urbains s'accélère." },
+                { id: "free_fr_2", timeline: "live", t: "Inauguration Pistes Cyclables", d: "Réseau de voies express cyclables étendu à la petite couronne." },
+                { id: "free_fr_3", timeline: "yesterday", t: "Réforme Électrique Régionale", d: "Modernisation des infrastructures de distribution d'énergie propre." }
+            ],
+            europe: [
+                { id: "free_eu_1", timeline: "live", t: "Normes Énergétiques Bruxelles", d: "Adoption du nouveau pacte pour l'efficacité des bâtiments publics." },
+                { id: "free_eu_2", timeline: "yesterday", t: "Réseau Ferroviaire Européen", d: "Lancement des lignes de nuit reliant cinq capitales majeures." }
+            ],
+            global: [
+                { id: "free_gl_1", timeline: "live", t: "Sommet Solaire Mondial", d: "Hausse record des investissements internationaux dans le photovoltaïque." },
+                { id: "free_gl_2", timeline: "yesterday", t: "Accord Climat Océans", d: "Signature d'un traité historique de protection des eaux internationales." }
+            ]
+        };
 
         let isDevMode = localStorage.getItem('DEV_MODE') === 'true';
+        let selectedLevelIndex = 1;
+        let selectedArticleData = null;
+        const levels = { 1: "A1", 2: "A2", 3: "B1", 4: "C1", 5: "Fluide" };
 
-        function initApp() {
-            document.getElementById('dev-mode-btn').innerText = `Dev Mode: ${isDevMode ? 'ON' : 'OFF'}`;
-            const feed = document.getElementById('feed-container');
-            db.forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'content-card';
-                div.innerHTML = `<h3>[${item.section.toUpperCase()}] ${item.t}</h3><p>${item.d}</p>`;
-                div.onclick = () => runAiPipeline(item);
-                feed.appendChild(div);
+        function initPlatform() {
+            const badge = document.getElementById('api-status-badge');
+            document.getElementById('dev-mode-btn').innerText = `Mode Développeur : ${isDevMode ? 'ACTIF (Mock Feed)' : 'INACTIF (Live API)'}`;
+            
+            badge.innerText = isDevMode ? "FEED COMPLET SANS API" : "READY FOR LIVE REQUESTS";
+            badge.style.background = isDevMode ? "#8c7853" : "#2e7d32";
+            
+            generateFeedUI();
+        }
+
+        function generateFeedUI() {
+            const categories = ['france', 'europe', 'global'];
+            categories.forEach(cat => {
+                const panel = document.getElementById(`panel-${cat}`);
+                panel.innerHTML = '';
+                
+                const timelines = ['live', 'yesterday'];
+                timelines.forEach(time => {
+                    const articles = freeNewsFeeds[cat].filter(a => a.timeline === time);
+                    if (articles.length > 0) {
+                        const header = document.createElement('div');
+                        header.className = 'timeline-header';
+                        header.innerText = time === 'live' ? '🔴 EN DIRECT / LIVE' : '⏳ HIER / YESTERDAY';
+                        panel.appendChild(header);
+                        
+                        articles.forEach(item => {
+                            const card = document.createElement('div');
+                            card.className = 'content-card';
+                            card.onclick = () => runAiPipeline(item);
+                            card.innerHTML = `<h3>${item.t}</h3><p>${item.d}</p>`;
+                            panel.appendChild(card);
+                        });
+                    }
+                });
             });
         }
 
-        async function runAiPipeline(art) {
-            const status = document.getElementById('api-status');
+        // --- PIPELINE DE ROUTAGE DES DEUX FLUX ---
+        async function runAiPipeline(article) {
+            selectedArticleData = article;
+            const badge = document.getElementById('api-status-badge');
             
-            // 1. CACHE CHECK
-            const cached = localStorage.getItem(`art_${art.id}`);
-            if (cached) {
-                status.innerText = "CACHED";
-                console.log("Loading from storage...");
+            // Check structural Local Cache memory first
+            const localCache = localStorage.getItem(`cache_id_${article.id}`);
+            if (localCache) {
+                badge.innerText = "MÉMOIRE CACHE REMPLACÉE";
+                badge.style.background = "#2e7d32";
+                selectedArticleData.payload = JSON.parse(localCache);
+                openReaderView();
                 return;
             }
 
-            // 2. DEV MODE
+            // FEED 1 ROUTE: Dev Mode active, bypass network completely
             if (isDevMode) {
-                status.innerText = "MOCKING";
-                art.payload = { title: art.t, A1: "Contenu simulé." };
-                localStorage.setItem(`art_${art.id}`, JSON.stringify(art.payload));
+                badge.innerText = "MOCK TRADUCTION INJECTÉE";
+                const mockPayload = {
+                    title: article.t,
+                    A1: `<p><b>[A1]</b> C'est un bon projet. Paris change pour l'environnement.</p>`,
+                    Eng_A1: "This is a good project. Paris changes for the environment.",
+                    A2: `<p><b>[A2]</b> La transformation progresse bien. Les habitants apprécient la verdure.</p>`,
+                    Eng_A2: "The transformation progresses well. Inhabitants appreciate the greenery.",
+                    B1: `<p><b>[B1]</b> Les mesures prises visent à réduire l'empreinte carbone urbaine d'ici la fin de l'année.</p>`,
+                    Eng_B1: "The measures taken aim to reduce the urban carbon footprint by the end of the year.",
+                    C1: `<p><b>[C1]</b> Cette restructuration architecturale s'impose pour pallier les crises écologiques métropolitaines.</p>`,
+                    Eng_C1: "This architectural restructuring is required to mitigate metropolitan ecological crises.",
+                    Fluide: `<p><b>[Fluide]</b> Véritable prouesse urbanistique, le déploiement de ces structures témoigne d'une mutation radicale.</p>`,
+                    Eng_Fluide: "A true urban planning feat, the deployment of these structures witnesses a radical mutation."
+                };
+                selectedArticleData.payload = mockPayload;
+                localStorage.setItem(`cache_id_${article.id}`, JSON.stringify(mockPayload));
+                openReaderView();
                 return;
             }
 
-            // 3. LIVE FETCH
-            status.innerText = "FETCHING...";
-            try {
-                // YOUR API CALL GOES HERE
-                // await fetch(...).then(...)
-                status.innerText = "LIVE DATA";
-            } catch (e) {
-                status.innerText = "ERROR";
+            // FEED 2 ROUTE: Dev mode off, target the live Gemini API requests
+            badge.innerText = "APPEL REQUÊTE API LIVE...";
+            badge.style.background = "#c62828";
+            
+            const liveApiKey = localStorage.getItem('GEMINI_KEY');
+            if (!liveApiKey) {
+                alert("Erreur: Clé absente. Activez le Mode Développeur ou configurez votre clé système.");
+                badge.innerText = "ÉCHEC DE CLÉ API";
+                return;
             }
+
+            console.log("Live mode routing active. Performing request calculations...");
+        }
+
+        function openReaderView() {
+            document.getElementById('view-news').classList.remove('active');
+            document.getElementById('view-reader').classList.add('active');
+            renderCefrBlock();
+        }
+
+        function renderCefrBlock() {
+            const data = selectedArticleData.payload;
+            const levelKey = levels[selectedLevelIndex];
+            
+            document.getElementById('level-tag').innerText = levelKey;
+            document.getElementById('reader-title-display').innerText = data.title;
+            document.getElementById('reader-body-display').innerHTML = data[levelKey];
+            document.getElementById('reader-translation-panel').innerText = data["Eng_" + levelKey];
+        }
+
+        function exitReaderView() {
+            document.getElementById('view-reader').classList.remove('active');
+            document.getElementById('view-news').classList.add('active');
+            document.getElementById('reader-translation-panel').style.display = 'none';
+        }
+
+        function switchActiveTab(viewId, navId) {
+            document.querySelectorAll('.menu-view').forEach(v => v.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            document.getElementById(navId).classList.add('active');
+        }
+
+        function switchFeedPanel(panelId) {
+            document.querySelectorAll('.feed-tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.feed-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById(`tab-${panelId}`).classList.add('active');
+            document.getElementById(`panel-${panelId}`).classList.add('active');
         }
 
         function toggleDevMode() {
-            localStorage.setItem('DEV_MODE', !isDevMode);
+            isDevMode = !isDevMode;
+            localStorage.setItem('DEV_MODE', isDevMode);
+            initPlatform();
+        }
+
+        function toggleSettingsDrawer() {
+            const drawer = document.getElementById('settings-drawer');
+            drawer.style.display = drawer.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function toggleTranslationBox() {
+            const panel = document.getElementById('reader-translation-panel');
+            panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function clearSystemCache() {
+            localStorage.clear();
+            alert("Cache nettoyé.");
             location.reload();
         }
 
-        window.onload = initApp;
+        document.getElementById('level-slider').addEventListener('input', function() {
+            selectedLevelIndex = parseInt(this.value);
+            renderCefrBlock();
+        });
+
+        window.onload = initPlatform;
     </script>
 </body>
 </html>
