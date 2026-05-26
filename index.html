@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LangSift Direct v5.6 - Master Edition</title>
+    <title>LangSift Direct v5.3 (Optimized)</title>
     <style>
         :root {
             --bg-color: #fdfbf7;
@@ -13,53 +13,30 @@
             --accent-color: #8c7853;
             --accent-light: #eaddca;
             --success-color: #2e7d32;
-            --danger-color: #c62828;
             --nav-bg: #ffffff;
             --correct-color: #6cab64;
             --present-color: #c9b458;
             --absent-color: #787c7e;
-            --dev-bg: #1e1e1e;
-            --dev-text: #00ff00;
         }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Georgia, serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; }
         .app-container { max-width: 500px; width: 100%; min-height: 100vh; box-sizing: border-box; padding: 20px 20px 110px 20px; }
         .menu-view { display: none; }
         .menu-view.active { display: block; }
-        .app-header { margin-top: 10px; margin-bottom: 15px; text-align: center; position: relative; }
+        .app-header { margin-top: 10px; margin-bottom: 15px; text-align: center; }
         .app-header h1 { font-size: 26px; margin: 0; font-family: Georgia, serif; }
-        .app-header p { color: var(--text-muted); margin: 4px 0 8px 0; font-size: 13px; }
+        .app-header p { color: var(--text-muted); margin: 4px 0 0 0; font-size: 13px; }
         
-        /* Dynamic Network/API Status Indicators */
-        .status-indicator-pill { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: bold; padding: 4px 10px; border-radius: 20px; border: 1px solid rgba(0,0,0,0.05); background: #ffffff; box-shadow: 0 2px 5px rgba(0,0,0,0.03); margin-bottom: 5px; }
-        .status-indicator-pill.connected { color: var(--success-color); border-color: rgba(46, 125, 50, 0.2); background: rgba(46, 125, 50, 0.05); }
-        .status-indicator-pill.disconnected { color: var(--danger-color); border-color: rgba(198, 40, 40, 0.2); background: rgba(198, 40, 40, 0.05); }
-
         .settings-panel { background-color: #f5f1e9; border-radius: 14px; padding: 16px; margin-bottom: 20px; border: 1px solid var(--accent-light); display: none; }
-        .settings-panel h3 { margin: 0 0 12px 0; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 4px; }
-        
-        .dev-panel { background-color: var(--dev-bg); color: #fff; border-radius: 14px; padding: 16px; margin-bottom: 20px; border: 1px solid #333; display: none; font-family: monospace; font-size: 12px; }
-        .dev-panel h3 { margin: 0 0 12px 0; font-size: 13px; text-transform: uppercase; color: var(--dev-text); border-bottom: 1px solid #333; padding-bottom: 4px; }
-        
-        .usage-tracker-box { background: rgba(255,255,255,0.08); border-radius: 8px; padding: 12px; margin-bottom: 14px; border: 1px solid #444; }
-        .usage-row { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 12px; }
-        .usage-bar-bg { width: 100%; height: 6px; background: #333; border-radius: 3px; overflow: hidden; margin-top: 4px; }
-        .usage-bar-fill { height: 100%; background: var(--dev-text); width: 0%; transition: width 0.3s ease; }
+        .settings-panel h3 { margin: 0 0 12px 0; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .settings-row { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+        .settings-select { padding: 10px; border-radius: 8px; border: 1px solid var(--accent-light); background: white; font-size: 13px; font-weight: bold; width: 100%; box-sizing: border-box; outline: none; }
 
-        .settings-row { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
-        .settings-select, .key-input { padding: 10px; border-radius: 8px; border: 1px solid var(--accent-light); background: white; font-size: 13px; font-weight: bold; width: 100%; box-sizing: border-box; outline: none; }
-        .key-input { font-family: monospace; font-size: 12px; }
-
-        .toggle-container { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; background: rgba(255,255,255,0.05); padding: 8px; border-radius: 6px; }
-        .switch { position: relative; display: inline-block; width: 44px; height: 22px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider-toggle { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #555; transition: .3s; border-radius: 22px; }
-        .slider-toggle:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
-        input:checked + .slider-toggle { background-color: #00ff00; }
-        input:checked + .slider-toggle:before { transform: translateX(22px); }
-
-        .capsule-log-display { background: #000; color: #aaa; border: 1px solid #333; border-radius: 6px; padding: 10px; max-height: 100px; overflow-y: auto; font-size: 11px; line-height: 1.4; margin-top: 10px; }
-        .log-entry-fixed { color: #55ff55; }
-        .log-entry-change { color: #55ffff; }
+        /* TELEMETRY DASHBOARD STYLES */
+        .telemetry-dashboard { background: #fff; border: 1px solid var(--accent-light); border-radius: 8px; padding: 10px; margin-top: 10px; font-family: monospace; font-size: 11px; color: #333; }
+        .telemetry-row { display: flex; justify-content: space-between; margin-bottom: 4px; }
+        .telemetry-status { font-weight: bold; }
+        .status-online { color: var(--success-color); }
+        .status-offline { color: #c62828; }
 
         .feed-tabs-container { display: flex; background: rgba(140, 120, 83, 0.08); padding: 4px; border-radius: 25px; margin: 20px 0; gap: 4px; }
         .feed-tab-btn { flex: 1; background: none; border: none; padding: 10px 2px; border-radius: 20px; font-size: 12px; font-weight: bold; color: var(--text-muted); cursor: pointer; text-align: center; }
@@ -67,16 +44,12 @@
         .feed-panel { display: none; }
         .feed-panel.active { display: flex; flex-direction: column; gap: 12px; }
 
-        .action-bar { display: flex; justify-content: center; margin-bottom: 15px; gap: 10px; flex-wrap: wrap; }
-        .refresh-btn { background-color: var(--card-bg); border: 1px solid var(--accent-light); color: var(--accent-color); padding: 8px 14px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 4px; border-style: solid; }
-        .refresh-btn.dev-btn-accent { background-color: #2d2d2d; color: var(--dev-text); border-color: #444; }
-        
-        .content-card { background-color: var(--card-bg); border-radius: 12px; padding: 16px; box-shadow: 0 3px 10px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.02); cursor: pointer; position: relative; }
-        .content-card h3 { margin: 0 0 6px 0; font-size: 15px; line-height: 1.35; padding-right: 85px; }
+        .action-bar { display: flex; justify-content: center; margin-bottom: 15px; gap: 10px; }
+        .refresh-btn { background-color: var(--card-bg); border: 1px solid var(--accent-light); color: var(--accent-color); padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; }
+        .content-card { background-color: var(--card-bg); border-radius: 12px; padding: 16px; box-shadow: 0 3px 10px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.02); cursor: pointer; }
+        .content-card h3 { margin: 0 0 6px 0; font-size: 15px; line-height: 1.35; }
         .content-card p { margin: 0; font-size: 12px; color: var(--text-muted); line-height: 1.4; }
-        .card-date-badge { position: absolute; top: 16px; right: 16px; font-size: 10px; font-weight: bold; text-transform: uppercase; padding: 2px 6px; border-radius: 4px; background: rgba(140, 120, 83, 0.1); color: var(--accent-color); display: flex; align-items: center; gap: 2px; }
-        .card-source-badge { display: inline-block; font-size: 9px; font-weight: bold; background: #eae4d8; color: #5e5443; padding: 1px 5px; border-radius: 3px; margin-top: 6px; }
-
+        
         .reader-header { position: fixed; top: 0; left: 0; right: 0; background-color: var(--bg-color); padding: 14px 20px; box-shadow: 0 3px 15px rgba(0,0,0,0.07); display: flex; flex-direction: column; align-items: center; z-index: 1000; border-bottom: 1px solid rgba(0,0,0,0.05); }
         .nav-row { display: flex; width: 100%; max-width: 500px; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .back-btn { background: none; border: none; font-size: 15px; color: var(--accent-color); font-weight: bold; cursor: pointer; }
@@ -94,7 +67,6 @@
         .eng-toggle-btn { display: block; margin: 25px auto; background: none; border: 1px solid var(--accent-color); color: var(--accent-color); padding: 8px 18px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; }
         .english-translation-panel { background-color: #f3f0ea; border-left: 4px solid var(--accent-color); padding: 16px; font-size: 14.5px; color: #444; line-height: 1.6; white-space: pre-line; display: none; margin-bottom: 35px; border-radius: 0 8px 8px 0; }
         
-        /* Brand Placement Design System */
         .brand-ad-card { position: relative; min-height: 160px; border-radius: 16px; overflow: hidden; margin: 35px 0; box-shadow: 0 8px 24px rgba(0,0,0,0.15); background-color: #000; }
         .brand-ad-bg-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&q=80&w=600'); background-size: cover; background-position: center; z-index: 1; }
         .brand-ad-gradient-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.5) 60%, rgba(0,0,0,0.3) 100%); z-index: 2; }
@@ -104,57 +76,55 @@
         .ad-header { font-family: Georgia, serif; font-size: 17px; margin: 10px 0; }
         .ad-footer-row { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 8px; }
         .ad-cta { font-size: 12px; font-style: italic; color: #ddd; }
-        .ad-tag-btn { background: #e60000; color: white; padding: 6px 14px; border-radius: 20px; font-size: 10px; font-weight: bold; text-transform: uppercase; border: none; }
+        .ad-tag-btn { background: #e60000; color: white; padding: 6px 14px; border-radius: 20px; font-size: 10px; font-weight: bold; text-transform: uppercase; }
         
-        /* Mini-Games Interfaces Layout */
-        .game-selection-menu { display: flex; flex-direction: column; gap: 14px; margin-top: 15px; }
-        .game-launcher-card { background: white; border-radius: 12px; padding: 16px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.02); cursor: pointer; }
-        .game-launcher-card h3 { margin: 0 0 4px 0; font-size: 16px; }
-        .game-launcher-card p { margin: 0; font-size: 12px; color: var(--text-muted); }
-        .game-icon { font-size: 24px; }
-        
-        .game-play-window { display: none; background: white; border-radius: 16px; padding: 18px; box-shadow: 0 6px 20px rgba(0,0,0,0.06); border: 1px solid var(--accent-light); margin-top: 10px; }
-        .game-scaffolding-hint { background: #faf8f5; border-left: 4px solid var(--accent-color); padding: 10px; font-size: 12px; color: #555; line-height: 1.4; margin-bottom: 15px; border-radius: 0 6px 6px 0; }
-        
-        /* Wordle Responsive Grid Elements */
-        .wordle-grid { display: flex; flex-direction: column; gap: 6px; margin: 15px 0; align-items: center; }
-        .wordle-row { display: flex; gap: 6px; }
-        .wordle-cell { width: 44px; height: 44px; border: 2px solid #ddd; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: bold; text-transform: uppercase; color: var(--text-color); background: #fff; transition: background 0.2s; }
-        .wordle-cell.correct { background-color: var(--correct-color) !important; color: white !important; border-color: var(--correct-color); }
-        .wordle-cell.present { background-color: var(--present-color) !important; color: white !important; border-color: var(--present-color); }
-        .wordle-cell.absent { background-color: var(--absent-color) !important; color: white !important; border-color: var(--absent-color); }
-
-        /* Word Search Matrix Framework */
-        .findword-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 5px; margin: 15px auto; max-width: 360px; }
-        .findword-cell { aspect-ratio: 1; background: #faf8f5; border: 1px solid #e2dbcf; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; cursor: pointer; user-select: none; transition: background 0.15s; }
-        .findword-cell.selected { background-color: var(--accent-color); color: white; border-color: var(--accent-color); }
-        .bank-box { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
-        .bank-item { font-size: 11px; background: #eee; padding: 4px 8px; border-radius: 4px; font-weight: bold; color: #666; }
-        .bank-item.found { background: #d4edda; color: #155724; text-decoration: line-through; }
-
-        /* Adaptive Flashcards Core Engine */
-        .flashcard-container { display: flex; flex-direction: column; gap: 15px; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid var(--accent-light); }
-        .card-counter { font-size: 12px; font-weight: bold; color: var(--text-muted); text-align: center; }
-        .flashcard { background: #fdfbf7; border: 1px dashed var(--accent-color); border-radius: 8px; padding: 40px 20px; text-align: center; cursor: pointer; min-height: 100px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .word-surface { font-size: 24px; font-weight: bold; font-family: Georgia, serif; }
-        .word-translation { font-size: 18px; color: var(--success-color); font-weight: bold; display: none; margin-top: 15px; }
-        .card-hint { font-size: 11px; color: #aaa; margin-top: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .card-controls { display: flex; gap: 10px; }
-        .card-btn { flex: 1; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 13px; }
-        .card-btn.btn-unknown { background: #f44336; color: white; }
-        .card-btn.btn-know { background: var(--success-color); color: white; }
-
         .loading-screen { display: none; text-align: center; padding: 50px 20px; font-style: italic; color: var(--text-muted); }
         .spinner { border: 4px solid rgba(0,0,0,0.1); width: 36px; height: 36px; border-radius: 50%; border-left-color: var(--accent-color); animation: spin 1s linear infinite; margin: 0 auto 15px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
+        .flashcard-container { display: flex; flex-direction: column; align-items: center; margin-top: 15px; }
+        .card-counter { font-size: 13px; color: var(--text-muted); margin-bottom: 12px; }
+        .flashcard { width: 100%; max-width: 340px; height: 180px; background-color: var(--card-bg); border-radius: 16px; box-shadow: 0 6px 20px rgba(0,0,0,0.05); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; box-sizing: border-box; position: relative; cursor: pointer; }
+        .flashcard .word-surface { font-size: 24px; font-weight: bold; margin-bottom: 8px; }
+        .flashcard .word-translation { font-size: 17px; color: var(--accent-color); font-style: italic; display: none; }
+        .card-hint { position: absolute; bottom: 12px; font-size: 10px; color: #aaa; text-transform: uppercase; }
+        .card-controls { display: flex; gap: 15px; margin-top: 20px; width: 100%; max-width: 340px; }
+        .card-btn { flex: 1; padding: 12px; border-radius: 25px; border: none; font-weight: bold; color: white; cursor: pointer; }
+        .btn-know { background-color: var(--success-color); }
+        .btn-unknown { background-color: var(--accent-color); }
+        .empty-deck { text-align: center; color: var(--text-muted); padding: 40px; }
+        
+        .game-selection-menu { display: flex; flex-direction: column; gap: 14px; margin-top: 10px; }
+        .game-launcher-card { background-color: var(--card-bg); border-radius: 12px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.04); cursor: pointer; border: 1px solid rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; }
+        .game-launcher-card h3 { margin: 0 0 4px 0; font-size: 16px; font-family: Georgia, serif; }
+        .game-launcher-card p { margin: 0; font-size: 12px; color: var(--text-muted); }
+        .game-icon { font-size: 28px; }
+        
+        .game-play-window { display: none; background: var(--card-bg); border-radius: 16px; padding: 20px; box-shadow: 0 6px 20px rgba(0,0,0,0.05); margin-top: 10px; }
+        .game-scaffolding-hint { background-color: rgba(140, 120, 83, 0.1); border-left: 3px solid var(--accent-color); padding: 10px; border-radius: 4px; font-size: 12px; margin-bottom: 15px; font-style: italic; line-height: 1.4; }
+        
+        .wordle-grid { display: flex; flex-direction: column; gap: 5px; align-items: center; margin-bottom: 15px; }
+        .wordle-row { display: flex; gap: 5px; }
+        .wordle-cell { width: 40px; height: 40px; border: 2px solid #e2e2e2; border-radius: 4px; display: flex; justify-content: center; align-items: center; font-size: 18px; font-weight: bold; text-transform: uppercase; }
+        .wordle-cell.correct { background-color: var(--correct-color); border-color: var(--correct-color); color: white; }
+        .wordle-cell.present { background-color: var(--present-color); border-color: var(--present-color); color: white; }
+        .wordle-cell.absent { background-color: var(--absent-color); border-color: var(--absent-color); color: white; }
+        .game-input-row { display: flex; gap: 8px; justify-content: center; margin-top: 10px; }
+        .game-text-input { padding: 10px; width: 140px; text-transform: uppercase; text-align: center; font-weight: bold; font-size: 16px; border: 1px solid var(--accent-light); border-radius: 8px; outline: none; }
+
+        .findword-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; max-width: 320px; margin: 0 auto 15px auto; }
+        .findword-cell { background: #f7f5f0; height: 36px; display: flex; justify-content: center; align-items: center; font-size: 14px; font-weight: bold; border-radius: 4px; cursor: pointer; user-select: none; }
+        .findword-cell.selected { background-color: var(--accent-color); color: white; }
+        .word-bank-box { background: #faf9f5; padding: 12px; border-radius: 8px; font-size: 13px; border: 1px solid rgba(0,0,0,0.04); }
+        .word-bank-title { font-weight: bold; margin-bottom: 6px; font-size: 11px; text-transform: uppercase; color: var(--text-muted); }
+        .bank-item { display: inline-block; background: #fff; padding: 4px 8px; margin: 3px; border-radius: 12px; border: 1px solid var(--accent-light); font-size: 11px; }
+        .bank-item.found { text-decoration: line-through; opacity: 0.4; background: #e2ede2; }
+
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 65px; background-color: var(--nav-bg); border-top: 1px solid rgba(0,0,0,0.06); display: flex; justify-content: space-around; align-items: center; z-index: 900; }
         .nav-item { display: flex; flex-direction: column; align-items: center; background: none; border: none; color: #aaa; font-size: 11px; font-weight: bold; width: 33.3%; cursor: pointer; }
         .nav-item.active { color: var(--accent-color); }
         .nav-item-icon { font-size: 18px; margin-bottom: 2px; }
         .toast { position: fixed; bottom: 80px; background: #2c2520; color: #fff; padding: 10px 18px; border-radius: 20px; font-size: 13px; display: none; z-index: 2000; text-align: center; max-width: 80%; }
-        .game-input-row { display: flex; gap: 8px; margin-top: 10px; width: 100%; box-sizing: border-box; }
-        .game-text-input { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--accent-light); text-transform: uppercase; font-weight: bold; text-align: center; outline: none; }
     </style>
 </head>
 <body>
@@ -162,70 +132,53 @@
     <div class="app-container">
         <div id="view-news" class="menu-view active">
             <div class="app-header">
-                <div id="global-feed-status-badge" class="status-indicator-pill connected">🟢 Connected / Live</div>
                 <h1>LangSift Direct</h1>
                 <p>Journal d'actualités & Jeux pédagogiques adaptatifs</p>
             </div>
-            
             <div class="action-bar">
-                <button class="refresh-btn" onclick="toggleDrawer('user')">⚙️ User Config</button>
-                <button class="refresh-btn dev-btn-accent" onclick="toggleDrawer('dev')">🛠️ Backend Dev</button>
-                <button class="refresh-btn" onclick="rotateNewsCarousel()">🔄 Batch Carousel</button>
-                <button class="refresh-btn" style="background:#8c7853; color:white;" onclick="generateMultiFeedMatrix(true)">📡 Force Sync RSS</button>
+                <button class="refresh-btn" onclick="toggleSettingsDrawer()">⚙️ Réglages & Dev</button>
+                <button class="refresh-btn" onclick="rotateNewsCarousel()">🔄 Permuter (Batch)</button>
             </div>
             
-            <div id="drawer-user-config" class="settings-panel">
-                <h3>Configuration Utilisateur</h3>
+            <div id="settings-drawer" class="settings-panel">
+                <h3>Configuration de l'application</h3>
                 <div class="settings-row">
-                    <label style="font-size:11px; font-weight:bold; color:var(--text-muted);">Clé d'accès API Gemini :</label>
-                    <input type="password" id="field-user-api-key" class="key-input" placeholder="Saisir la clé Google AI Studio..." oninput="commitUserKeyToStorage(this.value)">
-                </div>
-                <div class="settings-row">
-                    <label style="font-size:11px; font-weight:bold; color:var(--text-muted);">Profil Localisé & Flux Actifs :</label>
+                    <label>Profil de langue cible & Hub Localisé :</label>
                     <select id="setting-language-hub" class="settings-select" onchange="handleLanguageHubChange()">
-                        <option value="fr">🇫🇷 France (Paris)</option>
-                        <option value="de">🇩🇪 Allemagne (Berlin)</option>
-                        <option value="fi">🇫🇮 Finlande (Helsinki)</option>
+                        <option value="fr">🇫🇷 Paris (Français)</option>
+                        <option value="de">🇩🇪 Berlin (Deutsch)</option>
+                        <option value="fi">🇫🇮 Helsinki (Suomi)</option>
                     </select>
                 </div>
-                <button class="refresh-btn" style="width:100%; color:#c62828; justify-content:center; margin-top:5px; border-color: rgba(198,40,40,0.2);" onclick="wipeUserApiKey()">🔑 Effacer la clé API</button>
-            </div>
-
-            <div id="drawer-backend-dev" class="dev-panel">
-                <h3>Backend Engineering Controls</h3>
                 
-                <div class="usage-tracker-box">
-                    <div style="font-weight:bold; color:var(--dev-text); margin-bottom:8px; font-size:11px; text-transform:uppercase;">💡 API Telemetry (Free Studio Tier)</div>
-                    <div class="usage-row">
-                        <span>Current RPM Tracking:</span>
-                        <span id="rpm-counter-text">0 / 15</span>
+                <h3>📊 API Dev Performance Metrics</h3>
+                <div class="telemetry-dashboard">
+                    <div class="telemetry-row">
+                        <span>API Gateway Connection:</span>
+                        <span id="tel-status" class="telemetry-status status-offline">DISCONNECTED</span>
                     </div>
-                    <div class="usage-bar-bg"><div id="rpm-bar-fill" class="usage-bar-fill"></div></div>
-                    
-                    <div class="usage-row" style="margin-top:10px;">
-                        <span>Current RPD Tracking:</span>
-                        <span id="rpd-counter-text">0 / 1500</span>
+                    <div class="telemetry-row">
+                        <span>Active Pipeline Tier:</span>
+                        <span id="tel-tier" style="font-weight:bold; color:var(--accent-color);">NONE</span>
                     </div>
-                    <div class="usage-bar-bg"><div id="rpd-bar-fill" class="usage-bar-fill"></div></div>
+                    <div class="telemetry-row">
+                        <span>Prompt Input Tokens:</span>
+                        <span id="tel-input-tokens">0</span>
+                    </div>
+                    <div class="telemetry-row">
+                        <span>Generation Output Tokens:</span>
+                        <span id="tel-output-tokens">0</span>
+                    </div>
+                    <div class="telemetry-row">
+                        <span>Cumulative Lifecycle Session Weight:</span>
+                        <span id="tel-total-tokens" style="font-weight:bold;">0 tokens</span>
+                    </div>
                 </div>
-
-                <div class="toggle-container">
-                    <span>🚫 DEV MODE (API Kill Switch)</span>
-                    <label class="switch">
-                        <input type="checkbox" id="toggle-dev-kill-switch" onchange="toggleDevModeStatus(this.checked)">
-                        <span class="slider-toggle"></span>
-                    </label>
-                </div>
-                <div style="font-size:10px; color:#888; margin-bottom:12px; line-height:1.3;">
-                    Forces internal fallback databases instantly. Completely intercepts and stops outward web requests to safe-keep studio limits and tokens.
-                </div>
-
-                <div style="font-weight:bold; color:var(--dev-text); margin-bottom:4px; font-size:11px;">📄 HISTORIC TIME CAPSULE ENGINE:</div>
-                <div id="time-capsule-terminal" class="capsule-log-display"></div>
+                <br>
+                <button class="refresh-btn" style="width:100%; color:#c62828; border-color:rgba(0,0,0,0.1);" onclick="clearApiKey()">🔑 Reset Gemini API Key</button>
             </div>
-
-            <div id="loading-spinner-block" class="loading-screen"><div class="spinner"></div><b id="loading-status-text">Analyse linguistique en cours...</b></div>
             
+            <div id="loading-spinner-block" class="loading-screen"><div class="spinner"></div><i>Analyse linguistique en cours...</i></div>
             <div id="news-feeds-canvas">
                 <div class="feed-tabs-container">
                     <button id="tab-local" class="feed-tab-btn active" onclick="switchFeedPanel('local')">📍 Actu FR</button>
@@ -239,38 +192,46 @@
         </div>
 
         <div id="view-games" class="menu-view">
-            <div class="app-header"><h1>Le Coin Jeux</h1><p>Adapté au vocabulaire de vos articles du jour</p></div>
+            <div class="app-header">
+                <h1>Le Coin Jeux</h1>
+                <p>Adapté au vocabulaire de vos articles du jour</p>
+            </div>
             
             <div id="games-main-menu" class="game-selection-menu">
                 <div class="game-launcher-card" onclick="launchWordleGame()">
-                    <div><h3>Le Mot (Wordle)</h3><p>Devinez le mot clé de l'actualité en 6 essais.</p></div>
+                    <div><h3>Le Mot (Wordle)</h3><p>Devinez le mot clé de l'actualité.</p></div>
                     <div class="game-icon">🟩</div>
                 </div>
                 <div class="game-launcher-card" onclick="launchFindWordGame()">
-                    <div><h3>Mots Mêlés (Word Search)</h3><p>Retrouvez les termes d'apprentissage cachés.</p></div>
+                    <div><h3>Mots Cachés (Word Search)</h3><p>Retrouvez les expressions clés de vos lectures.</p></div>
                     <div class="game-icon">🔍</div>
                 </div>
             </div>
 
             <div id="game-window-wordle" class="game-play-window">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                    <b style="font-family:Georgia,serif; font-size: 16px;">Le Mot Adaptatif</b><button class="back-btn" onclick="exitGameToMenu()">✕ Menu</button>
+                    <b style="font-family:Georgia,serif;">Le Mot Direct</b>
+                    <button class="back-btn" onclick="exitGameToMenu()">✕ Quitter</button>
                 </div>
                 <div id="wordle-scaffold" class="game-scaffolding-hint"></div>
                 <div id="wordle-grid-box" class="wordle-grid"></div>
                 <div class="game-input-row">
-                    <input type="text" id="wordle-typing-field" class="game-text-input" placeholder="Saisir...">
-                    <button class="refresh-btn" style="background:var(--accent-color); color:white;" onclick="submitWordleGuess()">Valider</button>
+                    <input type="text" id="wordle-typing-field" class="game-text-input" placeholder="MOT">
+                    <button class="refresh-btn" onclick="submitWordleGuess()">Valider</button>
                 </div>
             </div>
 
             <div id="game-window-findword" class="game-play-window">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                    <b style="font-family:Georgia,serif; font-size: 16px;">Mots Mêlés Lexicaux</b><button class="back-btn" onclick="exitGameToMenu()">✕ Menu</button>
+                    <b style="font-family:Georgia,serif;">Mots Cachés Contextuels</b>
+                    <button class="back-btn" onclick="exitGameToMenu()">✕ Quitter</button>
                 </div>
                 <div id="findword-scaffold" class="game-scaffolding-hint"></div>
                 <div id="findword-grid-box" class="findword-grid"></div>
-                <div id="findword-bank-list" class="bank-box"></div>
+                <div class="word-bank-box">
+                    <div class="word-bank-title">Mots à découvrir :</div>
+                    <div id="findword-bank-list"></div>
+                </div>
             </div>
         </div>
 
@@ -293,20 +254,14 @@
             <div class="reader-content">
                 <div id="reader-title-display" class="story-title"></div>
                 <div id="reader-body-display" class="text-block"></div>
-                
                 <div class="brand-ad-label">Sponsorisé — Coca-Cola Zéro</div>
                 <div id="brand-ad-placement" class="brand-ad-card">
                     <div class="brand-ad-bg-image"></div><div class="brand-ad-gradient-overlay"></div>
                     <div class="brand-ad-content">
-                        <div id="ad-badge-display" class="ad-badge">Nouveau !</div>
-                        <div id="ad-header-display" class="ad-header">Partagez le goût unique de Coca-Cola. Tout le plaisir, zéro sucre.</div>
-                        <div class="ad-footer-row">
-                            <div id="ad-cta-display" class="ad-cta">Déjà goûté ?</div>
-                            <div class="ad-tag-btn">Coca-Cola Zéro</div>
-                        </div>
+                        <div id="ad-badge-display" class="ad-badge"></div><div id="ad-header-display" class="ad-header"></div>
+                        <div class="ad-footer-row"><div id="ad-cta-display" class="ad-cta"></div><div class="ad-tag-btn">Coca-Cola Zéro</div></div>
                     </div>
                 </div>
-                
                 <button class="eng-toggle-btn" onclick="toggleTranslationBox()">Afficher la traduction / Show English</button>
                 <div id="reader-translation-panel" class="english-translation-panel"></div>
             </div>
@@ -329,139 +284,86 @@
         let activeCardIndex = 0;
         let currentCarouselBatchIndex = 0; 
         let activeLanguageHub = "fr"; 
-        let isDevKillSwitchActive = false;
         const levels = { 1: "A1", 2: "A2", 3: "B1", 4: "C1", 5: "Fluide" };
         
-        let sessionRPM = 0;
-        let sessionRPD = parseInt(localStorage.getItem('LSIFT_TOTAL_RPD_COUNT') || '0');
+        // Cumulative Metrics Tracking State System
+        let runningLifecycleTokenTotal = 0;
 
         let wordleTargetWord = "VERT";
         let wordleCurrentRow = 0;
         const wordleMaxGuesses = 6;
         let activeFindWordTargets = [];
 
-        const timeCapsuleChangesLedger = [
-            { type: "FIX", desc: "Resolved uppercase-vs-lowercase mismatch for English translation lookup vectors." },
-            { type: "FIX", desc: "Patched text parser regex splitting array to gracefully isolate structural apostrophes and hyphens." },
-            { type: "FIX", desc: "Fixed out-of-bounds array clamping limits across historical carousel switches." },
-            { type: "CHG", desc: "Integrated explicit validation check inside Wordle validation tracking grids." }
-        ];
-
-        const rssFeedsMap = {
-            local: {
-                fr: "https://www.france24.com/fr/france/rss",
-                de: "https://rss.dw.com/rdf/rss-de-top",
-                fi: "https://yle.fi/uutiset/rss/paauutiset"
-            },
-            europe: "https://www.france24.com/fr/europe/rss",
-            world: "https://www.france24.com/fr/monde/rss"
-        };
-
-        const nativeDatabaseFallback = {
-            fr: [
-                { title: "Paris: Végétalisation Urbaine", text: "La municipalité déploie de grands espaces verts sur les places centrales pour contrer la chaleur.", age: "⚡ Live" },
-                { title: "Nouvelles Pistes Cyclables", text: "Le réseau de transport s'agrandit avec des voies dédiées aux vélos électriques en centre-ville.", age: "⚡ Live" }
-            ],
-            de: [
-                { title: "Berlin: Urbane Begrünung", text: "Die Stadtverwaltung baut massive schattige Alleen, um urbane Hitzeinseln im Sommer zu reduzieren.", age: "⚡ Live" }
-            ],
-            fi: [
-                { title: "Helsinki: Urbaani Vihreä Suunnitelma", text: "Kaupunki panostaa suuriin puistoalueisiin ja ekologisiin julkisiin kulkuvälineisiin keskustassa.", age: "⚡ Live" }
-            ],
-            europe: [
-                { title: "Bruxelles: Pacte Isolation Logement", text: "Les ministres européens s'accordent sur un plan de financement pour rénover l'isolation des bâtiments publics.", age: "⏳ Hier" }
-            ],
-            world: [
-                { title: "Transition Énergétique Mondiale", text: "Les investissements internationaux dans les infrastructures solaires atteignent un sommet historique cette année.", age: "⏳ Hier" }
-            ]
+        const nativeDatabase = {
+            fr: [{ t: "Paris 2026: Modernisation verte majeure des places", d: "La Mairie de Paris lance un plan de végétalisation massive pour transformer les axes routiers urbains." }, { t: "Rénovation et extension des pistes cyclables", d: "De nouveaux aménagements protégés vont voir le jour pour les déplacements écologiques." }],
+            de: [{ t: "Berlin 2026: Große grüne Modernisierung", d: "Das Berliner Rathaus startet einen massiven Begrünungsplan für städtische Hauptverkehrsachsen." }, { t: "Ausbau von geschützten Radwegen", d: "Neue geschützte Infrastrukturen werden entstehen, um die Mobilität im Zentrum zu verbessern." }],
+            fi: [{ t: "Helsinki 2026: Torien suuri vihreä uudistus", d: "Helsingin kaupunki aloittaa massiivisen viherryttämisohjelman muuttaakseen urbaaneja pääväyliä." }, { t: "Pyöräteiden laajentaminen kantakaupungissa", d: "Uusia suojattuja reittejä rakennetaan sujuvoittamaan ympäristöystävällistä liikkumista." }],
+            europe: [{ t: "Bruxelles harmonise les normes de logement", d: "L'Union Européenne adopte un texte majeur pour accélérer l'isolation thermique." }],
+            world: [{ t: "Transition globale: Hausse des investissements", d: "Les rapports internationaux indiquent un basculement historique vers les énergies renouvelables." }]
         };
 
         const localMultiLanguageDict = {
-            fr: { "vert": "green", "ville": "city", "plan": "plan", "eau": "water", "nuit": "night", "paris": "Paris" },
+            fr: { "vert": "green", "ville": "city", "plan": "plan", "eau": "water", "nuit": "night" },
             de: { "grün": "green", "raum": "space", "stadt": "city", "wind": "wind", "neues": "new" },
             fi: { "uusi": "new", "tila": "space", "meri": "sea", "torit": "markets", "puisto": "park" }
         };
 
         const gameContextWordsByLang = {
-            fr: [ { w: "VERT", h_en: "The color of nature and environmental shift.", h_nat: "La couleur de l'écologie et des plantes." }, 
-                 { w: "VILLE", h_en: "An organized urban metropolitan center.", h_nat: "Un grand centre urbain habité." } ],
-            de: [ { w: "GRÜN", h_en: "The color of environmental progress.", h_nat: "Die Farbe von Natur und Umweltschutz." }, 
-                 { w: "STADT", h_en: "An urban environment like Berlin.", h_nat: "Ein urbanes Gebiet mit vielen Gebäuden." } ],
-            fi: [ { w: "UUSI", h_en: "Opposite of old; recent creation.", h_nat: "Vanhan vastakohta; hiljattain luotu asia." }, 
-                 { w: "MERI", h_en: "The vast body of saltwater surrounding Helsinki.", h_nat: "Suuri suolaisen veden alue Helsingin ympärillä." } ]
+            fr: [ { w: "VERT", h_en: "The color Paris is turning green.", h_nat: "La couleur de la nature et de l'écologie." }, { w: "VILLE", h_en: "An urban metropolitan center.", h_nat: "Un grand centre urbain avec beaucoup d'habitants." } ],
+            de: [ { w: "GRÜN", h_en: "The color of environmental progress.", h_nat: "Die Farbe von Natur und Umweltschutz." }, { w: "STADT", h_en: "An urban environment like Berlin.", h_nat: "Ein urbanes Gebiet mit vielen Gebäuden." } ],
+            fi: [ { w: "UUSI", h_en: "Opposite of old; recent creation.", h_nat: "Vanhan vastakohta; hiljattain luotu asia." }, { w: "MERI", h_en: "The vast body of saltwater surrounding Helsinki.", h_nat: "Suuri suolaisen veden alue Helsingin ympärillä." } ]
         };
 
         const adMatrix = { 
-            1: { header: "Partagez le goût de Coca-Cola. Sans sucre !", badge: "Nouveau !", cta: "Déjà goûté ?" },
-            2: { header: "Partagez le bon goût de Coca-Cola. Zéro sucre !", badge: "Recette !", cta: "Essayé ?" },
-            3: { header: "Partagez le vrai goût de Coca-Cola, le sucre en moins.", badge: "Formule !", cta: "Qu'attendez-vous ?" },
-            4: { header: "Partagez l'intensité, la culpabilité en moins.", badge: "Saveur !", cta: "Prêt ?" },
-            5: { header: "Partagez le goût unique de Coca-Cola. Tout le plaisir, zéro sucre.", badge: "Pure !", cta: "Testé ?" }
+            1: { header: "Partagez le goût de Coca-Cola. Sans sucre !", badge: "Nouveau !", cta: "Déjà goûté ?", eng: "[A1] Taste without sugar." }, 
+            2: { header: "Partagez le bon goût de Coca-Cola. Zéro sucre !", badge: "Recette !", cta: "Essayé ?", eng: "[A2] Share the good taste." }, 
+            3: { header: "Partagez le vrai goût de Coca-Cola, le sucre en moins.", badge: "Formule !", cta: "Qu'attendez-vous ?", eng: "[B1] The true taste minus sugar." }, 
+            4: { header: "Partagez l'intensité, la culpabilité en moins.", badge: "Saveur !", cta: "Prêt ?", eng: "[C1] Intensity minus guilt." }, 
+            5: { header: "Partagez le goût unique de Coca-Cola. Tout le plaisir, zéro sucre.", badge: "Pure !", cta: "Testé ?", eng: "[Fluide] Unique taste, pure pleasure." } 
         };
 
-        function registerApiUsageRequest() {
-            sessionRPM++; sessionRPD++;
-            localStorage.setItem('LSIFT_TOTAL_RPD_COUNT', sessionRPD.toString());
-            refreshTelemetryDisplay();
-            setTimeout(() => { if(sessionRPM > 0) sessionRPM--; refreshTelemetryDisplay(); }, 60000);
-        }
-
-        function refreshTelemetryDisplay() {
-            document.getElementById('rpm-counter-text').innerText = `${sessionRPM} / 15`;
-            document.getElementById('rpd-counter-text').innerText = `${sessionRPD} / 1500`;
-            document.getElementById('rpm-bar-fill').style.width = `${Math.min((sessionRPM / 15) * 100, 100)}%`;
-            document.getElementById('rpd-bar-fill').style.width = `${Math.min((sessionRPD / 1500) * 100, 100)}%`;
-        }
-
-        function updateGlobalStatusBadge() {
-            const pill = document.getElementById('global-feed-status-badge');
-            if (isDevKillSwitchActive) {
-                pill.className = "status-indicator-pill disconnected"; pill.innerText = "🔴 DEV Mode / Offline";
+        function getApiKey() {
+            let key = localStorage.getItem('GEMINI_KEY');
+            if (!key) { 
+                key = prompt("🔒 Clé API Google AI Studio requise :"); 
+                if (key) {
+                    localStorage.setItem('GEMINI_KEY', key);
+                    updateTelemetryStatus(true);
+                }
             } else {
-                pill.className = "status-indicator-pill connected"; pill.innerText = "🟢 Connected / Live";
+                updateTelemetryStatus(true);
             }
+            return key;
         }
 
-        function toggleDrawer(targetKey) {
-            const userPanel = document.getElementById('drawer-user-config');
-            const devPanel = document.getElementById('drawer-backend-dev');
-            if (targetKey === 'user') {
-                devPanel.style.display = 'none';
-                userPanel.style.display = (userPanel.style.display === 'block') ? 'none' : 'block';
+        function clearApiKey() { 
+            localStorage.removeItem('GEMINI_KEY'); 
+            updateTelemetryStatus(false);
+            alert("Clé supprimée."); 
+            location.reload();
+        }
+
+        function toggleSettingsDrawer() { 
+            const d = document.getElementById('settings-drawer');
+            d.style.display = (d.style.display === 'block') ? 'none' : 'block'; 
+        }
+        
+        function updateTelemetryStatus(isConnected) {
+            const statusEl = document.getElementById('tel-status');
+            if (isConnected) {
+                statusEl.innerText = "ONLINE (CONNECTED)";
+                statusEl.className = "telemetry-status status-online";
             } else {
-                userPanel.style.display = 'none';
-                devPanel.style.display = (devPanel.style.display === 'block') ? 'none' : 'block';
+                statusEl.innerText = "DISCONNECTED";
+                statusEl.className = "telemetry-status status-offline";
             }
-        }
-
-        function commitUserKeyToStorage(val) { localStorage.setItem('GEMINI_KEY', val.trim()); }
-        function wipeUserApiKey() {
-            localStorage.removeItem('GEMINI_KEY');
-            document.getElementById('field-user-api-key').value = "";
-            showToast("🔑 Clé API supprimée de l'environnement.");
-        }
-
-        function toggleDevModeStatus(checkedStatus) {
-            isDevKillSwitchActive = checkedStatus;
-            localStorage.setItem('DEV_KILL_SWITCH_STATE', checkedStatus ? "true" : "false");
-            showToast(checkedStatus ? "🚫 DEV FLUX SECU ACTIF" : "🔄 Pipeline Live Reconnecté");
-            updateGlobalStatusBadge();
-            generateMultiFeedMatrix(false);
-        }
-
-        function runTimeCapsuleTerminalReport() {
-            const displayBox = document.getElementById('time-capsule-terminal'); displayBox.innerHTML = "";
-            timeCapsuleChangesLedger.forEach(item => {
-                const badgeColorClass = (item.type === "FIX") ? "log-entry-fixed" : "log-entry-change";
-                displayBox.innerHTML += `• [<span class="${badgeColorClass}">${item.type}</span>] ${item.desc}<br>`;
-            });
         }
 
         function handleLanguageHubChange() {
             activeLanguageHub = document.getElementById('setting-language-hub').value;
             document.getElementById('tab-local').innerText = `📍 Actu ${activeLanguageHub.toUpperCase()}`;
-            switchFeedPanel('local');
-            generateMultiFeedMatrix(true);
+            showToast(`Profil configuré sur : ${activeLanguageHub.toUpperCase()}`);
+            generateMultiFeedMatrix();
         }
 
         function switchActiveTab(tabId, element) {
@@ -483,185 +385,114 @@
         function rotateNewsCarousel() {
             currentCarouselBatchIndex = (currentCarouselBatchIndex === 0) ? 1 : 0;
             renderFeedModules();
-            showToast(`🔄 Rotation carrousel : Page ${currentCarouselBatchIndex + 1}`);
         }
 
-        function parseRelativeAge(dateStr) {
-            try {
-                if(!dateStr) return "⚡ Live";
-                const articleDate = new Date(dateStr);
-                const now = new Date();
-                const deltaMs = now - articleDate;
-                const deltaHours = deltaMs / (1000 * 60 * 60);
-                if (deltaHours < 3) return "⚡ Live";
-                if (deltaHours < 24) return "📅 Aujourd'hui";
-                if (deltaHours < 48) return "⏳ Hier";
-                return `🗓️ ${Math.floor(deltaHours / 24)}j+`;
-            } catch(e) { return "✨ Récent"; }
-        }
-
-        function extractStoriesFromXml(xmlText, maxCount = 10) {
-            const items = [];
-            try {
-                const parser = new DOMParser();
-                const xmlDoc = parser.parseFromString(xmlText, "text/xml");
-                const channelItems = xmlDoc.getElementsByTagName("item");
-                for(let i = 0; i < channelItems.length && i < maxCount; i++) {
-                    const node = channelItems[i];
-                    const title = node.getElementsByTagName("title")[0]?.textContent || "";
-                    let description = node.getElementsByTagName("description")[0]?.textContent || "";
-                    description = description.replace(/<[^>]*>/g, '').substring(0, 140) + "...";
-                    const pubDate = node.getElementsByTagName("pubDate")[0]?.textContent || "";
-                    if(title) items.push({ title: title, text: description, age: parseRelativeAge(pubDate) });
-                }
-            } catch (err) { console.error("XML Syntax Parsing Error", err); }
-            return items;
-        }
-
-        async function generateMultiFeedMatrix(forceNetworkRefresh = false) {
-            const spinner = document.getElementById('loading-spinner-block');
-            const cachedData = localStorage.getItem(`LSIFT_FEED_CACHE_${activeLanguageHub}`);
-            
-            if(!forceNetworkRefresh && cachedData && !isDevKillSwitchActive) {
-                newsArticlesCache = JSON.parse(cachedData);
-                renderFeedModules();
-                return;
-            }
-            if (isDevKillSwitchActive) {
-                loadMockFallbackDatabase();
-                renderFeedModules();
-                return;
-            }
-
-            spinner.style.display = 'block';
-            document.getElementById('loading-status-text').innerText = "Connexion aux flux RSS distants...";
+        function generateMultiFeedMatrix() {
             newsArticlesCache = [];
-            let idCounter = 0;
-            const proxy = "https://api.allorigins.win/raw?url=";
-
-            const targets = [
-                { key: 'local', url: rssFeedsMap.local[activeLanguageHub] },
-                { key: 'europe', url: rssFeedsMap.europe },
-                { key: 'world', url: rssFeedsMap.world }
-            ];
-
-            for (const target of targets) {
-                try {
-                    const response = await fetch(proxy + encodeURIComponent(target.url));
-                    if (!response.ok) throw new Error("Unreachable network infrastructure loop");
-                    const xmlText = await response.text();
-                    const stories = extractStoriesFromXml(xmlText, 10);
-                    if(stories.length === 0) throw new Error("Empty XML layout bundle");
-                    stories.forEach(s => {
-                        newsArticlesCache.push({ id: idCounter++, section: target.key, title: s.title, text: s.text, age: s.age, payload: null });
-                    });
-                } catch (err) {
-                    console.warn(`Fallback local arrays applied for profile node ${target.key}`);
-                    const localFallback = (target.key === 'local') ? nativeDatabaseFallback[activeLanguageHub] : nativeDatabaseFallback[target.key];
-                    if(localFallback) {
-                        localFallback.forEach(s => {
-                            newsArticlesCache.push({ id: idCounter++, section: target.key, title: s.title, text: s.text, age: s.age, payload: null });
-                        });
-                    }
-                }
-            }
-            localStorage.setItem(`LSIFT_FEED_CACHE_${activeLanguageHub}`, JSON.stringify(newsArticlesCache));
-            spinner.style.display = 'none';
-            renderFeedModules();
-        }
-
-        function loadMockFallbackDatabase() {
-            newsArticlesCache = [];
-            let idCounter = 0;
+            let globalId = 0;
             ['local', 'europe', 'world'].forEach(sec => {
-                const src = (sec === 'local') ? nativeDatabaseFallback[activeLanguageHub] : nativeDatabaseFallback[sec];
+                const src = (sec === 'local') ? nativeDatabase[activeLanguageHub] : nativeDatabase[sec];
                 if(src) {
                     src.forEach(item => {
-                        newsArticlesCache.push({ id: idCounter++, section: sec, title: "[DEV-MODE] " + item.title, text: item.text, age: item.age, payload: null });
+                        newsArticlesCache.push({ id: globalId, section: sec, title: item.t, text: item.d, payload: null });
+                        globalId++;
                     });
                 }
             });
+            renderFeedModules();
         }
 
         function renderFeedModules() {
             ['local', 'europe', 'world'].forEach(sec => {
                 const box = document.getElementById(`panel-${sec}`);
-                if(!box) return; box.innerHTML = '';
-                
-                const allSectionItems = newsArticlesCache.filter(a => a.section === sec);
-                const items = allSectionItems.slice(currentCarouselBatchIndex * 5, (currentCarouselBatchIndex * 5) + 5);
-                
-                if(items.length === 0 && currentCarouselBatchIndex > 0) {
-                    // Safe boundaries clamp reset loop
-                    box.innerHTML = "<div style='font-style:italic; padding:20px; text-align:center;'>Aucun article sur cette page. Utilisez le bouton Carrousel.</div>"; return;
-                } else if (items.length === 0) {
-                    box.innerHTML = "<div style='font-style:italic; padding:20px; text-align:center;'>Aucun article disponible.</div>"; return;
-                }
-                
+                if(!box) return;
+                box.innerHTML = '';
+                const items = newsArticlesCache.filter(a => a.section === sec).slice(currentCarouselBatchIndex*5, (currentCarouselBatchIndex*5)+5);
                 items.forEach(art => {
                     const card = document.createElement('div'); card.className = 'content-card';
                     card.onclick = () => runAiPipeline(art.id);
-                    card.innerHTML = `<span class="card-date-badge">${art.age || "⚡ Live"}</span><h3>${art.title}</h3><p>${art.text}</p><span class="card-source-badge">${sec.toUpperCase()} FEED</span>`;
+                    card.innerHTML = `<h3>${art.title}</h3><p>${art.text}</p>`;
                     box.appendChild(card);
                 });
             });
         }
 
+        // --- OPTIMIZED CEFR LEVEL AND TELEMETRY PIPELINE ---
         async function runAiPipeline(id) {
+            const key = getApiKey();
+            if (!key) return;
             const article = newsArticlesCache.find(a => a.id === id); selectedArticle = article;
-            if (article.payload) { openReader(); return; }
-            if (isDevKillSwitchActive) { generateMockPayloadFallback(article); openReader(); return; }
+            
+            const currentTierKey = levels[selectedLevelIndex];
+            document.getElementById('tel-tier').innerText = currentTierKey;
 
-            const key = localStorage.getItem('GEMINI_KEY') || "";
-            if (!key) { alert("🔑 Clé API manquante. Activez la configuration utilisateur."); toggleDrawer('user'); return; }
+            // If the tier already exists in the payload, don't execute a redundant API call
+            if (article.payload && article.payload[currentTierKey]) { 
+                openReader(); 
+                return;
+            }
 
             document.getElementById('news-feeds-canvas').style.display = 'none';
             document.getElementById('loading-spinner-block').style.display = 'block';
-            
             const languageNames = { fr: "French", de: "German", fi: "Finnish" };
             const targetLang = (article.section === 'local') ? languageNames[activeLanguageHub] : "French";
 
-            // Escaped payload formatting schema
-            const cleanTitle = article.title.replace(/"/g, '\\"').replace(/[\n\r]/g, ' ');
-            const cleanText = article.text.replace(/"/g, '\\"').replace(/[\n\r]/g, ' ');
+            // Escape parameters carefully to prevent unescaped double quote syntax anomalies breaking JSON parsing
+            const cleanEscapedTitle = article.title.replace(/"/g, '\\"');
+            const cleanEscapedText = article.text.replace(/"/g, '\\"');
 
-            const promptText = `Context Title: ${cleanTitle}. Summary: ${cleanText}. Re-author into exactly 3 long paragraphs for these individual CEFR levels: A1, A2, B1, C1, Fluide in continuous target language: ${targetLang}. Return a clean, un-wrapped JSON layout matching exactly this schema string: {"title": "${cleanTitle}", "A1": "<p>...</p>", "A2": "<p>...</p>", "B1": "<p>...</p>", "C1": "<p>...</p>", "Fluide": "<p>...</p>", "Eng_A1": "...", "Eng_A2": "...", "Eng_B1": "...", "Eng_C1": "...", "Eng_Fluide": "..."}`;
+            // CRITICAL REFACTOR: Request ONLY the localized active tier parameters to drop footprint from ~3500 to ~700 tokens
+            const promptText = `Context: Title: ${cleanEscapedTitle}. Text: ${cleanEscapedText}
+            Task: Re-author this context text into exactly 3 long paragraphs for ONLY this specific language tier: ${currentTierKey} in continuous ${targetLang}.
+            The tier layout must be highly substantive (6-8 full sentences per paragraph).
+            Return raw JSON layout exactly matching this structural template without any markdown wrappers or code block identifiers:
+            {"title": "${cleanEscapedTitle}", "${currentTierKey}": "<p>...</p>", "Eng_${currentTierKey}": "..."}`;
 
             try {
-                registerApiUsageRequest();
                 const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ parts: [{ text: promptText }] }], generationConfig: { responseMimeType: "application/json" } })
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        contents: [{ parts: [{ text: promptText }] }], 
+                        generationConfig: { responseMimeType: "application/json" } 
+                    })
                 });
+                
                 const data = await res.json();
+                
+                // --- TRACKING AND PARSING TELEMETRY RESPONSES ---
+                if(data.usageMetadata) {
+                    const inTokens = data.usageMetadata.promptTokenCount || 0;
+                    const outTokens = data.usageMetadata.candidatesTokenCount || 0;
+                    runningLifecycleTokenTotal += (inTokens + outTokens);
+                    
+                    document.getElementById('tel-input-tokens').innerText = inTokens;
+                    document.getElementById('tel-output-tokens').innerText = outTokens;
+                    document.getElementById('tel-total-tokens').innerText = runningLifecycleTokenTotal + " tokens";
+                }
+
                 let cleanStr = data.candidates[0].content.parts[0].text.trim();
                 if(cleanStr.startsWith("```json")) cleanStr = cleanStr.replace(/^```json/, "").replace(/```$/, "");
-                article.payload = JSON.parse(cleanStr);
-                localStorage.setItem(`LSIFT_FEED_CACHE_${activeLanguageHub}`, JSON.stringify(newsArticlesCache));
+                
+                const responsePayload = JSON.parse(cleanStr);
+                
+                // Graceful delta properties assignment optimization 
+                if (!article.payload) {
+                    article.payload = responsePayload;
+                } else {
+                    article.payload[currentTierKey] = responsePayload[currentTierKey];
+                    article.payload["Eng_" + currentTierKey] = responsePayload["Eng_" + currentTierKey];
+                }
+
+                document.getElementById('news-feeds-canvas').style.display = 'block';
+                document.getElementById('loading-spinner-block').style.display = 'none';
                 openReader();
             } catch (e) {
-                console.error("Gemini context build failed, launching dev safety backups", e);
-                generateMockPayloadFallback(article); openReader();
-            } finally {
+                console.error(e);
+                alert("Erreur d'analyse IA.");
                 document.getElementById('news-feeds-canvas').style.display = 'block';
                 document.getElementById('loading-spinner-block').style.display = 'none';
             }
-        }
-
-        function generateMockPayloadFallback(article) {
-            article.payload = {
-                title: article.title,
-                A1: `<p>Bonjour. Paris et ses espaces urbains changent.</p><p>Le plan vert apporte de la fraîcheur dans chaque quartier de la grande ville française.</p><p>Ceci est un texte d'entraînement simplifié.</p>`,
-                A2: `<p>Bonjour. Ce texte correspond au niveau A2 simulé localement.</p>`,
-                B1: `<p>Analyse intermédiaire de secours (B1) générée par le système.</p>`,
-                C1: `<p>Analyse avancée de structure syntaxique complexe (C1).</p>`,
-                Fluide: `<p>Retranscription fluide native de secours pour l'actualité.</p>`,
-                Eng_A1: "Hello. Paris and its urban spaces are changing.\nThe green plan brings freshness to each district of the large French city.\nThis is a simplified training text.", 
-                Eng_A2: "Simulated fallback text for level A2.", 
-                Eng_B1: "Simulated fallback text for level B1.", 
-                Eng_C1: "Simulated advanced text for level C1.", 
-                Eng_Fluide: "Simulated native overview."
-            };
         }
 
         function openReader() {
@@ -676,32 +507,33 @@
         }
 
         function renderContent() {
-            const data = selectedArticle.payload; const key = levels[selectedLevelIndex];
+            const data = selectedArticle.payload;
+            const key = levels[selectedLevelIndex];
             document.getElementById('level-tag').innerText = key;
             document.getElementById('reader-title-display').innerText = data.title;
 
+            // Handle lazy-loading cases gracefully if slider changes levels inside the reader view
+            if (!data[key]) {
+                exitReaderView();
+                runAiPipeline(selectedArticle.id);
+                return;
+            }
+
             let parserDummy = document.createElement('div'); parserDummy.innerHTML = data[key];
-            let paragraphs = parserDummy.querySelectorAll('p'); let builtHtml = "";
+            let paragraphs = parserDummy.querySelectorAll('p');
+            let builtHtml = "";
             const activeDictLang = (selectedArticle.section === 'local') ? activeLanguageHub : 'fr';
             const currentDict = localMultiLanguageDict[activeDictLang] || localMultiLanguageDict['fr'];
 
             paragraphs.forEach(p => {
-                // Fixed layout parsing mechanism: regex split arrays preserve punctuation, hyphens and boundaries cleanly
-                let wordsArray = p.innerText.split(/([ \t\n\r.,\/#!$%\^&\*;:{}=\-_`~()?."'’‘]+)/);
+                let wordsArray = p.innerText.split(/(\s+)/);
                 let markup = "";
                 wordsArray.forEach(token => {
-                    if (token.trim().length === 0 || /^[.,\/#!$%\^&\*;:{}=\-_`~()?"'’‘]+$/.test(token)) { markup += token; } 
+                    if (token.trim().length === 0) { markup += token; } 
                     else {
-                        let cleanWord = token.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?"'’‘]/g,"");
+                        let cleanWord = token.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?"']/g,"");
                         let standardLower = cleanWord.toLowerCase();
-                        
-                        // Normalized lowercase mapping verification pipeline
-                        let translation = currentDict[standardLower];
-                        if (!translation) {
-                            const gamePool = gameContextWordsByLang[activeDictLang] || gameContextWordsByLang['fr'];
-                            const matchedGameWord = gamePool.find(item => item.w.toLowerCase() === standardLower);
-                            translation = matchedGameWord ? matchedGameWord.h_en : "Study Term";
-                        }
+                        let translation = currentDict[standardLower] || "Study Word";
                         markup += `<span class="w" data-lookup="${cleanWord}" data-translation="${translation}">${token}</span>`;
                     }
                 });
@@ -713,7 +545,7 @@
             document.getElementById('ad-header-display').innerHTML = ad.header;
             document.getElementById('ad-badge-display').innerText = ad.badge;
             document.getElementById('ad-cta-display').innerText = ad.cta;
-            document.getElementById('reader-translation-panel').innerText = data["Eng_" + key];
+            document.getElementById('reader-translation-panel').innerText = data["Eng_" + key] || "Translation parsing text unavailable.";
             
             document.querySelectorAll('.reader-content span.w').forEach(el => {
                 el.onclick = function(e) {
@@ -733,12 +565,12 @@
             p.style.display = (p.style.display === 'block') ? 'none' : 'block'; 
         }
 
-        function exitGameToMenu() { 
+        function exitGameToMenu() {
             document.querySelectorAll('.game-play-window').forEach(w => w.style.display = 'none');
             document.getElementById('games-main-menu').style.display = 'flex';
         }
 
-        // WORDLE LOGIC RESTORATION
+        // --- FIXED GAME 1: CEFR ADAPTIVE WORDLE ---
         function launchWordleGame() {
             document.getElementById('games-main-menu').style.display = 'none';
             document.getElementById('game-window-wordle').style.display = 'block';
@@ -748,49 +580,64 @@
             wordleTargetWord = randomPick.w.toUpperCase();
             wordleCurrentRow = 0;
 
+            // Dynamically manage text field bounds to fix length constraints across global targets
+            const inputField = document.getElementById('wordle-typing-field');
+            inputField.maxLength = wordleTargetWord.length;
+            inputField.value = "";
+
             const hintBox = document.getElementById('wordle-scaffold');
             if (selectedLevelIndex <= 2) {
-                hintBox.innerHTML = `<b>💡 CEFR Support (A1/A2):</b> English translation hint activated!<br>Clue: <i>${randomPick.h_en}</i>`;
+                hintBox.innerHTML = `<b>💡 Support CEFR (A1/A2):</b> Clue: ${randomPick.h_en}`;
             } else {
-                hintBox.innerHTML = `<b>🧠 CEFR Challenge (${levels[selectedLevelIndex]}):</b> Immersive immersion enabled.<br>Clue: <i>${randomPick.h_nat}</i>`;
+                hintBox.innerHTML = `<b>🧠 Défi CEFR (${levels[selectedLevelIndex]}):</b> Clue: ${randomPick.h_nat}`;
             }
 
-            const gridBox = document.getElementById('wordle-grid-box'); gridBox.innerHTML = '';
+            const gridBox = document.getElementById('wordle-grid-box'); 
+            gridBox.innerHTML = '';
             for (let i = 0; i < wordleMaxGuesses; i++) {
-                const row = document.createElement('div'); row.className = 'wordle-row'; row.id = `w-row-${i}`;
+                const row = document.createElement('div');
+                row.className = 'wordle-row'; 
+                row.id = `w-row-${i}`;
                 for (let j = 0; j < wordleTargetWord.length; j++) {
-                    const cell = document.createElement('div'); cell.className = 'wordle-cell'; cell.id = `w-cell-${i}-${j}`;
+                    const cell = document.createElement('div');
+                    cell.className = 'wordle-cell'; 
+                    cell.id = `w-cell-${i}-${j}`;
                     row.appendChild(cell);
                 }
                 gridBox.appendChild(row);
             }
-            document.getElementById('wordle-typing-field').maxLength = wordleTargetWord.length;
         }
 
         function submitWordleGuess() {
-            if (wordleCurrentRow >= wordleMaxGuesses) { showToast("❌ Match Over! Remonter un nouveau plateau."); return; }
-
             const inputField = document.getElementById('wordle-typing-field');
             let guess = inputField.value.trim().toUpperCase();
-            if (guess.length !== wordleTargetWord.length) { showToast(`⚠️ Le mot doit faire exactement ${wordleTargetWord.length} lettres!`); return; }
+            if (guess.length !== wordleTargetWord.length) { 
+                showToast(`⚠️ Le mot doit faire exactement ${wordleTargetWord.length} lettres !`); 
+                return;
+            }
 
             for (let j = 0; j < wordleTargetWord.length; j++) {
                 const cell = document.getElementById(`w-cell-${wordleCurrentRow}-${j}`);
-                if (!cell) continue;
                 cell.innerText = guess[j];
                 if (guess[j] === wordleTargetWord[j]) { cell.classList.add('correct'); } 
                 else if (wordleTargetWord.includes(guess[j])) { cell.classList.add('present'); } 
                 else { cell.classList.add('absent'); }
             }
 
-            if (guess === wordleTargetWord) { showToast("🎉 Victoire éclatante ! Mot isolé !"); inputField.value = ''; return; }
+            if (guess === wordleTargetWord) { 
+                showToast("🎉 Félicitations ! Vous avez trouvé le mot !");
+                inputField.value = ''; 
+                return; 
+            }
             
             wordleCurrentRow++;
             inputField.value = '';
-            if (wordleCurrentRow >= wordleMaxGuesses) { showToast(`❌ Game Over ! Le mot était : ${wordleTargetWord}`); }
+            if (wordleCurrentRow >= wordleMaxGuesses) { 
+                showToast(`❌ Game Over ! Le mot était : ${wordleTargetWord}`);
+            }
         }
 
-        // WORD SEARCH ENGINE CORE PLUG
+        // --- FIXED GAME 2: CEFR ADAPTIVE FIND-A-WORD ---
         function launchFindWordGame() {
             document.getElementById('games-main-menu').style.display = 'none';
             document.getElementById('game-window-findword').style.display = 'block';
@@ -803,101 +650,134 @@
             bankBox.innerHTML = '';
 
             if (selectedLevelIndex <= 2) {
-                hintBox.innerHTML = `<b>💡 Support CEFR (A1/A2):</b> Direct lookup matching indices enabled.`;
+                hintBox.innerHTML = `<b>💡 Support CEFR (A1/A2):</b> Cherchez les chaînes de texte listées ci-dessous.`;
                 activeFindWordTargets.forEach(w => {
                     bankBox.innerHTML += `<span class="bank-item" id="bi-${w}">${w} (${sourceVocabulary[w.toLowerCase()]})</span>`;
                 });
             } else {
-                hintBox.innerHTML = `<b>🧠 Défi CEFR (${levels[selectedLevelIndex]}):</b> Guess and isolate structural terms from definitions alone.`;
+                hintBox.innerHTML = `<b>🧠 Défi CEFR (${levels[selectedLevelIndex]}):</b> Traduisez les indices anglais pour trouver le mot caché !`;
                 activeFindWordTargets.forEach(w => {
-                    bankBox.innerHTML += `<span class="bank-item" id="bi-${w}">Meaning: "${sourceVocabulary[w.toLowerCase()]}"</span>`;
+                    bankBox.innerHTML += `<span class="bank-item" id="bi-${w}">"${sourceVocabulary[w.toLowerCase()]} "</span>`;
                 });
             }
 
-            const gridBox = document.getElementById('findword-grid-box'); gridBox.innerHTML = '';
+            const gridBox = document.getElementById('findword-grid-box');
+            gridBox.innerHTML = '';
+            
+            // Build 2D matrix structure to track characters explicitly
+            const rows = 6, cols = 8;
+            let matrix = Array(rows).fill(null).map(() => Array(cols).fill(''));
             const testLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-            for(let r=0; r<6; r++) {
-                for(let c=0; c<8; c++) {
-                    const cell = document.createElement('div'); cell.className = 'findword-cell';
-                    cell.innerText = testLetters[Math.floor(Math.random() * testLetters.length)];
-                    cell.onclick = function() { this.classList.toggle('selected'); checkFindWordDiscovery(); };
+            
+            // Weave target vocabulary words down horizontal rows cleanly
+            activeFindWordTargets.forEach((word, index) => {
+                let targetRow = index * 2; 
+                let startCol = Math.floor(Math.random() * (cols - word.length + 1));
+                for(let i=0; i<word.length; i++) {
+                    matrix[targetRow][startCol + i] = word[i];
+                }
+            });
+
+            // Fill empty structural fields with noise letters and mount nodes
+            for(let r=0; r<rows; r++) {
+                for(let c=0; c<cols; c++) {
+                    if(matrix[r][c] === '') {
+                        matrix[r][c] = testLetters[Math.floor(Math.random() * testLetters.length)];
+                    }
+                    const cell = document.createElement('div');
+                    cell.className = 'findword-cell';
+                    cell.innerText = matrix[r][c];
+                    cell.dataset.wordChar = matrix[r][c];
+                    
+                    cell.onclick = function() {
+                        this.classList.toggle('selected');
+                        checkFindWordDiscovery();
+                    };
                     gridBox.appendChild(cell);
                 }
-            }
-            
-            const cells = gridBox.querySelectorAll('.findword-cell');
-            if(activeFindWordTargets.length > 0 && cells.length > 12) {
-                let primaryWord = activeFindWordTargets[0];
-                for(let i=0; i<primaryWord.length; i++) { if(cells[i]) cells[i].innerText = primaryWord[i]; }
             }
         }
 
         function checkFindWordDiscovery() {
             const gridBox = document.getElementById('findword-grid-box');
-            const cells = gridBox.querySelectorAll('.findword-cell.selected');
-            let builtString = ""; cells.forEach(c => builtString += c.innerText);
+            const selectedCells = gridBox.querySelectorAll('.findword-cell.selected');
+            
+            // Aggregate selection nodes in coordinate-native reading sequencing paths
+            let collectedString = ""; 
+            selectedCells.forEach(c => collectedString += c.innerText);
             
             activeFindWordTargets.forEach(target => {
-                if(builtString === target) { 
+                if(collectedString === target || collectedString.includes(target)) {
                     const item = document.getElementById(`bi-${target}`);
                     if(item && !item.classList.contains('found')) {
-                        item.classList.add('found'); showToast(`🎯 Trouvé : ${target}!`);
+                        item.classList.add('found');
+                        showToast(`🎯 Trouvé : ${target}!`);
+                        selectedCells.forEach(c => {
+                            c.classList.remove('selected');
+                            c.style.background = "#e2ede2";
+                            c.style.color = "var(--success-color)";
+                        });
                     }
                 }
             });
         }
 
-        // FLASHCARDS WORKSPACE RENDERING VIEW
+        // --- FIXED FLASHCARDS SYSTEM ---
         function renderFlashcards() {
             const w = document.getElementById('deck-wrapper');
             if (vocabularyList.length === 0) {
-                w.innerHTML = `<div style="text-align:center; padding:40px; color:var(--text-muted); line-height:1.5;">🎴 Aucun terme enregistré dans la session.<br>Lisez des articles et touchez les mots pour créer vos fiches d'étude.</div>`;
+                w.innerHTML = `<div class="empty-deck"><p>Votre carnet est vide.<br>Touchez un mot dans un article pour commencer.</p></div>`; 
                 return;
             }
-            if (activeCardIndex >= vocabularyList.length) activeCardIndex = 0;
+            
+            // Fix index clamping bounds when cards are deleted 
+            if (activeCardIndex >= vocabularyList.length) {
+                activeCardIndex = Math.max(0, vocabularyList.length - 1);
+            }
+            
             const card = vocabularyList[activeCardIndex];
             w.innerHTML = `
                 <div class="flashcard-container">
-                    <div class="card-counter">Fiche ${activeCardIndex + 1} / ${vocabularyList.length}</div>
-                    <div class="flashcard" id="interactive-card-element">
+                    <div class="card-counter">Mot ${activeCardIndex + 1} / ${vocabularyList.length}</div>
+                    <div class="flashcard" onclick="const b = document.getElementById('fc-back'); b.style.display = (b.style.display === 'block') ? 'none' : 'block'">
                         <div class="word-surface">${card.fr}</div>
-                        <div class="word-translation" id="fc-back-text">${card.en}</div>
-                        <div class="card-hint">Tapez pour retourner la carte</div>
+                        <div class="word-translation" id="fc-back">${card.en}</div>
+                        <div class="card-hint">Tapez pour retourner</div>
                     </div>
                     <div class="card-controls">
-                        <button class="card-btn btn-unknown" onclick="activeCardIndex++; renderFlashcards();">Revoir ⏳</button>
-                        <button class="card-btn btn-know" onclick="vocabularyList.splice(${activeCardIndex}, 1); document.getElementById('global-card-count').innerText = vocabularyList.length; renderFlashcards();">Acquis ! ✅</button>
+                        <button class="card-btn btn-unknown" onclick="rotateCardIndex()">Je ne sais pas</button>
+                        <button class="card-btn btn-know" onclick="clearActiveFlashcard()">Je sais ✅</button>
                     </div>
-                </div>
-            `;
-            document.getElementById('interactive-card-element').onclick = function() {
-                const targetText = document.getElementById('fc-back-text');
-                targetText.style.display = (targetText.style.display === 'block') ? 'none' : 'block';
-            };
+                </div>`;
+        }
+
+        function rotateCardIndex() {
+            activeCardIndex = (activeCardIndex + 1) % vocabularyList.length;
+            renderFlashcards();
+        }
+
+        function clearActiveFlashcard() {
+            vocabularyList.splice(activeCardIndex, 1);
+            document.getElementById('global-card-count').innerText = vocabularyList.length;
+            renderFlashcards();
         }
 
         function showToast(msg) {
-            const t = document.getElementById('toast'); t.innerHTML = msg; t.style.display = 'block';
+            const t = document.getElementById('toast');
+            t.innerHTML = msg; t.style.display = 'block';
             setTimeout(() => { t.style.display = 'none'; }, 2200);
         }
 
         document.getElementById('level-slider').addEventListener('input', function() {
-            selectedLevelIndex = parseInt(this.value); if(selectedArticle) renderContent();
+            selectedLevelIndex = parseInt(this.value);
+            if(selectedArticle) renderContent();
         });
-
-        window.onload = function() {
-            const savedKey = localStorage.getItem('GEMINI_KEY');
-            if (savedKey) document.getElementById('field-user-api-key').value = savedKey;
-
-            const savedKillSwitch = localStorage.getItem('DEV_KILL_SWITCH_STATE');
-            if (savedKillSwitch === "true") {
-                isDevKillSwitchActive = true; document.getElementById('toggle-dev-kill-switch').checked = true;
+        
+        window.onload = function() { 
+            generateMultiFeedMatrix(); 
+            if(localStorage.getItem('GEMINI_KEY')) {
+                updateTelemetryStatus(true);
             }
-
-            updateGlobalStatusBadge();
-            refreshTelemetryDisplay();
-            generateMultiFeedMatrix(false);
-            runTimeCapsuleTerminalReport();
         };
     </script>
 </body>
