@@ -155,6 +155,11 @@
         .toast { position: fixed; bottom: 80px; background: #2c2520; color: #fff; padding: 10px 18px; border-radius: 20px; font-size: 13px; display: none; z-index: 2000; text-align: center; max-width: 80%; }
         .game-input-row { display: flex; gap: 8px; margin-top: 10px; width: 100%; box-sizing: border-box; }
         .game-text-input { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--accent-light); text-transform: uppercase; font-weight: bold; text-align: center; outline: none; }
+        
+        /* New Architectural Additions CSS */
+        .checkbox-group-wrapper { display: flex; gap: 12px; margin-top: 4px; }
+        .checkbox-label-block { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; font-weight: bold; cursor: pointer; }
+        .checkbox-label-block input { cursor: pointer; width: 16px; height: 16px; accent-color: var(--accent-color); }
     </style>
 </head>
 <body>
@@ -188,6 +193,24 @@
                         <option value="fi">🇫🇮 Finlande (Helsinki)</option>
                     </select>
                 </div>
+                
+                <div class="settings-row">
+                    <label style="font-size:11px; font-weight:bold; color:var(--text-muted);">Tiers de niveau CEFR actifs :</label>
+                    <div class="checkbox-group-wrapper">
+                        <label class="checkbox-label-block"><input type="checkbox" id="tier-group-beginner" checked onchange="commitTierAssignments()"> A1 / A2</label>
+                        <label class="checkbox-label-block"><input type="checkbox" id="tier-group-intermediate" checked onchange="commitTierAssignments()"> B1 / B2</label>
+                        <label class="checkbox-label-block"><input type="checkbox" id="tier-group-advanced" checked onchange="commitTierAssignments()"> C1 / Fluide</label>
+                    </div>
+                </div>
+
+                <div class="settings-row">
+                    <label style="font-size:11px; font-weight:bold; color:var(--text-muted);">Formule d'abonnement :</label>
+                    <select id="setting-subscription-tier" class="settings-select" onchange="commitSubscriptionTierChange()">
+                        <option value="free">Version Gratuite (Max 3 Articles Cache Pipeline)</option>
+                        <option value="premium">Version Premium (Accès Illimité sans restriction)</option>
+                    </select>
+                </div>
+
                 <button class="refresh-btn" style="width:100%; color:#c62828; justify-content:center; margin-top:5px; border-color: rgba(198,40,40,0.2);" onclick="wipeUserApiKey()">🔑 Effacer la clé API</button>
             </div>
 
@@ -287,7 +310,7 @@
                 </div>
                 <div class="slider-container">
                     <input type="range" id="level-slider" min="1" max="5" value="1" step="1">
-                    <div class="ticks"><span>A1</span><span>A2</span><span>B1</span><span>C1</span><span>Fluide</span></div>
+                    <div id="slider-ticks-row" class="ticks"><span>A1</span><span>A2</span><span>B1</span><span>C1</span><span>Fluide</span></div>
                 </div>
             </div>
             <div class="reader-content">
@@ -324,13 +347,21 @@
     <script>
         let vocabularyList = [];
         let newsArticlesCache = [];
+        let mockArticlesCache = []; // Isolated mock array protecting real persistent memory downloads
         let selectedLevelIndex = 1;
         let selectedArticle = null;
         let activeCardIndex = 0;
         let currentCarouselBatchIndex = 0; 
         let activeLanguageHub = "fr"; 
         let isDevKillSwitchActive = false;
+        
+        // Comprehensive mapping dictionaries
         const levels = { 1: "A1", 2: "A2", 3: "B1", 4: "C1", 5: "Fluide" };
+        const levelIndexToCodeMap = { 1: "A1", 2: "A2", 3: "B1", 4: "C1", 5: "Fluide" };
+        
+        // Subscription and multi-tier adaptive testing states
+        let appSubscriberTierStatus = "free";
+        let activeAllowedCefrTiersList = [1, 2, 3, 4, 5];
         
         let sessionRPM = 0;
         let sessionRPD = parseInt(localStorage.getItem('LSIFT_TOTAL_RPD_COUNT') || '0');
@@ -339,6 +370,7 @@
         let wordleCurrentRow = 0;
         const wordleMaxGuesses = 6;
         let activeFindWordTargets = [];
+        let chronologicalFindWordCellIndices = []; // Strict array order selector vector protection tracking
 
         const timeCapsuleChangesLedger = [
             { type: "FIX", desc: "Resolved uppercase-vs-lowercase mismatch for English translation lookup vectors." },
@@ -435,6 +467,7 @@
         }
 
         function commitUserKeyToStorage(val) { localStorage.setItem('GEMINI_KEY', val.trim()); }
+        
         function wipeUserApiKey() {
             localStorage.removeItem('GEMINI_KEY');
             document.getElementById('field-user-api-key').value = "";
@@ -553,14 +586,15 @@
                     const stories = extractStoriesFromXml(xmlText, 10);
                     if(stories.length === 0) throw new Error("Empty XML layout bundle");
                     stories.forEach(s => {
-                        newsArticlesCache.push({ id: idCounter++, section: target.key, title: s.title, text: s.text, age: s.age, payload: null });
+                        // Using structured globally distinct IDs to prevent collisions
+                        newsArticlesCache.push({ id: "live_" + idCounter++, section: target.key, title: s.title, text: s.text, age: s.age, payload: null });
                     });
                 } catch (err) {
                     console.warn(`Fallback local arrays applied for profile node ${target.key}`);
                     const localFallback = (target.key === 'local') ? nativeDatabaseFallback[activeLanguageHub] : nativeDatabaseFallback[target.key];
                     if(localFallback) {
                         localFallback.forEach(s => {
-                            newsArticlesCache.push({ id: idCounter++, section: target.key, title: s.title, text: s.text, age: s.age, payload: null });
+                            newsArticlesCache.push({ id: "live_" + idCounter++, section: target.key, title: s.title, text: s.text, age: s.age, payload: null });
                         });
                     }
                 }
@@ -571,13 +605,13 @@
         }
 
         function loadMockFallbackDatabase() {
-            newsArticlesCache = [];
+            mockArticlesCache = [];
             let idCounter = 0;
             ['local', 'europe', 'world'].forEach(sec => {
                 const src = (sec === 'local') ? nativeDatabaseFallback[activeLanguageHub] : nativeDatabaseFallback[sec];
                 if(src) {
                     src.forEach(item => {
-                        newsArticlesCache.push({ id: idCounter++, section: sec, title: "[DEV-MODE] " + item.title, text: item.text, age: item.age, payload: null });
+                        mockArticlesCache.push({ id: "mock_" + idCounter++, section: sec, title: "[DEV-MODE] " + item.title, text: item.text, age: item.age, payload: null });
                     });
                 }
             });
@@ -588,7 +622,8 @@
                 const box = document.getElementById(`panel-${sec}`);
                 if(!box) return; box.innerHTML = '';
                 
-                const allSectionItems = newsArticlesCache.filter(a => a.section === sec);
+                const activeDataSource = isDevKillSwitchActive ? mockArticlesCache : newsArticlesCache;
+                const allSectionItems = activeDataSource.filter(a => a.section === sec);
                 const items = allSectionItems.slice(currentCarouselBatchIndex * 5, (currentCarouselBatchIndex * 5) + 5);
                 
                 if(items.length === 0 && currentCarouselBatchIndex > 0) {
@@ -606,10 +641,41 @@
             });
         }
 
+        // Modified Testing Suite Requirement 1 & 2 & 3: Subscription check, dynamic prompt remapping and incremental payload patching
         async function runAiPipeline(id) {
-            const article = newsArticlesCache.find(a => a.id === id); selectedArticle = article;
-            if (article.payload) { openReader(); return; }
-            if (isDevKillSwitchActive) { generateMockPayloadFallback(article); openReader(); return; }
+            const activeDataSource = String(id).startsWith("mock_") ? mockArticlesCache : newsArticlesCache;
+            const article = activeDataSource.find(a => a.id === id); 
+            selectedArticle = article;
+            
+            if (!article.payload) {
+                article.payload = { title: article.title, downloaded_levels: {} };
+            }
+
+            // Subscription Validation Guard check
+            if (appSubscriberTierStatus === "free") {
+                const uniqueCachedArticlesCount = activeDataSource.filter(a => a.payload && Object.keys(a.payload.downloaded_levels).length > 0).length;
+                const isThisArticleAlreadyCached = Object.keys(article.payload.downloaded_levels).length > 0;
+                
+                if (!isThisArticleAlreadyCached && uniqueCachedArticlesCount >= 3) {
+                    showToast("⛔ Version Gratuite : Limite de 3 articles atteinte ! Passez à Premium.");
+                    toggleDrawer('user');
+                    return;
+                }
+            }
+
+            const currentActiveCefrCode = levelIndexToCodeMap[selectedLevelIndex];
+            
+            // Checking if single active level exists incrementally cached locally
+            if (article.payload.downloaded_levels && article.payload.downloaded_levels[currentActiveCefrCode]) {
+                openReader(); 
+                return; 
+            }
+            
+            if (isDevKillSwitchActive || String(id).startsWith("mock_")) { 
+                generateMockPayloadFallback(article, currentActiveCefrCode); 
+                openReader(); 
+                return; 
+            }
 
             const key = localStorage.getItem('GEMINI_KEY') || "";
             if (!key) { alert("🔑 Clé API manquante. Activez la configuration utilisateur."); toggleDrawer('user'); return; }
@@ -623,7 +689,8 @@
             const cleanTitle = article.title.replace(/"/g, '\\"').replace(/[\n\r]/g, ' ');
             const cleanText = article.text.replace(/"/g, '\\"').replace(/[\n\r]/g, ' ');
 
-            const promptText = `Context Title: ${cleanTitle}. Summary: ${cleanText}. Re-author into exactly 3 long paragraphs for these individual CEFR levels: A1, A2, B1, C1, Fluide in continuous target language: ${targetLang}. Return a clean, un-wrapped JSON layout matching exactly this schema string: {"title": "${cleanTitle}", "A1": "<p>...</p>", "A2": "<p>...</p>", "B1": "<p>...</p>", "C1": "<p>...</p>", "Fluide": "<p>...</p>", "Eng_A1": "...", "Eng_A2": "...", "Eng_B1": "...", "Eng_C1": "...", "Eng_Fluide": "..."}`;
+            // Restructured dynamic non-monolithic prompt targeting single specific level key
+            const promptText = `Context Title: ${cleanTitle}. Summary: ${cleanText}. Re-author into exactly 3 long paragraphs for this SINGLE SPECIFIC CEFR level: ${currentActiveCefrCode} in continuous target language: ${targetLang}. Return a clean, un-wrapped JSON layout matching exactly this schema string: {"text": "<p>First paragraph...</p><p>Second...</p><p>Third...</p>", "eng_translation": "Complete English translation text here..."}`;
 
             try {
                 registerApiUsageRequest();
@@ -633,32 +700,55 @@
                 });
                 const data = await res.json();
                 let cleanStr = data.candidates[0].content.parts[0].text.trim();
-                if(cleanStr.startsWith("```json")) cleanStr = cleanStr.replace(/^```json/, "").replace(/```$/, "");
-                article.payload = JSON.parse(cleanStr);
-                localStorage.setItem(`LSIFT_FEED_CACHE_${activeLanguageHub}`, JSON.stringify(newsArticlesCache));
+                
+                // Enhanced robust sanitization mechanism preventing formatting exceptions
+                cleanStr = cleanStr.replace(/^```json\s*/i, "").replace(/\s*```$/, "");
+                const receivedLevelPayloadObj = JSON.parse(cleanStr);
+                
+                // Patching parsed item incrementally into specific level key map context
+                article.payload.downloaded_levels[currentActiveCefrCode] = {
+                    text: receivedLevelPayloadObj.text,
+                    eng: receivedLevelPayloadObj.eng_translation
+                };
+                
+                if (!String(id).startsWith("mock_")) {
+                    localStorage.setItem(`LSIFT_FEED_CACHE_${activeLanguageHub}`, JSON.stringify(newsArticlesCache));
+                }
                 openReader();
             } catch (e) {
                 console.error("Gemini context build failed, launching dev safety backups", e);
-                generateMockPayloadFallback(article); openReader();
+                generateMockPayloadFallback(article, currentActiveCefrCode); 
+                openReader();
             } finally {
                 document.getElementById('news-feeds-canvas').style.display = 'block';
                 document.getElementById('loading-spinner-block').style.display = 'none';
             }
         }
 
-        function generateMockPayloadFallback(article) {
-            article.payload = {
-                title: article.title,
+        function generateMockPayloadFallback(article, targetCefrCode) {
+            if (!article.payload) {
+                article.payload = { title: article.title, downloaded_levels: {} };
+            }
+            
+            const fallbackTextMap = {
                 A1: `<p>Bonjour. Paris et ses espaces urbains changent.</p><p>Le plan vert apporte de la fraîcheur dans chaque quartier de la grande ville française.</p><p>Ceci est un texte d'entraînement simplifié.</p>`,
                 A2: `<p>Bonjour. Ce texte correspond au niveau A2 simulé localement.</p>`,
                 B1: `<p>Analyse intermédiaire de secours (B1) générée par le système.</p>`,
                 C1: `<p>Analyse avancée de structure syntaxique complexe (C1).</p>`,
-                Fluide: `<p>Retranscription fluide native de secours pour l'actualité.</p>`,
-                Eng_A1: "Hello. Paris and its urban spaces are changing.\nThe green plan brings freshness to each district of the large French city.\nThis is a simplified training text.", 
-                Eng_A2: "Simulated fallback text for level A2.", 
-                Eng_B1: "Simulated fallback text for level B1.", 
-                Eng_C1: "Simulated advanced text for level C1.", 
-                Eng_Fluide: "Simulated native overview."
+                Fluide: `<p>Retranscription fluide native de secours pour l'actualité.</p>`
+            };
+
+            const fallbackEngMap = {
+                A1: "Hello. Paris and its urban spaces are changing.\nThe green plan brings freshness to each district of the large French city.\nThis is a simplified training text.",
+                A2: "Simulated fallback text for level A2.",
+                B1: "Simulated fallback text for level B1.",
+                C1: "Simulated advanced text for level C1.",
+                Fluide: "Simulated native overview."
+            };
+
+            article.payload.downloaded_levels[targetCefrCode] = {
+                text: fallbackTextMap[targetCefrCode] || fallbackTextMap["A1"],
+                eng: fallbackEngMap[targetCefrCode] || fallbackEngMap["A1"]
             };
         }
 
@@ -674,12 +764,23 @@
         }
 
         function renderContent() {
-            const data = selectedArticle.payload; const key = levels[selectedLevelIndex];
+            const data = selectedArticle.payload; 
+            const key = levelIndexToCodeMap[selectedLevelIndex];
             document.getElementById('level-tag').innerText = key;
             document.getElementById('reader-title-display').innerText = data.title;
 
-            let parserDummy = document.createElement('div'); parserDummy.innerHTML = data[key];
-            let paragraphs = parserDummy.querySelectorAll('p'); let builtHtml = "";
+            // Protection fallback checking if level array element has been loaded dynamically
+            if (!data.downloaded_levels || !data.downloaded_levels[key]) {
+                document.getElementById('reader-body-display').innerHTML = `<p style="font-style:italic; color:var(--text-muted); text-align:center; padding:30px;">[Chargement du niveau sur demande ${key}... Taper ci-dessous pour forcer l'acquisition]</p><button class='refresh-btn' style='margin:10px auto; display:block;' onclick='runAiPipeline(selectedArticle.id)'>📡 Télécharger le niveau ${key}</button>`;
+                document.getElementById('reader-translation-panel').innerText = "Translation not fetched yet.";
+                return;
+            }
+
+            const activeLevelData = data.downloaded_levels[key];
+            let parserDummy = document.createElement('div'); 
+            parserDummy.innerHTML = activeLevelData.text;
+            let paragraphs = parserDummy.querySelectorAll('p'); 
+            let builtHtml = "";
             const activeDictLang = (selectedArticle.section === 'local') ? activeLanguageHub : 'fr';
             const currentDict = localMultiLanguageDict[activeDictLang] || localMultiLanguageDict['fr'];
 
@@ -705,11 +806,11 @@
             });
 
             document.getElementById('reader-body-display').innerHTML = builtHtml;
-            const ad = adMatrix[selectedLevelIndex];
+            const ad = adMatrix[selectedLevelIndex] || adMatrix[1];
             document.getElementById('ad-header-display').innerHTML = ad.header;
             document.getElementById('ad-badge-display').innerText = ad.badge;
             document.getElementById('ad-cta-display').innerText = ad.cta;
-            document.getElementById('reader-translation-panel').innerText = data["Eng_" + key];
+            document.getElementById('reader-translation-panel').innerText = activeLevelData.eng;
             
             document.querySelectorAll('.reader-content span.w').forEach(el => {
                 el.onclick = function(e) {
@@ -791,6 +892,7 @@
 
             const sourceVocabulary = localMultiLanguageDict[activeLanguageHub] || localMultiLanguageDict['fr'];
             activeFindWordTargets = Object.keys(sourceVocabulary).map(k => k.toUpperCase()).slice(0, 3);
+            chronologicalFindWordCellIndices = []; 
 
             const hintBox = document.getElementById('findword-scaffold');
             const bankBox = document.getElementById('findword-bank-list');
@@ -810,13 +912,24 @@
 
             const gridBox = document.getElementById('findword-grid-box'); gridBox.innerHTML = '';
             const testLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-            for(let r=0; r<6; r++) {
-                for(let c=0; c<8; c++) {
-                    const cell = document.createElement('div'); cell.className = 'findword-cell';
-                    cell.innerText = testLetters[Math.floor(Math.random() * testLetters.length)];
-                    cell.onclick = function() { this.classList.toggle('selected'); checkFindWordDiscovery(); };
-                    gridBox.appendChild(cell);
-                }
+            
+            for(let i=0; i<48; i++) {
+                const cell = document.createElement('div'); 
+                cell.className = 'findword-cell';
+                cell.setAttribute('data-index', i);
+                cell.innerText = testLetters[Math.floor(Math.random() * testLetters.length)];
+                cell.onclick = function() { 
+                    const idx = parseInt(this.getAttribute('data-index'));
+                    if (this.classList.contains('selected')) {
+                        this.classList.remove('selected');
+                        chronologicalFindWordCellIndices = chronologicalFindWordCellIndices.filter(item => item !== idx);
+                    } else {
+                        this.classList.add('selected');
+                        chronologicalFindWordCellIndices.push(idx);
+                    }
+                    checkFindWordDiscovery(); 
+                };
+                gridBox.appendChild(cell);
             }
             
             const cells = gridBox.querySelectorAll('.findword-cell');
@@ -826,16 +939,28 @@
             }
         }
 
+        // Fixed Verification Logic tracking chronological vector click matrix
         function checkFindWordDiscovery() {
             const gridBox = document.getElementById('findword-grid-box');
-            const cells = gridBox.querySelectorAll('.findword-cell.selected');
-            let builtString = ""; cells.forEach(c => builtString += c.innerText);
+            const cells = gridBox.querySelectorAll('.findword-cell');
+            
+            let builtString = "";
+            chronologicalFindWordCellIndices.forEach(idx => {
+                if (cells[idx]) builtString += cells[idx].innerText;
+            });
             
             activeFindWordTargets.forEach(target => {
                 if(builtString === target) { 
                     const item = document.getElementById(`bi-${target}`);
                     if(item && !item.classList.contains('found')) {
-                        item.classList.add('found'); showToast(`🎯 Trouvé : ${target}!`);
+                        item.classList.add('found'); 
+                        showToast(`🎯 Trouvé : ${target}!`);
+                        
+                        // Clear successfully identified indexes mapping vector
+                        chronologicalFindWordCellIndices.forEach(idx => {
+                            if (cells[idx]) cells[idx].classList.remove('selected');
+                        });
+                        chronologicalFindWordCellIndices = [];
                     }
                 }
             });
@@ -847,7 +972,12 @@
                 w.innerHTML = `<div style="text-align:center; padding:40px; color:var(--text-muted); line-height:1.5;">🎴 Aucun terme enregistré dans la session.<br>Lisez des articles et touchez les mots pour créer vos fiches d'étude.</div>`;
                 return;
             }
-            if (activeCardIndex >= vocabularyList.length) activeCardIndex = 0;
+            
+            // Immediate post-splice evaluation guard preventing index crashes
+            if (activeCardIndex >= vocabularyList.length) {
+                activeCardIndex = 0;
+            }
+            
             const card = vocabularyList[activeCardIndex];
             w.innerHTML = `
                 <div class="flashcard-container">
@@ -859,7 +989,7 @@
                     </div>
                     <div class="card-controls">
                         <button class="card-btn btn-unknown" onclick="activeCardIndex++; renderFlashcards();">Revoir ⏳</button>
-                        <button class="card-btn btn-know" onclick="vocabularyList.splice(${activeCardIndex}, 1); document.getElementById('global-card-count').innerText = vocabularyList.length; renderFlashcards();">Acquis ! ✅</button>
+                        <button class="card-btn btn-know" onclick="vocabularyList.splice(activeCardIndex, 1); if(activeCardIndex >= vocabularyList.length){ activeCardIndex = 0; } document.getElementById('global-card-count').innerText = vocabularyList.length; renderFlashcards();">Acquis ! ✅</button>
                     </div>
                 </div>
             `;
@@ -874,8 +1004,73 @@
             setTimeout(() => { t.style.display = 'none'; }, 2200);
         }
 
+        // New Adaptive Slider Framework Remapping
+        function commitTierAssignments() {
+            const beg = document.getElementById('tier-group-beginner').checked;
+            const inter = document.getElementById('tier-group-intermediate').checked;
+            const adv = document.getElementById('tier-group-advanced').checked;
+            
+            let tempTiers = [];
+            if (beg) { tempTiers.push(1); tempTiers.push(2); }
+            if (inter) { tempTiers.push(3); }
+            if (adv) { tempTiers.push(4); tempTiers.push(5); }
+            
+            if (tempTiers.length === 0) {
+                tempTiers = [1];
+                document.getElementById('tier-group-beginner').checked = true;
+            }
+            
+            activeAllowedCefrTiersList = tempTiers;
+            localStorage.setItem('LSIFT_ACTIVE_TIERS', JSON.stringify(activeAllowedCefrTiersList));
+            rebuildSliderBounds();
+        }
+
+        function rebuildSliderBounds() {
+            const slider = document.getElementById('level-slider');
+            const ticksRow = document.getElementById('slider-ticks-row');
+            
+            const minVal = Math.min(...activeAllowedCefrTiersList);
+            const maxVal = Math.max(...activeAllowedCefrTiersList);
+            
+            slider.min = minVal;
+            slider.max = maxVal;
+            
+            if (!activeAllowedCefrTiersList.includes(selectedLevelIndex)) {
+                selectedLevelIndex = minVal;
+                slider.value = minVal;
+            }
+            
+            ticksRow.innerHTML = '';
+            const allCefrLabels = { 1: "A1", 2: "A2", 3: "B1", 4: "C1", 5: "Fluide" };
+            for (let i = minVal; i <= maxVal; i++) {
+                if (activeAllowedCefrTiersList.includes(i)) {
+                    ticksRow.innerHTML += `<span>${allCefrLabels[i]}</span>`;
+                } else {
+                    ticksRow.innerHTML += `<span style="opacity:0.2; text-decoration:line-through;">-</span>`;
+                }
+            }
+            
+            if (selectedArticle) renderContent();
+        }
+
+        function commitSubscriptionTierChange() {
+            appSubscriberTierStatus = document.getElementById('setting-subscription-tier').value;
+            localStorage.setItem('LSIFT_SUBSCRIBER_TIER', appSubscriberTierStatus);
+            showToast(`💳 Passage en formule : ${appSubscriberTierStatus.toUpperCase()}`);
+        }
+
         document.getElementById('level-slider').addEventListener('input', function() {
-            selectedLevelIndex = parseInt(this.value); if(selectedArticle) renderContent();
+            let targetVal = parseInt(this.value);
+            // Elastic boundary snapping constraint mapping validation loops
+            if (!activeAllowedCefrTiersList.includes(targetVal)) {
+                let closest = activeAllowedCefrTiersList.reduce((prev, curr) => 
+                    Math.abs(curr - targetVal) < Math.abs(prev - targetVal) ? curr : prev
+                );
+                targetVal = closest;
+                this.value = closest;
+            }
+            selectedLevelIndex = targetVal; 
+            if(selectedArticle) renderContent();
         });
 
         window.onload = function() {
@@ -884,13 +1079,30 @@
 
             const savedKillSwitch = localStorage.getItem('DEV_KILL_SWITCH_STATE');
             if (savedKillSwitch === "true") {
-                isDevKillSwitchActive = true; document.getElementById('toggle-dev-kill-switch').checked = true;
+                isDevKillSwitchActive = true; 
+                document.getElementById('toggle-dev-kill-switch').checked = true;
+            }
+            
+            // Hydrating Subscription setting values from disk persistence layers
+            const savedSub = localStorage.getItem('LSIFT_SUBSCRIBER_TIER');
+            if (savedSub) {
+                appSubscriberTierStatus = savedSub;
+                document.getElementById('setting-subscription-tier').value = savedSub;
+            }
+
+            const savedTiers = localStorage.getItem('LSIFT_ACTIVE_TIERS');
+            if (savedTiers) {
+                activeAllowedCefrTiersList = JSON.parse(savedTiers);
+                document.getElementById('tier-group-beginner').checked = activeAllowedCefrTiersList.includes(1);
+                document.getElementById('tier-group-intermediate').checked = activeAllowedCefrTiersList.includes(3);
+                document.getElementById('tier-group-advanced').checked = activeAllowedCefrTiersList.includes(5);
             }
 
             updateGlobalStatusBadge();
             refreshTelemetryDisplay();
             generateMultiFeedMatrix(false);
             runTimeCapsuleTerminalReport();
+            rebuildSliderBounds();
         };
     </script>
 </body>
