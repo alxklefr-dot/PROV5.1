@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LangSift Direct v7.0 - Complete Edition</title>
+    <title>LangSift Direct v7.2 - Bug Fixed Edition</title>
     <style>
         :root {
             --bg-color: #fdfbf7;
@@ -23,6 +23,7 @@
         .app-header p { color: var(--text-muted); margin: 4px 0 0 0; font-size: 13px; }
         
         .settings-panel { background-color: #f5f1e9; border-radius: 14px; padding: 16px; margin-bottom: 20px; border: 1px solid var(--accent-light); display: none; }
+        .key-input { width: 100%; padding: 10px; margin: 8px 0; border-radius: 8px; border: 1px solid var(--accent-light); box-sizing: border-box; font-size: 12px; }
         .status-tracker { display: flex; justify-content: space-between; align-items: center; background: #ebdcb9; padding: 8px 12px; border-radius: 8px; margin-top: 10px; font-size: 11px; font-weight: bold; }
         .status-badge { background: var(--accent-color); color: white; padding: 2px 8px; border-radius: 10px; font-size: 10px; }
 
@@ -82,7 +83,11 @@
 
             <div id="settings-drawer" class="settings-panel">
                 <h3>Configuration Générale</h3>
-                <button id="dev-mode-btn" class="refresh-btn" onclick="toggleDevMode()" style="color:#c62828; margin-bottom: 10px;">Dev Mode</button>
+                
+                <label style="font-size: 11px; font-weight: bold; color: var(--text-muted);">Clé API Google Gemini :</label>
+                <input type="password" id="api-key-field" class="key-input" placeholder="Paste AI Studio Key here..." onchange="saveApiKey(this.value)">
+
+                <button id="dev-mode-btn" class="refresh-btn" onclick="toggleDevMode()" style="color:#c62828; margin: 10px 0;">Dev Mode</button>
                 <button class="refresh-btn" onclick="clearSystemCache()">🧹 Vider la Mémoire Cache</button>
                 
                 <div class="status-tracker">
@@ -154,7 +159,6 @@
     </div>
 
     <script>
-        // --- CORE DATABASE MATRIX (All 15 Structural Feed Articles Restored) ---
         const freeNewsFeeds = {
             france: [
                 { id: "free_fr_1", timeline: "live", t: "Plan Vert Paris 2026", d: "La transformation écologique des boulevards urbains s'accélère." },
@@ -186,6 +190,12 @@
 
         function initPlatform() {
             const badge = document.getElementById('api-status-badge');
+            const savedKey = localStorage.getItem('GEMINI_KEY');
+            
+            if (savedKey) {
+                document.getElementById('api-key-field').value = savedKey;
+            }
+
             document.getElementById('dev-mode-btn').innerText = `Mode Développeur : ${isDevMode ? 'ACTIF (Mock Feed)' : 'INACTIF (Live API)'}`;
             badge.innerText = isDevMode ? "FEED COMPLET SANS API" : "READY FOR LIVE REQUESTS";
             badge.style.background = isDevMode ? "#8c7853" : "#2e7d32";
@@ -217,22 +227,23 @@
             });
         }
 
-        // --- PIPELINE CONTROLLER ROUTING ---
+        // --- PIPELINE CONTROLLER ROUTING FIXED ---
         async function runAiPipeline(article) {
             selectedArticleData = article;
             const badge = document.getElementById('api-status-badge');
             
-            // Check structural Local Storage Cache memory layer first
-            const localCache = localStorage.getItem(`cache_id_${article.id}`);
+            // Differentiate Mock Cache vs Live Cache Keys to prevent crossover corruption
+            const cachePrefix = isDevMode ? "mock_cache_" : "live_cache_";
+            const localCache = localStorage.getItem(`${cachePrefix}${article.id}`);
+            
             if (localCache) {
-                badge.innerText = "MÉMOIRE CACHE UTILLISÉE";
+                badge.innerText = isDevMode ? "MÉMOIRE MOCK CHARGÉE" : "MÉMOIRE API UTILLISÉE";
                 badge.style.background = "#2e7d32";
                 selectedArticleData.payload = JSON.parse(localCache);
                 openReaderView();
                 return;
             }
 
-            // MOCK INJECTION PATHWAY
             if (isDevMode) {
                 badge.innerText = "MOCK TRADUCTION INJECTÉE";
                 const mockPayload = {
@@ -244,18 +255,17 @@
                     Fluide: `<p><b>[Fluide]</b> Véritable prouesse urbanistique, le déploiement de ces structures témoigne d'une mutation radicale.</p>`, Eng_Fluide: "A true urban planning feat, the deployment of these structures witnesses a radical mutation."
                 };
                 selectedArticleData.payload = mockPayload;
-                localStorage.setItem(`cache_id_${article.id}`, JSON.stringify(mockPayload));
+                localStorage.setItem(`mock_cache_${article.id}`, JSON.stringify(mockPayload));
                 openReaderView();
                 return;
             }
 
-            // NATIVE API TRANSMISSION PATHWAY
             badge.innerText = "CONNEXION EN COURS...";
             badge.style.background = "#f57c00";
             
             const apiKey = localStorage.getItem('GEMINI_KEY');
             if (!apiKey) {
-                alert("Erreur: Clé absente. Veuillez l'ajouter en console via: localStorage.setItem('GEMINI_KEY', 'votre_cle')");
+                alert("Erreur: Clé absente. Veuillez copier votre clé API dans le champ dédié des Réglages.");
                 badge.innerText = "ÉCHEC DE CLÉ";
                 badge.style.background = "#c62828";
                 return;
@@ -295,7 +305,7 @@
                 
                 const parsedPayload = JSON.parse(cleanText.trim());
                 selectedArticleData.payload = parsedPayload;
-                localStorage.setItem(`cache_id_${article.id}`, JSON.stringify(parsedPayload));
+                localStorage.setItem(`live_cache_${article.id}`, JSON.stringify(parsedPayload));
                 
                 badge.innerText = "API LIVE CHARGÉE";
                 badge.style.background = "#2e7d32";
@@ -309,7 +319,6 @@
             }
         }
 
-        // --- RUNTIME INTERFACE UTILITIES ---
         function openReaderView() {
             document.getElementById('view-news').classList.remove('active');
             document.getElementById('view-reader').classList.add('active');
@@ -345,10 +354,15 @@
             document.getElementById(`panel-${panelId}`).classList.add('active');
         }
 
+        function saveApiKey(val) {
+            localStorage.setItem('GEMINI_KEY', val.trim());
+        }
+
         function toggleDevMode() {
             isDevMode = !isDevMode;
             localStorage.setItem('DEV_MODE', isDevMode);
-            initPlatform();
+            // Forced reload ensures completely fresh pipeline states run cleanly
+            location.reload();
         }
 
         function toggleSettingsDrawer() {
@@ -362,15 +376,15 @@
         }
 
         function clearSystemCache() {
-            // Explicitly map keys to avoid loop corruptions
             const categories = ['france', 'europe', 'global'];
             categories.forEach(c => {
                 freeNewsFeeds[c].forEach(art => {
-                    localStorage.removeItem(`cache_id_${art.id}`);
+                    localStorage.removeItem(`mock_cache_${art.id}`);
+                    localStorage.removeItem(`live_cache_${art.id}`);
                 });
             });
-            alert("Mémoire cache vidée.");
-            initPlatform();
+            alert("Mémoires caches nettoyées.");
+            location.reload();
         }
 
         document.getElementById('level-slider').addEventListener('input', function() {
