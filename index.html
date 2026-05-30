@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -6,7 +8,9 @@
 <style>
 :root {
 --bg-color: #fdfbf7;
-@@ -13,43 +13,70 @@
+--card-bg: #ffffff;
+--text-color: #2c2520;
+--text-muted: #6e655f;
 --accent-color: #8c7853;
 --accent-light: #eaddca;
 --success-color: #2e7d32;
@@ -94,7 +98,17 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Georg
 .reader-header { position: fixed; top: 0; left: 0; right: 0; background-color: var(--bg-color); padding: 14px 20px; box-shadow: 0 3px 15px rgba(0,0,0,0.07); display: flex; flex-direction: column; align-items: center; z-index: 1000; border-bottom: 1px solid rgba(0,0,0,0.05); }
 .nav-row { display: flex; width: 100%; max-width: 500px; justify-content: space-between; align-items: center; margin-bottom: 10px; }
 .back-btn { background: none; border: none; font-size: 15px; color: var(--accent-color); font-weight: bold; cursor: pointer; }
-@@ -67,6 +94,7 @@
+.slider-label { font-size: 12px; font-weight: bold; }
+.slider-container { width: 100%; max-width: 460px; display: flex; flex-direction: column; align-items: center; }
+input[type="range"] { width: 100%; accent-color: var(--accent-color); margin: 4px 0; }
+.ticks { display: flex; justify-content: space-between; width: 100%; font-size: 10px; font-weight: bold; color: #888; }
+
+.reader-content { margin-top: 145px; width: 100%; }
+.story-title { font-family: Georgia, serif; font-size: 24px; margin-bottom: 18px; line-height: 1.3; font-weight: bold; }
+.text-block p { font-size: 17px; line-height: 1.9; margin-bottom: 22px; text-align: justify; }
+.reader-content span.w { cursor: pointer; padding: 0 2px; border-radius: 3px; transition: background 0.15s ease; }
+.reader-content span.w:hover { background-color: var(--accent-light); }
+
 .eng-toggle-btn { display: block; margin: 25px auto; background: none; border: 1px solid var(--accent-color); color: var(--accent-color); padding: 8px 18px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; }
 .english-translation-panel { background-color: #f3f0ea; border-left: 4px solid var(--accent-color); padding: 16px; font-size: 14.5px; color: #444; line-height: 1.6; white-space: pre-line; display: none; margin-bottom: 35px; border-radius: 0 8px 8px 0; }
 
@@ -102,7 +116,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Georg
 .brand-ad-card { position: relative; min-height: 160px; border-radius: 16px; overflow: hidden; margin: 35px 0; box-shadow: 0 8px 24px rgba(0,0,0,0.15); background-color: #000; }
 .brand-ad-bg-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&q=80&w=600'); background-size: cover; background-position: center; z-index: 1; }
 .brand-ad-gradient-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.5) 60%, rgba(0,0,0,0.3) 100%); z-index: 2; }
-@@ -76,109 +104,128 @@
+.brand-ad-content { position: relative; z-index: 3; padding: 24px; color: white; display: flex; flex-direction: column; justify-content: space-between; min-height: 160px; box-sizing: border-box; }
+.brand-ad-label { font-size: 9px; color: #aaa; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; text-align: center; }
+.ad-badge { align-self: flex-start; background: #e60000; color: white; font-size: 10px; font-weight: bold; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; }
 .ad-header { font-family: Georgia, serif; font-size: 17px; margin: 10px 0; }
 .ad-footer-row { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 8px; }
 .ad-cta { font-size: 12px; font-style: italic; color: #ddd; }
@@ -301,7 +317,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Georg
 <div id="news-feeds-canvas">
 <div class="feed-tabs-container">
 <button id="tab-local" class="feed-tab-btn active" onclick="switchFeedPanel('local')">📍 Actu FR</button>
-@@ -192,46 +239,38 @@ <h3>📊 API Dev Performance Metrics</h3>
+<button id="tab-europe" class="feed-tab-btn" onclick="switchFeedPanel('europe')">🇪🇺 Europe</button>
+<button id="tab-world" class="feed-tab-btn" onclick="switchFeedPanel('world')">🌍 Monde</button>
+</div>
+<div id="panel-local" class="feed-panel active"></div>
+<div id="panel-europe" class="feed-panel"></div>
+<div id="panel-world" class="feed-panel"></div>
+</div>
 </div>
 
 <div id="view-games" class="menu-view">
@@ -356,7 +378,22 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Georg
 </div>
 </div>
 
-@@ -254,14 +293,20 @@ <h1>Le Coin Jeux</h1>
+<div id="view-flashcards" class="menu-view">
+<div class="app-header"><h1>Mon Vocabulaire</h1><p>Mots enregistrés depuis vos lectures</p></div>
+<div id="deck-wrapper"></div>
+</div>
+
+<div id="view-reader" class="menu-view">
+<div class="reader-header">
+<div class="nav-row">
+<button class="back-btn" onclick="exitReaderView()">✕ Retour</button>
+<div class="slider-label">NIVEAU CEFR: <span id="level-tag">A1</span></div>
+</div>
+<div class="slider-container">
+<input type="range" id="level-slider" min="1" max="5" value="1" step="1">
+<div class="ticks"><span>A1</span><span>A2</span><span>B1</span><span>C1</span><span>Fluide</span></div>
+</div>
+</div>
 <div class="reader-content">
 <div id="reader-title-display" class="story-title"></div>
 <div id="reader-body-display" class="text-block"></div>
@@ -379,7 +416,22 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Georg
 <button class="eng-toggle-btn" onclick="toggleTranslationBox()">Afficher la traduction / Show English</button>
 <div id="reader-translation-panel" class="english-translation-panel"></div>
 </div>
-@@ -284,86 +329,139 @@ <h1>Le Coin Jeux</h1>
+</div>
+</div>
+
+<div class="bottom-nav">
+<button id="nav-news" class="nav-item active" onclick="switchActiveTab('view-news', this)"><div class="nav-item-icon">📰</div><div>Actualités</div></button>
+<button id="nav-games" class="nav-item" onclick="switchActiveTab('view-games', this)"><div class="nav-item-icon">🎮</div><div>Jouer</div></button>
+<button id="nav-flashcards" class="nav-item" onclick="switchActiveTab('view-flashcards', this)"><div class="nav-item-icon">🎴</div><div>Flashcards (<span id="global-card-count">0</span>)</div></button>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+let vocabularyList = [];
+let newsArticlesCache = [];
+let selectedLevelIndex = 1;
+let selectedArticle = null;
 let activeCardIndex = 0;
 let currentCarouselBatchIndex = 0; 
 let activeLanguageHub = "fr"; 
@@ -566,7 +618,21 @@ document.getElementById('tab-local').innerText = `📍 Actu ${activeLanguageHub.
 }
 
 function switchActiveTab(tabId, element) {
-@@ -385,116 +483,185 @@ <h1>Le Coin Jeux</h1>
+document.querySelectorAll('.menu-view').forEach(v => v.classList.remove('active'));
+document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+document.getElementById(tabId).classList.add('active');
+element.classList.add('active');
+if (tabId === 'view-flashcards') renderFlashcards();
+if (tabId === 'view-games') exitGameToMenu();
+}
+
+function switchFeedPanel(panelKey) {
+document.querySelectorAll('.feed-tab-btn').forEach(b => b.classList.remove('active'));
+document.querySelectorAll('.feed-panel').forEach(p => p.classList.remove('active'));
+document.getElementById(`tab-${panelKey}`).classList.add('active');
+document.getElementById(`panel-${panelKey}`).classList.add('active');
+}
+
 function rotateNewsCarousel() {
 currentCarouselBatchIndex = (currentCarouselBatchIndex === 0) ? 1 : 0;
 renderFeedModules();
@@ -816,7 +882,12 @@ document.getElementById('loading-spinner-block').style.display = 'none';
 function openReader() {
 document.getElementById('view-news').classList.remove('active');
 document.getElementById('view-reader').classList.add('active');
-@@ -507,33 +674,30 @@ <h1>Le Coin Jeux</h1>
+renderContent();
+}
+
+function exitReaderView() { 
+document.getElementById('view-reader').classList.remove('active'); 
+document.getElementById('view-news').classList.add('active');
 }
 
 function renderContent() {
@@ -862,7 +933,11 @@ let standardLower = cleanWord.toLowerCase();
 markup += `<span class="w" data-lookup="${cleanWord}" data-translation="${translation}">${token}</span>`;
 }
 });
-@@ -545,7 +709,7 @@ <h1>Le Coin Jeux</h1>
+builtHtml += `<p>${markup}</p>`;
+});
+
+document.getElementById('reader-body-display').innerHTML = builtHtml;
+const ad = adMatrix[selectedLevelIndex];
 document.getElementById('ad-header-display').innerHTML = ad.header;
 document.getElementById('ad-badge-display').innerText = ad.badge;
 document.getElementById('ad-cta-display').innerText = ad.cta;
@@ -871,7 +946,19 @@ document.getElementById('ad-cta-display').innerText = ad.cta;
 
 document.querySelectorAll('.reader-content span.w').forEach(el => {
 el.onclick = function(e) {
-@@ -565,12 +729,11 @@ <h1>Le Coin Jeux</h1>
+e.stopPropagation();
+const surf = this.getAttribute('data-lookup'); const trans = this.getAttribute('data-translation');
+showToast(`💡 <b>${surf}</b> saved!`);
+if(!vocabularyList.find(v => v.fr.toLowerCase() === surf.toLowerCase())) {
+vocabularyList.push({ fr: surf, en: trans });
+document.getElementById('global-card-count').innerText = vocabularyList.length;
+}
+};
+});
+}
+
+function toggleTranslationBox() { 
+const p = document.getElementById('reader-translation-panel');
 p.style.display = (p.style.display === 'block') ? 'none' : 'block'; 
 }
 
@@ -885,7 +972,9 @@ document.getElementById('games-main-menu').style.display = 'flex';
 function launchWordleGame() {
 document.getElementById('games-main-menu').style.display = 'none';
 document.getElementById('game-window-wordle').style.display = 'block';
-@@ -580,64 +743,48 @@ <h1>Le Coin Jeux</h1>
+
+const pools = gameContextWordsByLang[activeLanguageHub] || gameContextWordsByLang['fr'];
+const randomPick = pools[Math.floor(Math.random() * pools.length)];
 wordleTargetWord = randomPick.w.toUpperCase();
 wordleCurrentRow = 0;
 
@@ -962,7 +1051,12 @@ inputField.value = '';
 function launchFindWordGame() {
 document.getElementById('games-main-menu').style.display = 'none';
 document.getElementById('game-window-findword').style.display = 'block';
-@@ -650,134 +797,100 @@ <h1>Le Coin Jeux</h1>
+
+const sourceVocabulary = localMultiLanguageDict[activeLanguageHub] || localMultiLanguageDict['fr'];
+activeFindWordTargets = Object.keys(sourceVocabulary).map(k => k.toUpperCase()).slice(0, 3);
+
+const hintBox = document.getElementById('findword-scaffold');
+const bankBox = document.getElementById('findword-bank-list');
 bankBox.innerHTML = '';
 
 if (selectedLevelIndex <= 2) {
@@ -1145,3 +1239,4 @@ document.getElementById('level-slider').addEventListener('input', function() {
 };
 </script>
 </body>
+</html>
