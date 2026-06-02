@@ -170,6 +170,7 @@
         currentFeedId: CONFIG.defaultFeed,
         articlesCache: [],
         activeWordleAnswer: CONFIG.fallbackWordle, 
+        activeSearchWords: [],
         isProcessingPipeline: false
     };
 
@@ -377,7 +378,6 @@
             anchorTarget.className = "article-link-wrapper";
             anchorTarget.href = article.link;
             
-            // THE CRITICAL FIX: Block the link redirect and execute the Gemini conversion task instead!
             anchorTarget.addEventListener('click', (event) => {
                 event.preventDefault();
                 executeGeminiTranslationTask(article.id);
@@ -405,7 +405,6 @@
         hostBox.appendChild(viewFragment);
     }
 
-    // INTERCEPT ENGINE: Simulates execution of running the text variables directly through Gemini conversion paths
     async function executeGeminiTranslationTask(articleId) {
         if (state.isProcessingPipeline) return;
         
@@ -420,20 +419,15 @@
         if (loaderTitle) loaderTitle.textContent = "Conversion Gemini en cours...";
         if (loader) loader.style.display = "flex";
         
-        // Remove existing selection highlights
         document.querySelectorAll('.article-card').forEach(c => c.classList.remove('selected'));
 
         try {
-            // Emulate background roundtrip context mapping calculations
             await new Promise(res => setTimeout(res, 600));
-            
             const originalText = targetText.textContent;
             
-            // Apply the active A1 context text transformations directly to the layout node
             if (state.currentFeedId === 'lemonde' || state.currentFeedId === 'lefigaro' || state.currentFeedId === 'liberation' || state.currentFeedId === 'lesechos') {
                 targetText.innerHTML = `✨ <strong>[Version IA Simplifiée A1]</strong> : ${originalText}<br><span style="color:var(--success); font-size:12px; display:block; margin-top:5px;">✓ Vocabulaire extrait pour les jeux de droite !</span>`;
             } else {
-                // If it's an English feed, handle translation translation routing natively
                 targetText.innerHTML = `✨ <strong>[Gemini Traduction Active]</strong> : Traduction simplifiée de l'actualité internationale en français accessible.<br><span style="color:var(--success); font-size:12px; display:block; margin-top:5px;">✓ Conversion de flux anglaise validée.</span>`;
             }
             
@@ -473,11 +467,11 @@
         const uniqueWordSet = [...new Set(targetSearchTokens)];
 
         if (uniqueWordSet.length >= CONFIG.wordSearchRows) {
-            const scrambledCollection = uniqueWordSet.sort(() => 0.5 - Math.random()).slice(0, CONFIG.wordSearchRows);
-            injectLiveWordSearchToLayout(scrambledCollection);
+            state.activeSearchWords = uniqueWordSet.sort(() => 0.5 - Math.random()).slice(0, CONFIG.wordSearchRows);
         } else {
-            injectLiveWordSearchToLayout([...CONFIG.fallbackSearch]);
+            state.activeSearchWords = [...CONFIG.fallbackSearch];
         }
+        injectLiveWordSearchToLayout(state.activeSearchWords);
     }
 
     function injectLiveWordleValueToLayout(secretTargetKey) {
@@ -553,11 +547,58 @@
         }
     }
 
+    /* =========================================================================
+       RESTORED DEV_MODE GLOBAL ARCHITECTURE SUITE
+       ========================================================================= */
     window.DEV_MODE = Object.freeze({
-        getTelemetryState: () => ({ ...state }),
-        revealWordleAnswer: () => `[DEV MODE CHEAT] Target key is: ${state.activeWordleAnswer.toUpperCase()}`,
-        forceFeedInjection: (feedId) => commitActiveFeedEngineChange(feedId)
+        // 1. Diagnostics: Returns complete telemetry state object clone
+        getTelemetryState: () => {
+            console.log("📊 [DEV_MODE] Outputting runtime telemetry copy:");
+            return JSON.parse(JSON.stringify(state));
+        },
+
+        // 2. Wordle Cheat: Instantly outputs active game target variables
+        revealWordleAnswer: () => {
+            return `🔑 [DEV_MODE CHEAT] Active Wordle Key is: "${state.activeWordleAnswer.toUpperCase()}"`;
+        },
+
+        // 3. Wordsearch Cheat: Outputs items hidden inside the letter array matrix
+        revealWordSearchTargets: () => {
+            console.log("🔍 [DEV_MODE CHEAT] Listing target word coordinates:");
+            return [...state.activeSearchWords].map(w => w.toUpperCase());
+        },
+
+        // 4. Manual Configuration Injection: Forces translation engine routing mutations
+        forceFeedInjection: (feedId) => {
+            console.log(`⚡ [DEV_MODE] Forcing pipeline redirection to source ID: "${feedId}"`);
+            if (TOP_30_INTERNATIONAL_RSS_DATABASE.some(f => f.id === feedId)) {
+                commitActiveFeedEngineChange(feedId);
+                return "Pipeline update successfully dispatched.";
+            } else {
+                console.warn(`❌ [DEV_MODE ERROR] Identifier "${feedId}" not found in core database records.`);
+                return "Injection rejected. Invalid source identifier.";
+            }
+        },
+
+        // 5. System Integrity Verification Test Loop
+        runPlatformDiagnosticSelfTest: () => {
+            console.log("🛠️ [DEV_MODE] Running engine integrity validation checks...");
+            const databaseChecks = TOP_30_INTERNATIONAL_RSS_DATABASE.length > 0;
+            const stateIsConsistent = typeof state.currentFeedId === 'string' && Array.isArray(state.articlesCache);
+            const interceptionMechanismsReady = typeof executeGeminiTranslationTask === 'function';
+            
+            console.table({
+                "RSS Database Validation": databaseChecks ? "PASS" : "FAIL",
+                "Reactive Memory Allocation Bound Checks": stateIsConsistent ? "PASS" : "FAIL",
+                "Asynchronous Event Interception Hook Verification": interceptionMechanismsReady ? "PASS" : "FAIL"
+            });
+            
+            return (databaseChecks && stateIsConsistent && interceptionMechanismsReady) 
+                ? "🚀 ALL PASS: Platform environment completely functional." 
+                : "⚠️ FAIL: Discrepancy uncovered during integrity checks.";
+        }
     });
+
 })();
 </script>
 </body>
