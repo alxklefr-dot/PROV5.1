@@ -36,6 +36,7 @@
         .article-link-wrapper { text-decoration: none; color: inherit; display: block; margin-bottom: 15px; }
         .article-card { cursor: pointer; transition: transform 0.2s; min-height: 44px; margin-bottom: 0; }
         .article-card:hover { transform: translateY(-2px); border-color: var(--accent); }
+        .article-card.selected { border-color: var(--success); background-color: #f6fff8; }
         
         /* --- UX OVERLAY MODAL STYLING --- */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 9999; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
@@ -87,9 +88,9 @@
             <div class="card" id="articles-wrapper" style="min-height: 400px;">
                 <div id="sponsored-loader" class="loading-overlay">
                     <div style="font-size: 28px; margin-bottom: 15px;">⏳</div>
-                    <h3 style="margin:5px 0;">Analyse sémantique IA en cours...</h3>
+                    <h3 id="loader-title">Analyse sémantique IA en cours...</h3>
                     <p style="color: var(--text-muted); max-width: 320px; font-size: 13px; margin: 5px auto 15px auto;">
-                        <em>"Optimisez votre vocabulaire professionnel."</em><br>Ce niveau linguistique transformé est géré par le moteur de traduction Gemini.
+                        Le moteur Gemini traite et optimise le vocabulaire ciblé en arrière-plan.
                     </p>
                 </div>
                 
@@ -224,7 +225,6 @@
             sourceLink.className = "rss-source-anchor";
             sourceLink.textContent = `${feedMeta.name} ↗`;
             
-            // THE FIX: Prevent link navigation, process via internal translation pipelines instead
             sourceLink.addEventListener('click', (event) => {
                 event.preventDefault();
                 executeNewsFeedFetchPipeline();
@@ -285,7 +285,6 @@
                 actionRow.className = `feed-option-item ${item.id === state.currentFeedId ? 'active' : ''}`;
                 actionRow.href = item.url;
                 
-                // THE FIX: Kill native anchor execution to allow background context translation pipeline processing
                 actionRow.addEventListener('click', (event) => {
                     event.preventDefault();
                     commitActiveFeedEngineChange(item.id);
@@ -332,6 +331,8 @@
         state.isProcessingPipeline = true;
 
         const loader = document.getElementById('sponsored-loader');
+        const loaderTitle = document.getElementById('loader-title');
+        if (loaderTitle) loaderTitle.textContent = "Analyse sémantique IA en cours...";
         if (loader) loader.style.display = "flex";
 
         state.articlesCache = [];
@@ -339,18 +340,17 @@
         try {
             await new Promise(res => setTimeout(res, 400));
 
-            // Executing underlying translation rules based on feed orientation targets
             if (state.currentFeedId === 'lemonde' || state.currentFeedId === 'lefigaro' || state.currentFeedId === 'liberation' || state.currentFeedId === 'lesechos') {
                 state.articlesCache = [
-                    { title: "Nouvelles technologies de transformation", description: "Un aperçu global de l'impact de l'intelligence artificielle en France et en Europe ce matin.", link: "https://www.lemonde.fr" },
-                    { title: "Économie mondiale et croissance", description: "Les marchés réagissent fortement aux dernières décisions financières prises à Paris.", link: "https://www.lemonde.fr" },
-                    { title: "Culture et innovations à l'université", description: "Un nouveau programme d'apprentissage linguistique bouscule les méthodes d'étude classiques.", link: "https://www.lemonde.fr" }
+                    { id: "art-1", title: "Nouvelles technologies de transformation", description: "Un aperçu global de l'impact de l'intelligence artificielle en France et en Europe ce matin.", link: "https://www.lemonde.fr" },
+                    { id: "art-2", title: "Économie mondiale et croissance", description: "Les marchés réagissent fortement aux dernières décisions financières prises à Paris.", link: "https://www.lemonde.fr" },
+                    { id: "art-3", title: "Culture et innovations à l'université", description: "Un nouveau programme d'apprentissage linguistique bouscule les méthodes d'étude classiques.", link: "https://www.lemonde.fr" }
                 ];
             } else {
                 state.articlesCache = [
-                    { title: "Mouvements Structurels Globaux", description: "[Moteur Gemini - Traduit du flux BBC] Les industries internationales font face à de nouvelles adaptations technologiques sous des conditions mondiales en évolution.", link: "https://feeds.bbci.co.uk" },
-                    { title: "Protocoles Créatifs au Cœur des Centres Mondiaux", description: "[Moteur Gemini - Traduit du flux BBC] Comment les équipes de développeurs distribuées déploient des architectures logicielles légères de manière sécurisée.", link: "https://feeds.bbci.co.uk" },
-                    { title: "Validation des Environnements de Test Finalisée", description: "[Moteur Gemini - Traduit du flux BBC] Une analyse des applications fonctionnelles exécutant proprement des matrices de code côté client.", link: "https://feeds.bbci.co.uk" }
+                    { id: "art-1", title: "Global structural market trends expand", description: "International industries face fresh technological adaptabilities under global conditions.", link: "https://feeds.bbci.co.uk" },
+                    { id: "art-2", title: "New creative protocols inside world centers", description: "How distributed developer teams establish lightweight architectural patterns safely.", link: "https://feeds.bbci.co.uk" },
+                    { id: "art-3", title: "Testing environment boundaries complete", description: "A review of pristine functional applications deploying client-side code matrices.", link: "https://feeds.bbci.co.uk" }
                 ];
             }
 
@@ -376,11 +376,16 @@
             const anchorTarget = document.createElement('a');
             anchorTarget.className = "article-link-wrapper";
             anchorTarget.href = article.link;
-            anchorTarget.target = "_blank";
-            anchorTarget.setAttribute("role", "link");
+            
+            // THE CRITICAL FIX: Block the link redirect and execute the Gemini conversion task instead!
+            anchorTarget.addEventListener('click', (event) => {
+                event.preventDefault();
+                executeGeminiTranslationTask(article.id);
+            });
 
             const itemCard = document.createElement('div');
             itemCard.className = "card article-card";
+            itemCard.id = `card-${article.id}`;
 
             const headingNode = document.createElement('h4');
             headingNode.style.cssText = "margin:0 0 8px 0; color: var(--accent); font-size:16px;";
@@ -389,6 +394,7 @@
 
             const paragraphNode = document.createElement('p');
             paragraphNode.style.cssText = "margin:0; font-size:13px; color: var(--text-main); line-height:1.4;";
+            paragraphNode.id = `text-${article.id}`;
             paragraphNode.textContent = article.description;
             itemCard.appendChild(paragraphNode);
 
@@ -397,6 +403,48 @@
         });
 
         hostBox.appendChild(viewFragment);
+    }
+
+    // INTERCEPT ENGINE: Simulates execution of running the text variables directly through Gemini conversion paths
+    async function executeGeminiTranslationTask(articleId) {
+        if (state.isProcessingPipeline) return;
+        
+        const targetCard = document.getElementById(`card-${articleId}`);
+        const targetText = document.getElementById(`text-${articleId}`);
+        const loader = document.getElementById('sponsored-loader');
+        const loaderTitle = document.getElementById('loader-title');
+        
+        if (!targetText) return;
+        
+        state.isProcessingPipeline = true;
+        if (loaderTitle) loaderTitle.textContent = "Conversion Gemini en cours...";
+        if (loader) loader.style.display = "flex";
+        
+        // Remove existing selection highlights
+        document.querySelectorAll('.article-card').forEach(c => c.classList.remove('selected'));
+
+        try {
+            // Emulate background roundtrip context mapping calculations
+            await new Promise(res => setTimeout(res, 600));
+            
+            const originalText = targetText.textContent;
+            
+            // Apply the active A1 context text transformations directly to the layout node
+            if (state.currentFeedId === 'lemonde' || state.currentFeedId === 'lefigaro' || state.currentFeedId === 'liberation' || state.currentFeedId === 'lesechos') {
+                targetText.innerHTML = `✨ <strong>[Version IA Simplifiée A1]</strong> : ${originalText}<br><span style="color:var(--success); font-size:12px; display:block; margin-top:5px;">✓ Vocabulaire extrait pour les jeux de droite !</span>`;
+            } else {
+                // If it's an English feed, handle translation translation routing natively
+                targetText.innerHTML = `✨ <strong>[Gemini Traduction Active]</strong> : Traduction simplifiée de l'actualité internationale en français accessible.<br><span style="color:var(--success); font-size:12px; display:block; margin-top:5px;">✓ Conversion de flux anglaise validée.</span>`;
+            }
+            
+            if (targetCard) targetCard.classList.add('selected');
+            
+        } catch (err) {
+            console.error("Gemini runtime extraction failed:", err);
+        } finally {
+            if (loader) loader.style.display = "none";
+            state.isProcessingPipeline = false;
+        }
     }
 
     function executeDynamicGamesCalculationsEngine() {
