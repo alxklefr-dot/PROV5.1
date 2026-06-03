@@ -84,7 +84,6 @@
         .btn-danger { background-color: #dc2626; }
         .select-input { padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--surface); font-weight: 500; }
         
-        /* Mobile Friendly Layout Rules */
         .grid-layout { display: flex; flex-direction: column; gap: 24px; }
         @media(min-width: 1024px) {
             .grid-layout { display: grid; grid-template-columns: 2.5fr 1fr; }
@@ -116,6 +115,11 @@
         .source-tag { background: #e2e8f0; color: #334155; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 10px; text-transform: uppercase; }
         .article-title { margin: 0 0 6px 0; font-size: 18px; color: #0f172a; }
         .article-desc { margin: 0; font-size: 14px; color: #475569; line-height: 1.5; }
+
+        /* Infinite Scroll Sentinel Indicators */
+        .scroller-sentinel { height: 40px; display: flex; align-items: center; justify-content: center; font-size: 13px; color: var(--text-muted); font-weight: 500; margin-top: 10px; }
+        .spinner-icon { border: 3px solid #e2e8f0; border-radius: 50%; border-top: 3px solid var(--accent); width: 16px; height: 16px; animation: spin 0.8s linear infinite; margin-right: 8px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         /* Sidebar Widgets */
         .sidebar { display: flex; flex-direction: column; gap: 20px; }
@@ -226,7 +230,15 @@
             </div>
 
             <h2 style="margin:0 0 4px 0; font-size:18px; color:#0f172a;">Flux d'actualités consolidé</h2>
-            <div id="articles-target-container"></div>
+            
+            <!-- Unified scrolling viewport layout target -->
+            <div id="articles-target-container" style="display:flex; flex-direction:column; gap:16px;"></div>
+            
+            <!-- Infinite Scroll Intersection Element -->
+            <div id="infinite-scroll-sentinel" class="scroller-sentinel">
+                <div class="spinner-icon"></div>
+                <span>Analyse des flux suivants en cours...</span>
+            </div>
         </main>
 
         <aside class="sidebar">
@@ -270,7 +282,6 @@
             <h3 id="reader-headline-title" style="margin:0; font-size:18px; color:#0f172a;">Title</h3>
         </div>
         
-        <!-- Feature 5: Image placement restored directly within the reader pop-up canvas frame -->
         <div class="reader-hero-frame">
             <img id="reader-hero-image-render" src="" class="reader-hero-img" alt="Illustration">
         </div>
@@ -299,7 +310,6 @@
         <h3 style="margin:0 0 12px 0; font-size:16px;">Sélectionner les sources d'actualités</h3>
         <div id="modal-sources-list"></div>
         
-        <!-- Feature 4: Interactive custom RSS ingestion module tied directly to application context profiles -->
         <div class="custom-feed-injector-box">
             <h4 style="margin: 0 0 8px 0; font-size: 14px; color:#0f172a;">➕ Ajouter un flux RSS personnalisé</h4>
             <input type="text" id="custom-rss-title-field" class="form-input-text" placeholder="Nom de la source (ex: Mon Echo)">
@@ -315,12 +325,18 @@
 (function () {
     "use strict";
 
-    // Feature 3: Full suite of standardized production RSS feeds restored to original architecture
     const CORE_NEWS_DATABASE = [
         { id: "lm_01", sourceId: "lemonde", title: "Transformation numérique en Europe", desc: "L'impact des investissements technologiques s'accélère à Paris, Berlin et Helsinki, restructurant les infrastructures industrielles régionales.", timestamp: "Écrit il y a 2 heures", thumb: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=400&auto=format&fit=crop&q=60" },
         { id: "lf_02", sourceId: "lefigaro", title: "Analyse des marchés financiers internationaux", desc: "Les indices boursiers globaux affichent une volatilité record suite aux dernières annonces macroéconomiques des banques centrales.", timestamp: "Écrit il y a 5 heures", thumb: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&auto=format&fit=crop&q=60" },
-        { id: "les_03", sourceId: "lesechos", title: "Transition écologique et transports", desc: "Les investissements dans le ferroviaire et l'infrastructure électrique redéfinissent la mobilité urbaine des grandes métropoles européennes.", timestamp: "Écrit il y a 6 heures", thumb: "https://images.unsplash.com/photo-1519003722824-192d992a6058?w=400&auto=format&fit=crop&q=60" },
+        { id: "les_03", sourceId: "lesechos", title: "Transition écologique et transports", desc: "Les investissements dans le ferroviaire et l'infrastructure électrique redéfinissent la mobility urbaine des grandes métropoles européennes.", timestamp: "Écrit il y a 6 heures", thumb: "https://images.unsplash.com/photo-1519003722824-192d992a6058?w=400&auto=format&fit=crop&q=60" },
         { id: "lib_04", sourceId: "liberation", title: "Évolution du marché du travail francophone", desc: "Le télétravail et les plateformes numériques modifient en profondeur les droits et l'organisation des jeunes actifs salariés.", timestamp: "Écrit il y a 8 heures", thumb: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&auto=format&fit=crop&q=60" }
+    ];
+
+    const HISTORICAL_BATCH_POOL = [
+        { title: "Alexandre le Grand et la route d'Asie", desc: "Une étude tactique sur l'intégration des cultures locales au sein des lignes d'approvisionnement macédoniennes durant les campagnes orientales.", thumb: "https://images.unsplash.com/photo-1599733589046-10c005739ef9?w=400&auto=format&fit=crop&q=60" },
+        { title: "L'essor de la Hanse en mer Baltique", desc: "Comment une ligue marchande a reconfiguré les infrastructures douanières d'Europe du Nord sans armée permanente.", thumb: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=400&auto=format&fit=crop&q=60" },
+        { title: "Le mystère de la machine d'Anticythère", desc: "Analyse des engrenages de bronze antiques révélant des compétences de calcul astronomique hors norme pour l'époque.", thumb: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&auto=format&fit=crop&q=60" },
+        { title: "Voltaire et la liberté éditoriale à Genève", desc: "Chronique des imprimeries clandestines installées à la frontière pour contourner la censure royale française au XVIIIe siècle.", thumb: "https://images.unsplash.com/photo-1457369804613-52c61a468e7d?w=400&auto=format&fit=crop&q=60" }
     ];
 
     const DEFAULT_RSS_SOURCES = [
@@ -335,7 +351,6 @@
         de: {}, fi: {}
     });
 
-    // Feature 6: Restored localized cross-tier marketing payload messages matching targeted scaling requirements
     const ADVERTISING_VAULT = [
         { level: "A1", headline: "Babbel Débutant Express", body: "Construisez vos 100 premiers mots de vocabulaire natif avec notre assistant immersif à -50%." },
         { level: "A2", headline: "Babbel Débutant Express", body: "Construisez vos 100 premiers mots de vocabulaire natif avec notre assistant immersif à -50%." },
@@ -402,6 +417,12 @@
             this.currentLanguage = "fr";
             this.sliderIndexMap = ["A1", "A2", "B1", "B2", "C1", "C2"];
             
+            // Infinite Scroll Pagination States
+            this.virtualPagePointer = 1;
+            this.isScrollLoadingActive = false;
+            this.hasMoreVirtualArticles = true;
+            this.infiniteObserverInstance = null;
+
             this.wordleSecretWord = "";
             this.wordleRowsGuessedCount = 0;
             this.wordleMaxRowAttempts = 6;
@@ -413,7 +434,6 @@
             this.flashcardIsFlippedFaceState = false;
             this.currentlyTargetedLookupToken = null;
 
-            // Load saved user custom profile feeds on build boot
             this.customFeedsCollection = JSON.parse(localStorage.getItem(STORAGE_KEY_CUSTOM_FEEDS) || "[]");
 
             this.init();
@@ -425,6 +445,7 @@
             this.renderHomeFeedLayout();
             this.syncActiveSourceIndicators();
             this.updateFlashcardInterfaceDisplayCanvas();
+            this.bindInfiniteScrollingIntersectionObserver();
         }
 
         initializeAndSyncTokenHUDCounters() {
@@ -448,7 +469,6 @@
             document.getElementById('hud-total-tokens').textContent = total.toLocaleString();
         }
 
-        // Feature 4: Inject custom stored RSS frameworks dynamically into current run session parameters
         injectCustomFeedsIntoProductionDB() {
             this.customFeedsCollection.forEach(feed => {
                 const generatedId = `custom_art_${feed.id}`;
@@ -456,16 +476,15 @@
                     CORE_NEWS_DATABASE.push({
                         id: generatedId,
                         sourceId: feed.id,
-                        title: `Flux personnalisé : ${feed.name}`,
-                        desc: `Exploration sémantique active du lien de flux externalisé configuré sous l'adresse source : ${feed.url}.`,
+                        title: `${feed.name}`,
+                        desc: `Récit historique et analyse en direct du flux configuré à l'adresse : ${feed.url}.`,
                         timestamp: "Mis à jour en direct",
-                        thumb: "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=400&auto=format&fit=crop&q=60"
+                        thumb: "https://images.unsplash.com/photo-1461360228754-6e81c478b882?w=400&auto=format&fit=crop&q=60"
                     });
                 }
             });
         }
 
-        // Feature 4: Action to store persistent custom configuration payloads
         registerCustomUserIngestedRSS() {
             const nameInput = document.getElementById('custom-rss-title-field');
             const urlInput = document.getElementById('custom-rss-url-field');
@@ -555,25 +574,90 @@
             }
 
             displayCollection.forEach(article => {
-                const staticSource = DEFAULT_RSS_SOURCES.find(s => s.id === article.sourceId);
-                const customSource = this.customFeedsCollection.find(s => s.id === article.sourceId);
-                const sourceDisplayName = staticSource ? staticSource.name : (customSource ? customSource.name : "Custom RSS");
-
-                const card = document.createElement('div');
-                card.className = "article-card";
-                card.innerHTML = `
-                    <div class="thumb-frame"><img src="${article.thumb}" class="thumb-img" alt="Asset"></div>
-                    <div class="article-content">
-                        <div>
-                            <div class="article-meta"><span class="source-tag">${sourceDisplayName}</span><span>${article.timestamp}</span></div>
-                            <h3 class="article-title">${article.title}</h3>
-                            <p class="article-desc">${article.desc}</p>
-                        </div>
-                    </div>
-                `;
-                card.onclick = () => this.invokeImmersiveReaderPipelinePopup(article.id);
-                container.appendChild(card);
+                this.appendArticleNodeToDOMContainer(article);
             });
+        }
+
+        appendArticleNodeToDOMContainer(article) {
+            const container = document.getElementById('articles-target-container');
+            const staticSource = DEFAULT_RSS_SOURCES.find(s => s.id === article.sourceId);
+            const customSource = this.customFeedsCollection.find(s => s.id === article.sourceId);
+            const sourceDisplayName = staticSource ? staticSource.name : (customSource ? customSource.name : "Histoire RSS");
+
+            const card = document.createElement('div');
+            card.className = "article-card";
+            card.innerHTML = `
+                <div class="thumb-frame"><img src="${article.thumb}" class="thumb-img" alt="Asset"></div>
+                <div class="article-content">
+                    <div>
+                        <div class="article-meta"><span class="source-tag">${sourceDisplayName}</span><span>${article.timestamp}</span></div>
+                        <h3 class="article-title">${article.title}</h3>
+                        <p class="article-desc">${article.desc}</p>
+                    </div>
+                </div>
+            `;
+            card.onclick = () => this.invokeImmersiveReaderPipelinePopup(article.id);
+            container.appendChild(card);
+        }
+
+        bindInfiniteScrollingIntersectionObserver() {
+            const sentinelNode = document.getElementById('infinite-scroll-sentinel');
+            if (!sentinelNode) return;
+
+            this.infiniteObserverInstance = new IntersectionObserver((entries) => {
+                if (entries[0].isIntersecting && !this.isScrollLoadingActive && this.hasMoreVirtualArticles) {
+                    this.executeLoadMoreArticlesPipeline();
+                }
+            }, {
+                root: null,
+                rootMargin: "150px",
+                threshold: 0.1
+            });
+
+            this.infiniteObserverInstance.observe(sentinelNode);
+        }
+
+        async executeLoadMoreArticlesPipeline() {
+            this.isScrollLoadingActive = true;
+            const sentinelLabel = document.querySelector('#infinite-scroll-sentinel span');
+            
+            if (sentinelLabel) sentinelLabel.textContent = "Ingestion sémantique du segment suivant...";
+
+            // Simulate parsing and generation network delay over Gemini Free Dock structures
+            await new Promise(res => setTimeout(res, 1000));
+
+            const totalPoolItemsCount = HISTORICAL_BATCH_POOL.length;
+            const pointerIndex = (this.virtualPagePointer - 1) % totalPoolItemsCount;
+            const baseTemplate = HISTORICAL_BATCH_POOL[pointerIndex];
+
+            // Setup a production data node inside database registry
+            const uniqueId = `scrolled_art_${Date.now()}`;
+            const virtualArticleObj = {
+                id: uniqueId,
+                sourceId: this.selectedSources[0] || "lemonde",
+                title: `${baseTemplate.title} (Vol. ${this.virtualPagePointer})`,
+                desc: baseTemplate.desc,
+                timestamp: `Chargé via défilement continu`,
+                thumb: baseTemplate.thumb
+            };
+
+            CORE_NEWS_DATABASE.push(virtualArticleObj);
+            this.appendArticleNodeToDOMContainer(virtualArticleObj);
+
+            this.virtualPagePointer++;
+
+            // Cap local layout browsing at 20 synthetic generations to save local testing loops
+            if (this.virtualPagePointer > 20) {
+                this.hasMoreVirtualArticles = false;
+                if (sentinelLabel) sentinelLabel.textContent = "Tous les récits disponibles ont été ingérés.";
+                const spinner = document.querySelector('.spinner-icon');
+                if (spinner) spinner.style.display = "none";
+                this.infiniteObserverInstance.unobserve(document.getElementById('infinite-scroll-sentinel'));
+            } else {
+                if (sentinelLabel) sentinelLabel.textContent = "Faites défiler pour charger d'autres articles";
+            }
+
+            this.isScrollLoadingActive = false;
         }
 
         async invokeImmersiveReaderPipelinePopup(articleId) {
@@ -586,7 +670,6 @@
             const estimatedPromptTokens = Math.ceil(rawTextWeightString.length / 3.8) + 250; 
             const estimatedCompTokens = 1800;
 
-            // Feature 6: Ensure initial loader pulls advertising metadata correctly matching the initialization state
             const targetAd = ADVERTISING_VAULT.find(ad => ad.level === "A1");
             document.getElementById('ad-headline').textContent = targetAd.headline;
             document.getElementById('ad-body').textContent = targetAd.body;
@@ -602,7 +685,7 @@
                 const loader = document.getElementById('sponsored-loader');
                 const headline = document.getElementById('loader-headline-txt');
                 
-                headline.textContent = `Appel Gemini API : Parsing de l'article étendu (~${estimatedPromptTokens} tokens)...`;
+                headline.textContent = `Appel Gemini API : Ingestion de la source étendue (~${estimatedPromptTokens} tokens)...`;
                 if (loader) loader.style.display = "flex";
                 
                 await new Promise(res => setTimeout(res, 1200));
@@ -614,7 +697,6 @@
 
             document.getElementById('reader-headline-title').textContent = article.title;
             
-            // Feature 5: Inject article thumbnail asset source into reader component template
             const heroImageNode = document.getElementById('reader-hero-image-render');
             if (heroImageNode) heroImageNode.src = article.thumb;
 
@@ -636,7 +718,6 @@
             const targetLevel = this.sliderIndexMap[parseInt(sliderValue, 10)];
             document.getElementById('cefr-badge-indicator').textContent = targetLevel;
             
-            // Feature 6: Perform dynamic updates to advertising messages when user updates the CEFR tier
             const pairedAd = ADVERTISING_VAULT.find(ad => ad.level === targetLevel) || ADVERTISING_VAULT[0];
             const activeLoaderHeadline = document.getElementById('ad-headline');
             const activeLoaderBody = document.getElementById('ad-body');
@@ -648,13 +729,55 @@
             const viewport = document.getElementById('reader-dynamic-body-viewport');
             if (!viewport || !this.activeArticleId) return;
 
-            // Fallback for user custom ingested tokens to maintain system execution stability
+            let dynamicParagraphsArray = [];
+            
+            // Check if parsing standard matrix elements or generated scroll/custom entries
             let translationSet = MULTI_LEVEL_TRANSLATION_MATRIX[this.activeArticleId];
-            if (!translationSet && this.activeArticleId.startsWith("custom_art_")) {
-                translationSet = MULTI_LEVEL_TRANSLATION_MATRIX["lm_01"]; 
-            }
 
-            const dynamicParagraphsArray = (translationSet && translationSet[this.currentLanguage]) ? translationSet[this.currentLanguage][targetLevel] : ["Texte d'actualité en cours de traitement pour cette source."];
+            if (translationSet && translationSet[this.currentLanguage]) {
+                dynamicParagraphsArray = translationSet[this.currentLanguage][targetLevel];
+            } else {
+                const article = CORE_NEWS_DATABASE.find(a => a.id === this.activeArticleId);
+                const baseText = article ? article.desc : "Contenu indisponible.";
+                
+                if (targetLevel === "A1") {
+                    dynamicParagraphsArray = [
+                        `[A1] Voici un récit historique simple. ${baseText.split('.').slice(0, 1).join('. ')}.`,
+                        "Le vocabulaire choisi reste court et facile à lire pour tous les débutants.",
+                        "Chaque phrase utilise des structures basiques."
+                    ];
+                } else if (targetLevel === "A2") {
+                    dynamicParagraphsArray = [
+                        `[A2] Regardons cette chronique de plus près. ${baseText.split('.').slice(0, 1).join('. ')}.`,
+                        "Nous pouvons y voir des expressions simples mais très utiles au quotidien.",
+                        "C'est idéal pour consolider sereinement les bases de la langue."
+                    ];
+                } else if (targetLevel === "B1") {
+                    dynamicParagraphsArray = [
+                        `[B1] Cette archive historique nous permet de mieux assimiler le contexte général. ${baseText}`,
+                        "Les tournures courantes permettent de suivre le fil de la narration de manière autonome.",
+                        "Une lecture fluide sans barrière linguistique complexe."
+                    ];
+                } else if (targetLevel === "B2") {
+                    dynamicParagraphsArray = [
+                        `[B2] En analysant ce profil historique, on comprend l'influence des événements décrits. ${baseText}`,
+                        "Des structures grammaticales variées enrichissent la perspective d'ensemble de la situation.",
+                        "Parfait pour stabiliser un niveau indépendant et aborder des articles de presse standard."
+                    ];
+                } else if (targetLevel === "C1") {
+                    dynamicParagraphsArray = [
+                        `[C1] L'examen analytique de cette trajectoire historique met en lumière des dynamiques structurelles profondes. ${baseText} Ce processus s'inscrit pleinement dans une perspective sociopolitique nuancée.`,
+                        "L'appareil conceptuel employé ici requiert une saisie fine des expressions idiomatiques et du lexique abstrait.",
+                        "Une immersion stimulante face à des variations de style avancées."
+                    ];
+                } else { // C2
+                    dynamicParagraphsArray = [
+                        `[C2] L'effervescence documentaire de ce texte biographique consacre l'avènement d'une réinterprétation herméneutique totale. ${baseText} Cette convergence de faits historiques déconstruit les paradigmes établis.`,
+                        "L'interconnectivité des nuances rhétoriques exige une fluidité de décodage conceptuel équivalente à celle d'un locuteur natif.",
+                        "Cette configuration cristallise une aisance absolue face aux subtilités stylistiques et littéraires les plus denses."
+                    ];
+                }
+            }
             
             viewport.innerHTML = "";
 
@@ -690,7 +813,7 @@
             const transNode = document.getElementById('popover-lexicon-translation');
 
             const dictionaryBranch = TRANSLATION_DICTIONARY[this.currentLanguage] || {};
-            const standardTranslation = dictionaryBranch[wordKey] || "Contextual definition available via study block";
+            const standardTranslation = dictionaryBranch[wordKey] || "Définition d'étude disponible en mémoire cache";
 
             this.currentlyTargetedLookupToken = { foreign: wordKey, english: standardTranslation, lang: this.currentLanguage };
 
@@ -769,14 +892,12 @@
             this.updateFlashcardInterfaceDisplayCanvas();
         }
 
-        // Feature 2: Randomized keyword generation using an in-place math shuffle algorithm
         instantiateContextualGamesEngine(compositeTextSource) {
             let standardTokens = compositeTextSource.toLowerCase()
                 .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?"'’]/g, "")
                 .split(/\s+/)
                 .filter(word => /^[a-zA-Zàâäéèêëîïôöùûüçæœﬁ]+$/.test(word) && word.length >= 4);
 
-            // In-place text list array shuffle execution block
             standardTokens.sort(() => Math.random() - 0.5);
 
             const standardFiveLetterTokens = standardTokens.filter(w => w.length === 5);
@@ -961,7 +1082,6 @@
                 if (!container) return;
                 container.innerHTML = "";
                 
-                // Render both fixed systems and user profile-ingested sources
                 const fullMergedSourcesArray = [...DEFAULT_RSS_SOURCES];
                 this.customFeedsCollection.forEach(f => {
                     fullMergedSourcesArray.push({ id: f.id, name: f.name, lang: "Custom" });
