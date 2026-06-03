@@ -29,7 +29,6 @@
             padding: 0;
         }
 
-        /* Live Token Tracker HUD Style Panel */
         .dev-token-hud {
             background: var(--dev-bg);
             color: #fff;
@@ -78,11 +77,9 @@
         }
         .btn-secondary { background-color: var(--surface); color: var(--text-main); border: 1px solid var(--border-color); }
         .btn-danger { background-color: #dc2626; }
-        .btn-success { background-color: var(--success); }
         .select-input { padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--surface); font-weight: 500; }
         .grid-layout { display: grid; grid-template-columns: 2.5fr 1fr; gap: 24px; }
         
-        /* Article Feed Layout */
         .articles-panel { display: flex; flex-direction: column; gap: 16px; position: relative; }
         .article-card { 
             background: var(--surface); 
@@ -108,7 +105,7 @@
         .widget { background: var(--surface); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
         .widget-title { margin-top: 0; font-size: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
         
-        /* Interactive Game Frameworks */
+        /* Games & Elements */
         .wordle-grid { display: grid; grid-template-rows: repeat(6, 1fr); gap: 4px; max-width: 220px; margin: 12px 0; }
         .wordle-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
         .wordle-cell { aspect-ratio: 1; border: 2px solid var(--border-color); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px; text-transform: uppercase; border-radius: 4px; background: var(--surface); }
@@ -127,19 +124,23 @@
 
         .flashcard-box { min-height: 100px; border: 1px dashed var(--border-color); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px; text-align: center; background: var(--bg-primary); cursor: pointer; position: relative; }
 
-        /* Modal Overlays */
+        /* Modals & Readers Architecture */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.2s ease; }
         .modal.active { opacity: 1; pointer-events: auto; }
         .modal-content { background: var(--surface); padding: 24px; border-radius: 16px; max-width: 550px; width: 90%; max-height: 80vh; overflow-y: auto; }
         
-        .reader-modal { max-width: 850px; width: 95%; height: 85vh; display: flex; flex-direction: column; justify-content: space-between; }
-        .reader-scroller { overflow-y: auto; flex-grow: 1; padding-right: 8px; margin-bottom: 16px; }
+        .reader-modal { max-width: 900px; width: 95%; height: 90vh; display: flex; flex-direction: column; justify-content: space-between; }
+        .reader-scroller { overflow-y: auto; flex-grow: 1; padding-right: 12px; margin-top: 16px; margin-bottom: 16px; border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; background: #fafafa; }
         
-        .tokenized-word-span { cursor: pointer; display: inline-block; padding: 0 2px; border-radius: 3px; transition: background 0.1s; }
+        .slider-container { background: var(--accent-light); padding: 16px; border-radius: 12px; border: 1px solid var(--border-color); margin-top: 10px; }
+        .cefr-slider { width: 100%; margin: 10px 0; cursor: pointer; }
+        .cefr-labels { display: flex; justify-content: space-between; font-size: 12px; font-weight: bold; color: var(--text-muted); padding: 0 4px; }
+
+        .tokenized-word-span { cursor: pointer; display: inline-block; padding: 0 1px; border-radius: 3px; transition: background 0.1s; }
         .tokenized-word-span:hover { background: #fef08a; color: #000; }
 
-        .word-popover { position: absolute; background: #1e293b; color: white; padding: 8px 12px; border-radius: 8px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); font-size: 13px; z-index: 2000; display: none; pointer-events: auto; max-width: 200px; }
-        .word-popover button { background: var(--success); border: none; color: white; padding: 2px 6px; border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: bold; margin-top: 6px; width: 100%; }
+        .word-popover { position: absolute; background: #1e293b; color: white; padding: 8px 12px; border-radius: 8px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); font-size: 13px; z-index: 2000; display: none; max-width: 200px; }
+        .word-popover button { background: var(--success); border: none; color: white; padding: 4px 6px; border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: bold; margin-top: 6px; width: 100%; }
 
         .source-selection-row { display: flex; align-items: center; justify-content: space-between; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 8px; cursor: pointer; }
         .source-selection-row.selected { border-color: var(--accent); background-color: var(--accent-light); }
@@ -149,6 +150,8 @@
 
         .loading-overlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.9); z-index: 100; flex-direction: column; align-items: center; justify-content: center; border-radius: 12px; padding: 20px; box-sizing: border-box; }
         .ad-container { background: var(--ad-bg); border: 1px solid var(--ad-border); padding: 16px; border-radius: 10px; max-width: 450px; text-align: center; margin-top: 20px; }
+        
+        .paragraph-block { margin-bottom: 14px; line-height: 1.6; font-size: 15px; text-align: justify; }
     </style>
 </head>
 <body>
@@ -246,12 +249,12 @@
         
         <div class="slider-container">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-                <label for="cefr-scale" style="font-weight:bold; font-size:14px; color:#334155;">Niveau de complexité adaptatif :</label>
-                <span id="cefr-badge-indicator" style="background:var(--accent); color:white; font-size:11px; padding:2px 8px; border-radius:4px; font-weight:bold;">A1</span>
+                <label style="font-weight:bold; font-size:14px; color:#334155;">Échelle Standard CEFR Adaptative :</label>
+                <span id="cefr-badge-indicator" style="background:var(--accent); color:white; font-size:12px; padding:3px 10px; border-radius:4px; font-weight:bold;">A1</span>
             </div>
-            <input type="range" id="cefr-scale" class="cefr-slider" min="0" max="4" step="1" value="0" oninput="window.appEngine.handleSliderMutation(this.value)">
+            <input type="range" id="cefr-scale" class="cefr-slider" min="0" max="5" step="1" value="0" oninput="window.appEngine.handleSliderMutation(this.value)">
             <div class="cefr-labels">
-                <span>A1 (Initial)</span><span>A2</span><span>B1</span><span>C1</span><span>Fluent (Original)</span>
+                <span>A1</span><span>A2</span><span>B1</span><span>B2</span><span>C1</span><span>C2</span>
             </div>
         </div>
 
@@ -276,44 +279,93 @@
     "use strict";
 
     const CORE_NEWS_DATABASE = Object.freeze([
-        { id: "lm_01", sourceId: "lemonde", title: "Transformation numérique en Europe", desc: "L'impact des investissements technologiques s'accélère à Paris, Berlin et Helsinki.", timestamp: "Écrit il y a 2 heures", thumb: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=150&auto=format&fit=crop&q=60" },
-        { id: "lf_02", sourceId: "lefigaro", title: "Analyse des marchés financiers internationaux", desc: "Les indices boursiers affichent une volatilité record suite aux dernières annonces macroéconomiques.", timestamp: "Écrit il y a 5 heures", thumb: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=150&auto=format&fit=crop&q=60" },
-        { id: "bbc_03", sourceId: "bbc", title: "Global Innovation Protocols Dispatched", desc: "Engineering environments report scaling successes using modernized distributed processing hubs.", timestamp: "Written 4 hours ago", thumb: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=150&auto=format&fit=crop&q=60" }
+        { id: "lm_01", sourceId: "lemonde", title: "Transformation numérique en Europe", desc: "L'impact des investissements technologiques s'accélère à Paris, Berlin et Helsinki, restructurant les infrastructures industrielles régionales.", timestamp: "Écrit il y a 2 heures", thumb: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=150&auto=format&fit=crop&q=60" },
+        { id: "lf_02", sourceId: "lefigaro", title: "Analyse des marchés financiers internationaux", desc: "Les indices boursiers globaux affichent une volatilité record suite aux dernières annonces macroéconomiques des banques centrales.", timestamp: "Écrit il y a 5 heures", thumb: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=150&auto=format&fit=crop&q=60" }
     ]);
 
     const RSS_SOURCES = Object.freeze([
         { id: "lemonde", name: "Le Monde (Une)", lang: "fr" },
-        { id: "lefigaro", name: "Le Figaro", lang: "fr" },
-        { id: "bbc", name: "BBC News World", lang: "en" }
+        { id: "lefigaro", name: "Le Figaro", lang: "fr" }
     ]);
 
     const TRANSLATION_DICTIONARY = Object.freeze({
-        fr: { "europe": "Europe", "transformation": "Transformation", "numérique": "Digital", "impact": "Impact", "investissements": "Investissements", "technologiques": "Technological", "s'accélère": "Accelerates", "marchés": "Markets" },
-        de: { "europa": "Europe", "ändert": "Changes", "einfacher": "Simpler", "technologie": "Technology" },
-        fi: { "eurooppa": "Europe", "muuttuu": "Changes", "tekniikan": "Technology" }
+        fr: { "europe": "Europe", "transformation": "Transformation", "numérique": "Digital", "villes": "Cities", "grandes": "Big", "investissements": "Investissements", "technologiques": "Technological", "infrastructures": "Infrastructures", "industrielles": "Industrial", "marchés": "Markets", "financiers": "Financial", "indices": "Indexes", "boursiers": "Stock market", "volatilité": "Volatility" }
     });
 
+    // Multi-Paragraph Deep Content Matrix matching real reading workflows (Issue 1 & 2)
     const MULTI_LEVEL_TRANSLATION_MATRIX = Object.freeze({
         "lm_01": {
-            fr: { A1: "L'Europe change avec la technologie simple à Paris et Berlin.", A2: "La transformation numérique avance vite en Europe, surtout à Paris, Berlin et Helsinki.", B1: "L'impact des nouveaux investissements technologiques majeurs s'accélère nettement au sein des grandes capitales européennes.", C1: "L'accélération systémique des investissements technologiques redéfinit en profondeur les infrastructures numériques européennes.", Fluent: "L'impact des investissements technologiques s'accélère à Paris, Berlin et Helsinki." },
-            de: { A1: "Europa ändert sich mit einfacher Technologie in Paris und Berlin.", A2: "Die digitale Transformation schreitet in Europa schnell voran, besonders in Paris und Berlin.", B1: "Die Auswirkungen neuer technologischer Investitionen beschleunigen sich in den europäischen Hauptstädten deutlich.", C1: "Die strukturelle Beschleunigung von Technologieinvestitionen definiert die europäische digitale Landschaft tiefgreifend neu.", Fluent: "Der Einfluss technologischer Investitionen beschleunigt sich in Paris, Berlin und Helsinki zusehends." },
-            fi: { A1: "Eurooppa muuttuu tekniikan avulla Pariisissa ja Berliinissä.", A2: "Digitaalinen muutos etenee nopeasti Euroopassa, erityisesti Pariisissa ja Helsingissä.", B1: "Uusien teknologisten investointien vaikutukset kiihtyvät selvästi Euroopan pääkaupungeissa.", C1: "Teknologiainvestointien rakenteellinen kiihtyminen määrittelee Euroopan digitaalisen ympäristön syvällisesti uudelleen.", Fluent: "Teknologiainvestointien vaikutus kiihtyy Pariisissa, Berliinissä ja Helsingissä." }
+            fr: {
+                A1: [
+                    "L'Europe change aujourd'hui avec la technologie simple. Les grandes villes comme Paris, Berlin et Helsinki achètent de nouveaux ordinateurs et des outils modernes pour travailler.",
+                    "Les usines utilisent maintenant ces outils pour fabriquer des objets plus vite. C'est une bonne transformation pour les étudiants et les jeunes travailleurs de la région européenne.",
+                    "Les parlements donnent de l'argent pour aider les écoles. Chaque personne peut apprendre à utiliser Internet facilement à l'école ou à la maison."
+                ],
+                A2: [
+                    "La transformation numérique avance très vite en Europe. Des capitales importantes comme Paris, Berlin et Helsinki font de grands investissements dans le secteur de la technologie moderne.",
+                    "Ces changements transforment les vieilles infrastructures industrielles. Les ingénieurs locaux construisent des réseaux rapides pour connecter toutes les usines et améliorer la production quotidienne.",
+                    "De plus, les gouvernements ouvrent des centres de formation pour le public. L'objectif principal est de s'assurer que chaque citoyen trouve un emploi stable dans l'économie de demain."
+                ],
+                B1: [
+                    "L'impact des nouveaux investissements technologiques s'accélère nettement au sein des grandes métropoles européennes, notamment à Paris, Berlin et Helsinki. Cette transition nécessite une refonte complète des infrastructures industrielles traditionnelles.",
+                    "Les entreprises adoptent massivement des systèmes automatisés et des solutions de serveurs cloud pour optimiser leur rendement. Les spécialistes affirment que cela va créer de nouveaux profils d'emplois hautement qualifiés.",
+                    "Néanmoins, certains syndicats s'inquiètent de la rapidité de cette automatisation. Ils demandent des garanties financières claires pour protéger les ouvriers dont les tâches manuelles disparaissent au profit des algorithmes intelligents."
+                ],
+                B2: [
+                    "Le déploiement des investissements technologiques à grande échelle s'accélère de façon exponentielle à Paris, Berlin et Helsinki. Ce phénomène engendre une restructuration globale des infrastructures industrielles régionales qui modifie les équilibres économiques traditionnels.",
+                    "En intégrant l'intelligence artificielle et l'automatisation avancée au cœur des lignes de production, les industries européennes cherchent à regagner une compétitivité internationale face aux marchés asiatiques et américains.",
+                    "Cette stratégie d'innovation impose une mise à niveau obligatoire des compétences techniques de la main-d'œuvre. Des budgets étatiques substantiels sont alloués à la reconversion professionnelle pour atténuer les fractures sociales provoquées par cette mutation industrielle rapide."
+                ],
+                C1: [
+                    "L'accélération systémique des investissements technologiques au sein de l'axe Paris-Berlin-Helsinki redéfinit en profondeur les infrastructures industrielles européennes. Cette dynamique s'inscrit dans une volonté politique de souveraineté numérique européenne face aux géants transatlantiques.",
+                    "L'intégration massive de l'Internet des objets (IoT) et de l'analyse prédictive permet une maintenance proactive des outils industriels. Cette transition technologique induit une mutation profonde des modèles managériaux et opérationnels des entreprises manufacturières.",
+                    "Toutefois, cette transition vers l'industrie 4.0 soulève des interrogations complexes quant à la sécurité des données et à la dépendance technologique. La centralisation des infrastructures critiques expose les nations à des risques accrus de cyberattaques, exigeant un renforcement immédiat des protocoles de sécurité."
+                ],
+                C2: [
+                    "L'effervescence et la convergence systémique des investissements technologiques au cœur des métropoles de Paris, Berlin et Helsinki orchestrent une restructuration radicale des infrastructures industrielles régionales. Cette reconfiguration va bien au-delà d'une simple modernisation technique ; elle consacre l'avènement d'un paradigme géoéconomique inédit.",
+                    "L'interconnectivité ubiquitaire des systèmes cyber-physiques et l'implémentation d'algorithmes d'apprentissage profond autonomes catalysent une efficience opérationnelle sans précédent. Ce saut technologique redéfinit radicalement les chaînes de valeur mondiales, modifiant les flux de capitaux et provoquant une obsolescence accélérée des compétences sectorielles traditionnelles.",
+                    "Face aux implications éthiques et macroéconomiques d'une telle rupture, les régulateurs européens naviguent entre la nécessité de stimuler l'innovation et l'impératif de préserver le tissu social. La viabilité de ce modèle repose sur une gestion subtile des asymétries de compétences et sur la résilience des architectures de cybersécurité nationales."
+                ]
+            }
         },
         "lf_02": {
-            fr: { A1: "Les marchés d'argent changent beaucoup aujourd'hui.", A2: "Les indices de la bourse changent de façon record après les grandes nouvelles de l'économie.", B1: "Les indices boursiers affichent une instabilité sans précédent suite aux récentes décisions macroéconomiques globales.", C1: "Les marchés financiers internationaux manifestent une volatilité historique induite par les inflexions macroéconomiques.", Fluent: "Les indices boursiers affichent une volatilité record suite aux dernières annonces macroéconomiques." },
-            de: { A1: "Die Geldmärkte ändern sich heute très stark.", A2: "Die Börsenindizes zeigen nach den großen Wirtschaftsnachrichten rekordverdächtige Veränderungen.", B1: "Die Aktienindizes weisen nach den jüngsten globalen makroökonomischen Entscheidungen eine beispiellose Instabilität auf.", C1: "Internationale Finanzmärkte manifestieren eine historische Volatilität, koordiniert durch makroökonomische Wendepunkte.", Fluent: "Die Börsenindizes verzeichnen eine Rekordvolatilität infolge der jüngsten makroökonomischen Ankündigungen." },
-            fi: { A1: "Rahamarkkinat muuttuvat paljon tänään.", A2: "Pörssi-indeksit näyttävät ennätyksellisiä muutoksia suurten talousuutisten jälkeen.", B1: "Osakeindeksit osoittavat ennennäkemätöntä epävakautta viimeaikaisten globaalien makrotaloudellisten päätösten seurauksena.", C1: "Kansainväliset rahoitusmarkkinat osoittavat historiallista volatiliteettia, jota makrotaloudellisen käännekohdat ohjaavat.", Fluent: "Pörssi-indeksit osoittavat ennätysmäistä volatiliteettia viimeaikaisten makrotaloudellisten ilmoitusten jälkeen." }
-        },
-        "bbc_03": {
-            fr: { A1: "Les ingénieurs ont du succès avec les nouveaux serveurs.", A2: "Les équipes de développeurs réussissent à stabiliser le réseau avec des outils modernes.", B1: "Les environnements d'ingénierie enregistrent des succès d'évolutivité notables grâce à des architectures distribuées.", C1: "Les écosystèmes d'ingénierie valident des gains d'évolutivité substantiels via le déploiement de nœuds distribués.", Fluent: "Engineering environments report scaling successes using modernized distributed processing hubs." },
-            de: { A1: "Ingenieure haben Erfolg mit neuen Servern.", A2: "Entwicklerteams stabilisieren das network erfolgreich mit modernen Tools.", B1: "Engineering-Umgebungen verzeichnen beachtliche Skalierungserfolge durch modernisierte verteilte Verarbeitungs-Hubs.", C1: "Engineering-Ökosysteme validieren erhebliche Skalierbarkeitsgewinne durch den Einsatz verteilter Verarbeitungsknoten.", Fluent: "Engineering-Umgebungen melden Skalierungserfolge unter Verwendung modernisierter verteilter Verarbeitungs-Hubs." },
-            fi: { A1: "Insinöörit saavuttavat menestystä uusien palvelimien kanssa.", A2: "Kehittäjätiimit onnistuvat vakauttamaan verkon nykyaikaisten työkalujen avulla.", B1: "Suunnitteluympäristöt raportoivat merkittävistä skaalautuvuusmenestyksistä käyttämällä hajautettuja prosessointikeskuksia.", C1: "Suunnitteluekosysteemit vahvistavat huomattavia skaalautuvuushyötyjä ottamalla käyttöön hajautettuja solmuja.", Fluent: "Insinööriympäristöt raportoivat skaalautuvuusmenestyksistä käyttämällä uudistettuja hajautettuja prosessointikeskuksia." }
+            fr: {
+                A1: [
+                    "Les marchés financiers changent beaucoup cette semaine. Les indices de la bourse affichent des mouvements très rapides après les annonces de la banque centrale à Paris.",
+                    "Les grands investisseurs vendent des actions parce qu'ils ont peur de perdre de l'argent. C'est une situation difficile pour l'économie générale.",
+                    "Les petits commerçants regardent la télévision pour comprendre la crise. Tout le monde espère un retour au calme rapidement."
+                ],
+                A2: [
+                    "Les indices boursiers internationaux affichent une volatilité record aujourd'hui. Ces grands changements arrivent juste après les dernières décisions macroéconomiques importantes de la banque.",
+                    "Les banques centrales augmentent les taux d'intérêt pour stopper l'inflation galopante. Cette situation crée une grande inquiétude chez les investisseurs privés qui préfèrent placer leur argent dans l'or.",
+                    "Les experts pensent que les marchés vont rester instables pendant plusieurs mois. Les entreprises doivent être prudentes avec leurs dépenses."
+                ],
+                B1: [
+                    "Les marchés financiers internationaux manifestent une instabilité sans précédent suite aux récentes annonces macroéconomiques globales des banques centrales. Les indices boursiers ont chuté lourdement dès l'ouverture des sessions de négociation.",
+                    "Les analystes expliquent que la hausse surprise des taux directeurs vise à juguler l'inflation. Cependant, cette politique monétaire stricte fait craindre un ralentissement économique majeur pour l'année fiscale en cours.",
+                    "Les grandes entreprises technologiques sont les plus touchées par cette baisse d'activité. Leurs dirigeants préparent des plans de restructuration pour rassurer les actionnaires face à l'instabilité des marchés."
+                ],
+                B2: [
+                    "Une volatilité sans précédent secoue les indices boursiers internationaux à la suite des orientations macroéconomiques restrictives divulguées par les autorités monétaires. Les marchés financiers réagissent vivement à la fin de la politique de l'argent facile.",
+                    "La décision conjointe de relever les taux d'intérêt vise à freiner la spirale inflationniste, mais elle menace également d'asphyxier la croissance économique mondiale. Les investisseurs opèrent une réallocation massive de leurs actifs vers des valeurs refuges.",
+                    "Cette correction boursière met en évidence la fragilité de certaines institutions financières fortement endettées. Les semaines à venir seront déterminantes pour évaluer la capacité de résilience du système bancaire face à ce choc monétaire."
+                ],
+                C1: [
+                    "Les marchés financiers internationaux manifestent une volatilité historique, directement induite par les inflexions macroéconomiques rigoureuses des banques centrales. Cette correction brutale des indices boursiers mondiaux traduit l'appréhension des opérateurs face au durcissement des conditions de crédit.",
+                    "La stratégie de resserrement monétaire quantitatif, adoptée pour juguler une inflation structurelle, altère la valorisation des actifs à risque. Les modèles d'évaluation basés sur des taux d'intérêt bas s'effondrent, provoquant un tarissement des liquidités sur les compartiments interbancaires.",
+                    "Ce bouleversement financier accentue le risque de récession technique pour les économies développées. La marge de manœuvre des gouvernements s'avère extrêmement réduite, coincée entre le fardeau du service de la dette publique et l'urgence de soutenir l'activité économique."
+                ],
+                C2: [
+                    "Les marchés financiers internationaux traversent des turbulences d'une intensité historique, catalysées par les récentes inflexions macroéconomiques des principales banques centrales. Ce décrochage systémique des indices boursiers mondiaux reflète la capitulation des opérateurs face à un revirement monétaire sans précédent historique récent.",
+                    "L'interruption brutale des injections de liquidités et le relèvement agressif des taux directeurs ébranlent les fondations de l'écosystème financier mondial. Ce changement de paradigme provoque un ajustement violent des primes de risque, exacerbant les tensions de liquidité sur les marchés de taux et déclenchant des appels de marge en cascade.",
+                    "L'onde de choc macroéconomique fait peser un risque imminent de stagflation sur l'économie globale. La convergence d'un endettement souverain abyssal et d'un ralentissement de l'appareil productif place les décideurs face à un dilemme insoluble, où chaque levier monétaire risque d'aggraver la crise."
+                ]
+            }
         }
     });
 
-    const ADVERTISING_VAULT = [{ headline: "Devenez Bilingue avec Babbel Pro", body: "Profitez de 60% de réduction sur les parcours intensifs d'immersion business !" }, { headline: "Garmin Fenix 8 - Édition Premium", body: "Optimisez vos running metrics grâce à la cartographie avancée et l'analyse de foulée." }];
+    const ADVERTISING_VAULT = [{ headline: "Devenez Bilingue avec Babbel Pro", body: "Profitez de 60% de réduction sur les parcours intensifs d'immersion business !" }];
 
-    // Token Tracking Persistent Keys Configuration Block (Issue 7)
     const STORAGE_KEY_CALLS = "gemini_free_day_calls";
     const STORAGE_KEY_PROMPT_TOKENS = "gemini_free_prompt_tokens";
     const STORAGE_KEY_COMP_TOKENS = "gemini_free_comp_tokens";
@@ -322,10 +374,11 @@
 
     class ApplicationImmersionEngine {
         constructor() {
-            this.selectedSources = ["lemonde", "lefigaro", "bbc"];
+            this.selectedSources = ["lemonde", "lefigaro"];
             this.activeArticleId = null;
             this.currentLanguage = "fr";
-            this.sliderIndexMap = ["A1", "A2", "B1", "C1", "Fluent"];
+            // Map array matching explicit A1-C2 requests (Issue 2)
+            this.sliderIndexMap = ["A1", "A2", "B1", "B2", "C1", "C2"];
             
             this.wordleSecretWord = "";
             this.wordleRowsGuessedCount = 0;
@@ -348,9 +401,7 @@
             this.updateFlashcardInterfaceDisplayCanvas();
         }
 
-        // Token Estimation & Rate Limit Breaker Engine Core (Critical Guard Component)
         initializeAndSyncTokenHUDCounters() {
-            // Verify daily epoch rollover state parameters
             const lastTrackedDay = localStorage.getItem("gemini_last_tracked_date_str");
             const todayStr = new Date().toISOString().split('T')[0];
 
@@ -376,7 +427,6 @@
             let windowStartTime = parseInt(localStorage.getItem(STORAGE_KEY_WINDOW_TIMESTAMP) || currentTimeStamp, 10);
             let accumulatedWindowTokens = parseInt(localStorage.getItem(STORAGE_KEY_WINDOW_TOKENS) || "0", 10);
 
-            // If the rolling window time surpasses 60 seconds, clear the rolling memory stack
             if (currentTimeStamp - windowStartTime > 60000) {
                 windowStartTime = currentTimeStamp;
                 accumulatedWindowTokens = 0;
@@ -384,17 +434,14 @@
             }
 
             const projectedTotal = accumulatedWindowTokens + estimatedPromptTokens;
-            
-            // Check if upcoming token weight triggers free tier overload block
             if (projectedTotal > 32000) {
                 this.updateHUDSafetyIndicator(true);
-                return false; // Breach imminent: Lock API execution call
+                return false;
             }
 
-            // Update rolling buffer
             localStorage.setItem(STORAGE_KEY_WINDOW_TOKENS, projectedTotal.toString());
             this.updateHUDSafetyIndicator(false);
-            return true; // Secure: Pass processing check
+            return true;
         }
 
         updateHUDSafetyIndicator(isBreached) {
@@ -454,20 +501,17 @@
             this.activeArticleId = articleId;
             const cacheKey = `lang_immersion_cache_${articleId}`;
             
-            // Calculate simulated payload input data vectors for metric accuracy evaluation
             const article = CORE_NEWS_DATABASE.find(a => a.id === articleId);
             const rawTextWeightString = article.title + " " + article.desc;
             
-            // Gemini Token Metric Formula Approximation Layer
-            const estimatedPromptTokens = Math.ceil(rawTextWeightString.length / 3.8) + 120; // Text weight + system instructions character envelope
-            const estimatedCompTokens = 850; // Average weight of five parsed linguistic output translations
+            const estimatedPromptTokens = Math.ceil(rawTextWeightString.length / 3.8) + 250; 
+            const estimatedCompTokens = 1800; // Updated higher token budget for larger paragraphs across 6 layers
 
             if (!localStorage.getItem(cacheKey)) {
-                // Rate Limit Breaker Gate Control Evaluation Step
                 const passageAuthorized = this.checkAndEnforceRollingRateLimits(estimatedPromptTokens);
                 
                 if (!passageAuthorized) {
-                    alert("⚠️ ALERTE CRITIQUE : Requête bloquée par l'émulateur Dev-Mode.\nLe volume de jetons dépasse la limite gratuite de 32 000 TPM. Attendez 60 secondes pour réinitialiser la pile.");
+                    alert("⚠️ ALERTE CRITIQUE : Requête bloquée par l'émulateur.\nLe volume dépasse la limite gratuite de 32 000 TPM. Attendez 60 secondes.");
                     return;
                 }
 
@@ -479,23 +523,24 @@
                 
                 adHeadline.textContent = adItem.headline;
                 adBody.textContent = adItem.body;
-                headline.textContent = `Appel Gemini API : Évaluation de ~${estimatedPromptTokens} tokens...`;
+                headline.textContent = `Appel Gemini API : Parsing de l'article étendu (~${estimatedPromptTokens} tokens)...`;
                 if (loader) loader.style.display = "flex";
                 
                 await new Promise(res => setTimeout(res, 1200));
                 if (loader) loader.style.display = "none";
                 
-                // Success: Commit transactions metrics out to dashboard state metrics counters
                 this.commitTokenCalculationsToStorageHUD(estimatedPromptTokens, estimatedCompTokens);
                 localStorage.setItem(cacheKey, "cached_state_true");
             }
 
             document.getElementById('reader-headline-title').textContent = article.title;
             const slider = document.getElementById('cefr-scale');
-            slider.value = 0;
+            slider.value = 0; // Default to A1 initialization state panel layout
 
             this.handleSliderMutation(0);
             document.getElementById('article-reader-modal').classList.add('active');
+            
+            // Build the dynamic puzzle matrices using the text contents of the initial active view
             this.instantiateContextualGamesEngine(article.title + " " + article.desc);
         }
 
@@ -504,6 +549,7 @@
             this.dismissContextPopoverMenu();
         }
 
+        // Tokenization Engine supporting multi-paragraph structural splits (Issue 1 & 2)
         handleSliderMutation(sliderValue) {
             const targetLevel = this.sliderIndexMap[parseInt(sliderValue, 10)];
             document.getElementById('cefr-badge-indicator').textContent = targetLevel;
@@ -512,25 +558,34 @@
             if (!viewport || !this.activeArticleId) return;
 
             const translationSet = MULTI_LEVEL_TRANSLATION_MATRIX[this.activeArticleId];
-            const rawTextContentString = (translationSet && translationSet[this.currentLanguage]) ? translationSet[this.currentLanguage][targetLevel] : "Text variance not found.";
+            const dynamicParagraphsArray = (translationSet && translationSet[this.currentLanguage]) ? translationSet[this.currentLanguage][targetLevel] : ["Text variance not found."];
             
-            const continuousTokenArray = rawTextContentString.split(/(\s+)/);
             viewport.innerHTML = "";
 
-            continuousTokenArray.forEach(token => {
-                if (token.trim().length === 0) {
-                    viewport.appendChild(document.createTextNode(token));
-                    return;
-                }
-                const normalizedCleanKey = token.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?"'’]/g, "");
-                const spanNode = document.createElement('span');
-                spanNode.className = "tokenized-word-span";
-                spanNode.textContent = token;
-                spanNode.onclick = (event) => {
-                    event.stopPropagation();
-                    this.executePopoverLookupInvocation(event, normalizedCleanKey);
-                };
-                viewport.appendChild(spanNode);
+            // Loop through each paragraph individually to preserve robust, extended journalistic formatting
+            dynamicParagraphsArray.forEach(paragraphText => {
+                const paragraphDivNode = document.createElement('div');
+                paragraphDivNode.className = "paragraph-block";
+                
+                const continuousTokenArray = paragraphText.split(/(\s+)/);
+
+                continuousTokenArray.forEach(token => {
+                    if (token.trim().length === 0) {
+                        paragraphDivNode.appendChild(document.createTextNode(token));
+                        return;
+                    }
+                    const normalizedCleanKey = token.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?"'’]/g, "");
+                    const spanNode = document.createElement('span');
+                    spanNode.className = "tokenized-word-span";
+                    spanNode.textContent = token;
+                    spanNode.onclick = (event) => {
+                        event.stopPropagation();
+                        this.executePopoverLookupInvocation(event, normalizedCleanKey);
+                    };
+                    paragraphDivNode.appendChild(spanNode);
+                });
+
+                viewport.appendChild(paragraphDivNode);
             });
         }
 
@@ -626,7 +681,7 @@
                 .filter(word => /^[a-zA-Zàâäéèêëîïôöùûüçæœﬁ]+$/.test(word));
 
             const standardFiveLetterTokens = standardTokens.filter(w => w.length === 5);
-            this.wordleSecretWord = standardFiveLetterTokens.length > 0 ? standardFiveLetterTokens[0] : "monde";
+            this.wordleSecretWord = standardFiveLetterTokens.length > 0 ? standardFiveLetterTokens[0] : "villes";
             this.wordleRowsGuessedCount = 0;
             
             this.rebuildWordleInterfaceMarkupDOM();
@@ -846,13 +901,6 @@
 
     window.addEventListener('DOMContentLoaded', () => {
         window.appEngine = new ApplicationImmersionEngine();
-        
-        // Manual simulation injection utility hooks for developer console validation testing
-        window.SIMULATE_TOKEN_OVERLOAD_BURST = () => {
-            localStorage.setItem(STORAGE_KEY_WINDOW_TOKENS, "31900");
-            window.appEngine.checkAndEnforceRollingRateLimits(200);
-            console.warn("[⚠️ DEV SIMULATION] Window forced to 31,900 tokens. Next unique article click triggers the circuit breaker.");
-        };
     });
 })();
 </script>
