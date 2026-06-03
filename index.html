@@ -16,6 +16,9 @@
             --border-color: #cbd5e1;
             --ad-bg: #fffbeb;
             --ad-border: #fef3c7;
+            --dev-bg: #0f172a;
+            --dev-text: #38bdf8;
+            --warning: #e11d48;
         }
 
         body {
@@ -23,10 +26,32 @@
             background-color: var(--bg-primary);
             color: var(--text-main);
             margin: 0;
-            padding: 20px;
+            padding: 0;
         }
 
-        .container { max-width: 1280px; margin: 0 auto; }
+        /* Live Token Tracker HUD Style Panel */
+        .dev-token-hud {
+            background: var(--dev-bg);
+            color: #fff;
+            padding: 8px 16px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--dev-text);
+            position: sticky;
+            top: 0;
+            z-index: 5000;
+        }
+        .hud-metrics { display: flex; gap: 16px; }
+        .hud-badge { background: #1e293b; padding: 2px 6px; border-radius: 4px; border: 1px solid #334155; }
+        .hud-badge span { color: var(--dev-text); font-weight: bold; }
+        .hud-warning { color: #f43f5e; font-weight: bold; animation: blink 1s infinite alternate; }
+
+        @keyframes blink { from { opacity: 0.4; } to { opacity: 1; } }
+
+        .container { max-width: 1280px; margin: 0 auto; padding: 20px; }
         
         header { 
             display: flex; 
@@ -38,7 +63,6 @@
         }
 
         .global-controls { display: flex; gap: 12px; align-items: center; }
-        
         .btn { 
             background-color: var(--accent); 
             color: white; 
@@ -54,12 +78,11 @@
         }
         .btn-secondary { background-color: var(--surface); color: var(--text-main); border: 1px solid var(--border-color); }
         .btn-danger { background-color: #dc2626; }
-
+        .btn-success { background-color: var(--success); }
         .select-input { padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--surface); font-weight: 500; }
-
         .grid-layout { display: grid; grid-template-columns: 2.5fr 1fr; gap: 24px; }
         
-        /* Article Feed & Cards */
+        /* Article Feed Layout */
         .articles-panel { display: flex; flex-direction: column; gap: 16px; position: relative; }
         .article-card { 
             background: var(--surface); 
@@ -72,56 +95,80 @@
             transition: transform 0.2s, border-color 0.2s; 
         }
         .article-card:hover { transform: translateY(-2px); border-color: var(--accent); }
-        .article-card.selected { border-color: var(--success); box-shadow: 0 0 0 1px var(--success); }
-        
         .thumb-frame { width: 140px; height: 95px; border-radius: 8px; overflow: hidden; background: #e2e8f0; flex-shrink: 0; }
         .thumb-img { width: 100%; height: 100%; object-fit: cover; }
-        
         .article-content { flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
         .article-meta { font-size: 12px; color: var(--text-muted); display: flex; gap: 12px; margin-bottom: 4px; }
         .source-tag { background: #e2e8f0; color: #334155; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 10px; text-transform: uppercase; }
         .article-title { margin: 0 0 6px 0; font-size: 18px; color: #0f172a; }
         .article-desc { margin: 0; font-size: 14px; color: #475569; line-height: 1.5; }
 
-        /* CEFR Reading Workbench Panel */
-        .workbench-card { background: var(--surface); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-bottom: 20px; display: none; }
-        .workbench-card.active { display: block; }
-        .slider-container { background: var(--accent-light); padding: 16px; border-radius: 8px; margin: 15px 0; }
-        .cefr-slider { width: 100%; margin-top: 10px; }
-        .cefr-labels { display: flex; justify-content: space-between; margin-top: 6px; font-size: 12px; font-weight: bold; color: var(--accent); }
-
         /* Sidebar Widgets */
         .sidebar { display: flex; flex-direction: column; gap: 20px; }
         .widget { background: var(--surface); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
         .widget-title { margin-top: 0; font-size: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
         
-        /* Wordle Architecture */
-        .wordle-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; max-width: 220px; margin: 12px 0; }
-        .wordle-cell { aspect-ratio: 1; border: 2px solid var(--border-color); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; text-transform: uppercase; border-radius: 6px; background: var(--bg-primary); }
-        .wordle-cell.revealed { background: #dbeafe; border-color: var(--accent); color: var(--accent); }
+        /* Interactive Game Frameworks */
+        .wordle-grid { display: grid; grid-template-rows: repeat(6, 1fr); gap: 4px; max-width: 220px; margin: 12px 0; }
+        .wordle-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
+        .wordle-cell { aspect-ratio: 1; border: 2px solid var(--border-color); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px; text-transform: uppercase; border-radius: 4px; background: var(--surface); }
+        .wordle-cell.correct { background-color: #6aaa64; border-color: #6aaa64; color: white; }
+        .wordle-cell.present { background-color: #c9b458; border-color: #c9b458; color: white; }
+        .wordle-cell.absent { background-color: #787c7e; border-color: #787c7e; color: white; }
+        .wordle-input { width: 100%; max-width: 220px; padding: 8px; border: 1px solid var(--border-color); border-radius: 6px; font-weight: bold; text-transform: uppercase; text-align: center; }
 
-        /* Word Search Architecture */
         .wordsearch-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
         .word-badge { background: var(--accent-light); color: var(--accent); padding: 4px 8px; border-radius: 16px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
-        .wordsearch-grid { font-family: 'Courier New', Courier, monospace; font-weight: bold; letter-spacing: 6px; line-height: 1.6; background: #1e293b; color: #f8fafc; padding: 12px; border-radius: 8px; text-align: center; font-size: 15px; }
+        .word-badge.found { background: var(--success); color: white; text-decoration: line-through; }
+        .wordsearch-matrix-container { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; background: #1e293b; border-radius: 8px; max-width: 280px; margin: 0 auto; padding: 8px; }
+        .matrix-letter-node { background: #334155; color: white; text-align: center; font-family: monospace; font-weight: bold; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 4px; cursor: pointer; user-select: none; font-size: 14px; }
+        .matrix-letter-node.selected-run { background: var(--accent); }
+        .matrix-letter-node.finalized-run { background: var(--success); }
 
-        /* Dynamic Loading Overlay & Sponsored Advertising System */
-        .loading-overlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.9); z-index: 100; flex-direction: column; align-items: center; justify-content: center; border-radius: 12px; padding: 20px; box-sizing: border-box; }
-        .ad-container { background: var(--ad-bg); border: 1px solid var(--ad-border); padding: 16px; border-radius: 10px; max-width: 450px; text-align: center; margin-top: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .flashcard-box { min-height: 100px; border: 1px dashed var(--border-color); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px; text-align: center; background: var(--bg-primary); cursor: pointer; position: relative; }
 
-        /* Multiple Source Modal Matrix */
+        /* Modal Overlays */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.2s ease; }
         .modal.active { opacity: 1; pointer-events: auto; }
         .modal-content { background: var(--surface); padding: 24px; border-radius: 16px; max-width: 550px; width: 90%; max-height: 80vh; overflow-y: auto; }
+        
+        .reader-modal { max-width: 850px; width: 95%; height: 85vh; display: flex; flex-direction: column; justify-content: space-between; }
+        .reader-scroller { overflow-y: auto; flex-grow: 1; padding-right: 8px; margin-bottom: 16px; }
+        
+        .tokenized-word-span { cursor: pointer; display: inline-block; padding: 0 2px; border-radius: 3px; transition: background 0.1s; }
+        .tokenized-word-span:hover { background: #fef08a; color: #000; }
+
+        .word-popover { position: absolute; background: #1e293b; color: white; padding: 8px 12px; border-radius: 8px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); font-size: 13px; z-index: 2000; display: none; pointer-events: auto; max-width: 200px; }
+        .word-popover button { background: var(--success); border: none; color: white; padding: 2px 6px; border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: bold; margin-top: 6px; width: 100%; }
+
         .source-selection-row { display: flex; align-items: center; justify-content: space-between; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 8px; cursor: pointer; }
-        .source-selection-row:hover { background: var(--bg-primary); }
         .source-selection-row.selected { border-color: var(--accent); background-color: var(--accent-light); }
         .checkbox-custom { width: 18px; height: 18px; border-radius: 4px; border: 2px solid var(--border-color); display: flex; align-items: center; justify-content: center; }
         .source-selection-row.selected .checkbox-custom { background: var(--accent); border-color: var(--accent); }
         .source-selection-row.selected .checkbox-custom::after { content: "✓"; color: white; font-size: 12px; font-weight: bold; }
+
+        .loading-overlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.9); z-index: 100; flex-direction: column; align-items: center; justify-content: center; border-radius: 12px; padding: 20px; box-sizing: border-box; }
+        .ad-container { background: var(--ad-bg); border: 1px solid var(--ad-border); padding: 16px; border-radius: 10px; max-width: 450px; text-align: center; margin-top: 20px; }
     </style>
 </head>
 <body>
+
+<div class="dev-token-hud" id="dev-hud-panel">
+    <div>🛠️ DEV MODE ACTIVE — GEMINI FREE TIER DOCK (Limit: 32,000 TPM)</div>
+    <div class="hud-metrics">
+        <div class="hud-badge">Appels du jour : <span id="hud-day-calls">0</span></div>
+        <div class="hud-badge">Jetons Prompt : <span id="hud-prompt-tokens">0</span></div>
+        <div class="hud-badge">Jetons Comp : <span id="hud-comp-tokens">0</span></div>
+        <div class="hud-badge" style="border-color: var(--dev-text);">Total Cumulé (24h) : <span id="hud-total-tokens" style="color:#4ade80;">0</span></div>
+        <div class="hud-badge" id="hud-safety-status" style="background:#064e3b; border-color:#10b981;">Statut : <span style="color:#34d399;">SÉCURISÉ</span></div>
+    </div>
+</div>
+
+<div id="lookup-popover-engine" class="word-popover">
+    <div id="popover-lexicon-term" style="font-weight: bold; border-bottom: 1px solid #475569; padding-bottom: 2px; margin-bottom: 4px;">Word</div>
+    <div id="popover-lexicon-translation" style="color: #cbd5e1; font-style: italic;">Translation...</div>
+    <button onclick="window.appEngine.commitActivePopoverToFlashcards()">💾 Ajouter aux cartes</button>
+</div>
 
 <div class="container">
     <header>
@@ -135,41 +182,20 @@
                 <option value="de">🇩🇪 Deutsch</option>
                 <option value="fi">🇫🇮 Suomi</option>
             </select>
-            <button class="btn btn-secondary" onclick="window.appEngine.openModal()">⚙️ Configurer Flux</button>
-            <button class="btn btn-danger" onclick="window.appEngine.hardReset()" style="font-size:12px; padding:6px 12px;">Hard Reset</button>
+            <button class="btn btn-secondary" onclick="window.appEngine.openModal('sources')">⚙️ Configurer Flux</button>
+            <button class="btn btn-danger" onclick="window.appEngine.hardReset()" style="font-size:12px; padding:6px 12px;">Purge Storage</button>
         </div>
     </header>
-
-    <section class="workbench-card" id="cefr-workbench">
-        <h3 id="workbench-title" style="margin-top:0; color:#0f172a;">Analyse de l'article</h3>
-        <p id="workbench-meta" style="font-size:12px; color:var(--text-muted); margin-top:-8px;"></p>
-        
-        <div class="slider-container">
-            <label for="cefr-scale" style="font-weight:bold; font-size:14px; color:#334155;">Niveau de complexité CEFR :</label>
-            <input type="range" id="cefr-scale" class="cefr-slider" min="0" max="4" step="1" value="0" oninput="window.appEngine.handleSliderMutation(this.value)">
-            <div class="cefr-labels">
-                <span>A1 (Débutant)</span>
-                <span>A2</span>
-                <span>B1</span>
-                <span>C1</span>
-                <span>Fluent (Original)</span>
-            </div>
-        </div>
-        
-        <div id="workbench-transformed-body" style="font-size:16px; line-height:1.6; color:#1e293b; padding:10px 0; border-top:1px solid var(--border-color);"></div>
-    </section>
 
     <div class="grid-layout">
         <main class="articles-panel">
             <div id="sponsored-loader" class="loading-overlay">
-                <div style="font-size: 32px; animation: spin 2s linear infinite; margin-bottom:10px;">⏳</div>
-                <h3 style="margin:0; color:#0f172a;">Analyse sémantique IA en cours...</h3>
-                <p style="color:var(--text-muted); font-size:13px; margin: 4px 0 15px 0;">Calcul des structures morphologiques de l'article...</p>
-                
+                <div style="font-size: 32px; margin-bottom:10px;">⏳</div>
+                <h3 id="loader-headline-txt" style="margin:0; color:#0f172a;">Analyse sémantique IA en cours...</h3>
                 <div class="ad-container">
-                    <span style="background:#f59e0b; color:white; font-size:10px; font-weight:bold; padding:2px 6px; border-radius:4px; text-transform:uppercase;">Sponsorisé</span>
-                    <h4 id="ad-headline" style="margin:8px 0 4px 0; color:#92400e;">Chargement des offres...</h4>
-                    <p id="ad-body" style="margin:0; font-size:12px; color:#b45309; line-height:1.4;"></p>
+                    <span style="background:#f59e0b; color:white; font-size:10px; font-weight:bold; padding:2px 6px; border-radius:4px;">Sponsorisé</span>
+                    <h4 id="ad-headline" style="margin:8px 0 4px 0; color:#92400e;">Chargement...</h4>
+                    <p id="ad-body" style="margin:0; font-size:12px; color:#b45309;"></p>
                 </div>
             </div>
 
@@ -179,31 +205,69 @@
 
         <aside class="sidebar">
             <div class="widget">
-                <h3 class="widget-title">Wordle Live <span style="font-size:10px; color:var(--text-muted); background:#f1f5f9; padding:2px 6px; border-radius:4px;">Généré par l'article</span></h3>
-                <p style="font-size:12px; color:var(--text-muted); margin:0 0 10px 0;">Devinez le jeton de 5 lettres identifié par l'IA dans l'article sélectionné :</p>
-                <div class="wordle-grid" id="wordle-target-board">
-                    <div class="wordle-cell"></div><div class="wordle-cell"></div><div class="wordle-cell"></div><div class="wordle-cell"></div><div class="wordle-cell"></div>
+                <h3 class="widget-title">Wordle Live</h3>
+                <p style="font-size:12px; color:var(--text-muted); margin:0 0 10px 0;">Devinez le jeton de 5 lettres issu de la lecture active :</p>
+                <div class="wordle-grid" id="wordle-target-board"></div>
+                <div id="wordle-interactive-input-zone" style="display:none; flex-direction:column; gap:6px;">
+                    <input type="text" id="wordle-user-field" class="wordle-input" maxlength="5" placeholder="Entrez un mot">
+                    <button class="btn" style="padding:6px; font-size:12px; justify-content:center;" onclick="window.appEngine.submitWordleGuessRow()">Valider Jeton</button>
                 </div>
-                <div style="font-size:11px; font-weight:bold; color:var(--text-muted);">Statut : <span id="wordle-status" style="color:var(--accent);">En attente de sélection</span></div>
+                <div style="font-size:11px; font-weight:bold; color:var(--text-muted); margin-top:8px;">Statut : <span id="wordle-status" style="color:#dc2626;">Aucun article ouvert</span></div>
             </div>
 
             <div class="widget">
                 <h3 class="widget-title">Mots Cachés</h3>
-                <p style="font-size:12px; color:var(--text-muted); margin:0 0 10px 0;">Retrouvez les concepts clés dissimulés horizontalement dans la matrice :</p>
+                <p style="font-size:12px; color:var(--text-muted); margin:0 0 10px 0;">Glissez ou cliquez séquentiellement pour valider les cibles :</p>
                 <div class="wordsearch-tags" id="wordsearch-target-badges"></div>
-                <div class="wordsearch-grid" id="wordsearch-target-grid">SELECT AN ARTICLE</div>
+                <div class="wordsearch-matrix-container" id="wordsearch-target-grid"></div>
+                <button id="find-a-word-clear-btn" class="btn btn-secondary" style="width:100%; margin-top:8px; padding:4px; font-size:11px; justify-content:center; display:none;" onclick="window.appEngine.clearActiveWordsearchSelectionRun()">Effacer Sélection</button>
+            </div>
+
+            <div class="widget">
+                <h3 class="widget-title">Flashcards d'étude (<span id="flashcard-total-count">0</span>)</h3>
+                <div class="flashcard-box" id="study-flashcard-viewport" onclick="window.appEngine.toggleFlashcardFlipState()">
+                    <div id="flashcard-text-canvas" style="font-weight:bold; font-size:16px;">Sélectionnez des mots dans l'article</div>
+                    <div id="flashcard-sub-indicator" style="font-size:10px; color:var(--text-muted); margin-top:8px; text-transform:uppercase;">Pile vide</div>
+                </div>
+                <div id="flashcard-action-controls" style="display:none; justify-content:space-between; margin-top:8px; gap:8px;">
+                    <button class="btn btn-secondary" style="flex:1; padding:6px; font-size:12px; justify-content:center;" onclick="window.appEngine.cycleFlashcardIndexPointer()">Suivant</button>
+                    <button class="btn btn-danger" style="padding:6px; font-size:12px;" onclick="window.appEngine.deleteActiveFlashcardNode()">🗑️</button>
+                </div>
             </div>
         </aside>
     </div>
 </div>
 
-<div id="source-modal" class="modal" onclick="window.appEngine.closeModal(event)">
-    <div class="modal-content" onclick="event.stopPropagation()">
-        <div style="display:flex; justify-content:between; align-items:center; margin-bottom:16px; border-bottom:1px solid var(--border-color); padding-bottom:10px;">
-            <h3 style="margin:0; font-size:18px;">Sélectionner les sources du flux d'actualités</h3>
+<div id="article-reader-modal" class="modal" onclick="window.appEngine.closeArticleReaderViewWindow()">
+    <div class="modal-content reader-modal" onclick="event.stopPropagation()">
+        <div style="display:flex; justify-content:between; align-items:center; border-bottom:1px solid var(--border-color); padding-bottom:10px; margin-bottom:12px;">
+            <h3 id="reader-headline-title" style="margin:0; font-size:20px; color:#0f172a;">Title</h3>
         </div>
+        
+        <div class="slider-container">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <label for="cefr-scale" style="font-weight:bold; font-size:14px; color:#334155;">Niveau de complexité adaptatif :</label>
+                <span id="cefr-badge-indicator" style="background:var(--accent); color:white; font-size:11px; padding:2px 8px; border-radius:4px; font-weight:bold;">A1</span>
+            </div>
+            <input type="range" id="cefr-scale" class="cefr-slider" min="0" max="4" step="1" value="0" oninput="window.appEngine.handleSliderMutation(this.value)">
+            <div class="cefr-labels">
+                <span>A1 (Initial)</span><span>A2</span><span>B1</span><span>C1</span><span>Fluent (Original)</span>
+            </div>
+        </div>
+
+        <div class="reader-scroller" id="reader-dynamic-body-viewport" onclick="window.appEngine.dismissContextPopoverMenu()"></div>
+
+        <div style="border-top:1px solid var(--border-color); padding-top:12px; display:flex; justify-content:flex-end;">
+            <button class="btn btn-secondary" onclick="window.appEngine.closeArticleReaderViewWindow()">Fermer le Pop-up</button>
+        </div>
+    </div>
+</div>
+
+<div id="source-modal" class="modal" onclick="window.appEngine.closeModal('sources')">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <h3 style="margin:0 0 16px 0; font-size:18px;">Sélectionner les sources d'actualités</h3>
         <div id="modal-sources-list"></div>
-        <button class="btn" onclick="window.appEngine.saveModalConfiguration()" style="width:100%; margin-top:15px; justify-content:center;">Appliquer la configuration du flux</button>
+        <button class="btn" onclick="window.appEngine.saveModalConfiguration()" style="width:100%; margin-top:15px; justify-content:center;">Appliquer</button>
     </div>
 </div>
 
@@ -211,29 +275,24 @@
 (function () {
     "use strict";
 
-    // Immutable Repository Dataset mapping components across Languages, Timestamps & Images (Issues 5 & 6)
     const CORE_NEWS_DATABASE = Object.freeze([
         { id: "lm_01", sourceId: "lemonde", title: "Transformation numérique en Europe", desc: "L'impact des investissements technologiques s'accélère à Paris, Berlin et Helsinki.", timestamp: "Écrit il y a 2 heures", thumb: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=150&auto=format&fit=crop&q=60" },
         { id: "lf_02", sourceId: "lefigaro", title: "Analyse des marchés financiers internationaux", desc: "Les indices boursiers affichent une volatilité record suite aux dernières annonces macroéconomiques.", timestamp: "Écrit il y a 5 heures", thumb: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=150&auto=format&fit=crop&q=60" },
-        { id: "bbc_03", sourceId: "bbc", title: "Global Innovation Protocols Dispatched", desc: "Engineering environments report scaling successes using modernized distributed processing hubs.", timestamp: "Written 4 hours ago", thumb: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=150&auto=format&fit=crop&q=60" },
-        { id: "nyt_04", sourceId: "nyt", title: "Climatic Architecture Transformations", desc: "Global metropolitan sectors restructure design workflows toward strict zero-emission mandates.", timestamp: "Written 1 day ago", thumb: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=150&auto=format&fit=crop&q=60" }
+        { id: "bbc_03", sourceId: "bbc", title: "Global Innovation Protocols Dispatched", desc: "Engineering environments report scaling successes using modernized distributed processing hubs.", timestamp: "Written 4 hours ago", thumb: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=150&auto=format&fit=crop&q=60" }
     ]);
 
     const RSS_SOURCES = Object.freeze([
         { id: "lemonde", name: "Le Monde (Une)", lang: "fr" },
         { id: "lefigaro", name: "Le Figaro", lang: "fr" },
-        { id: "bbc", name: "BBC News World", lang: "en" },
-        { id: "nyt", name: "The New York Times", lang: "en" }
+        { id: "bbc", name: "BBC News World", lang: "en" }
     ]);
 
-    // Sponsored Copy Bank Matrix Framework (Issue 4)
-    const ADVERTISING_VAULT = Object.freeze([
-        { headline: "Devenez Bilingue avec Babbel Pro", body: "Profitez de 60% de réduction sur les parcours intensifs d'immersion business ce mois-ci !" },
-        { headline: "Garmin Fenix 8 - Édition Premium", body: "Optimisez vos running metrics grâce à la cartographie avancée et l'analyse de foulée en temps réel." },
-        { headline: "NordVPN : Protection Sandbox active", body: "Chiffrez vos connexions de données et contournez les restrictions géographiques instantanément." }
-    ]);
+    const TRANSLATION_DICTIONARY = Object.freeze({
+        fr: { "europe": "Europe", "transformation": "Transformation", "numérique": "Digital", "impact": "Impact", "investissements": "Investissements", "technologiques": "Technological", "s'accélère": "Accelerates", "marchés": "Markets" },
+        de: { "europa": "Europe", "ändert": "Changes", "einfacher": "Simpler", "technologie": "Technology" },
+        fi: { "eurooppa": "Europe", "muuttuu": "Changes", "tekniikan": "Technology" }
+    });
 
-    // Multidimensional Language & CEFR Translation Engine Matrix Array Block (Issues 2 & 8)
     const MULTI_LEVEL_TRANSLATION_MATRIX = Object.freeze({
         "lm_01": {
             fr: { A1: "L'Europe change avec la technologie simple à Paris et Berlin.", A2: "La transformation numérique avance vite en Europe, surtout à Paris, Berlin et Helsinki.", B1: "L'impact des nouveaux investissements technologiques majeurs s'accélère nettement au sein des grandes capitales européennes.", C1: "L'accélération systémique des investissements technologiques redéfinit en profondeur les infrastructures numériques européennes.", Fluent: "L'impact des investissements technologiques s'accélère à Paris, Berlin et Helsinki." },
@@ -242,76 +301,127 @@
         },
         "lf_02": {
             fr: { A1: "Les marchés d'argent changent beaucoup aujourd'hui.", A2: "Les indices de la bourse changent de façon record après les grandes nouvelles de l'économie.", B1: "Les indices boursiers affichent une instabilité sans précédent suite aux récentes décisions macroéconomiques globales.", C1: "Les marchés financiers internationaux manifestent une volatilité historique induite par les inflexions macroéconomiques.", Fluent: "Les indices boursiers affichent une volatilité record suite aux dernières annonces macroéconomiques." },
-            de: { A1: "Die Geldmärkte ändern sich heute sehr stark.", A2: "Die Börsenindizes zeigen nach den großen Wirtschaftsnachrichten rekordverdächtige Veränderungen.", B1: "Die Aktienindizes weisen nach den jüngsten globalen makroökonomischen Entscheidungen eine beispiellose Instabilität auf.", C1: "Internationale Finanzmärkte manifestieren eine historische Volatilität, koordiniert durch makroökonomische Wendepunkte.", Fluent: "Die Börsenindizes verzeichnen eine Rekordvolatilität infolge der jüngsten makroökonomischen Ankündigungen." },
-            fi: { A1: "Rahamarkkinat muuttuvat paljon tänään.", A2: "Pörssi-indeksit näyttävät ennätyksellisiä muutoksia suurten talousuutisten jälkeen.", B1: "Osakeindeksit osoittavat ennennäkemätöntä epävakautta viimeaikaisten globaalien makrotaloudellisten päätösten seurauksena.", C1: "Kansainväliset rahoitusmarkkinat osoittavat historiallista volatiliteettia, jota makrotaloudelliset käännekohdat ohjaavat.", Fluent: "Pörssi-indeksit osoittavat ennätysmäistä volatiliteettia viimeaikaisten makrotaloudellisten ilmoitusten jälkeen." }
+            de: { A1: "Die Geldmärkte ändern sich heute très stark.", A2: "Die Börsenindizes zeigen nach den großen Wirtschaftsnachrichten rekordverdächtige Veränderungen.", B1: "Die Aktienindizes weisen nach den jüngsten globalen makroökonomischen Entscheidungen eine beispiellose Instabilität auf.", C1: "Internationale Finanzmärkte manifestieren eine historische Volatilität, koordiniert durch makroökonomische Wendepunkte.", Fluent: "Die Börsenindizes verzeichnen eine Rekordvolatilität infolge der jüngsten makroökonomischen Ankündigungen." },
+            fi: { A1: "Rahamarkkinat muuttuvat paljon tänään.", A2: "Pörssi-indeksit näyttävät ennätyksellisiä muutoksia suurten talousuutisten jälkeen.", B1: "Osakeindeksit osoittavat ennennäkemätöntä epävakautta viimeaikaisten globaalien makrotaloudellisten päätösten seurauksena.", C1: "Kansainväliset rahoitusmarkkinat osoittavat historiallista volatiliteettia, jota makrotaloudellisen käännekohdat ohjaavat.", Fluent: "Pörssi-indeksit osoittavat ennätysmäistä volatiliteettia viimeaikaisten makrotaloudellisten ilmoitusten jälkeen." }
         },
         "bbc_03": {
             fr: { A1: "Les ingénieurs ont du succès avec les nouveaux serveurs.", A2: "Les équipes de développeurs réussissent à stabiliser le réseau avec des outils modernes.", B1: "Les environnements d'ingénierie enregistrent des succès d'évolutivité notables grâce à des architectures distribuées.", C1: "Les écosystèmes d'ingénierie valident des gains d'évolutivité substantiels via le déploiement de nœuds distribués.", Fluent: "Engineering environments report scaling successes using modernized distributed processing hubs." },
-            de: { A1: "Ingenieure haben Erfolg mit neuen Servern.", A2: "Entwicklerteams stabilisieren das Netzwerk erfolgreich mit modernen Tools.", B1: "Engineering-Umgebungen verzeichnen beachtliche Skalierungserfolge durch modernisierte verteilte Verarbeitungs-Hubs.", C1: "Engineering-Ökosysteme validieren erhebliche Skalierbarkeitsgewinne durch den Einsatz verteilter Verarbeitungsknoten.", Fluent: "Engineering-Umgebungen melden Skalierungserfolge unter Verwendung modernisierter verteilter Verarbeitungs-Hubs." },
+            de: { A1: "Ingenieure haben Erfolg mit neuen Servern.", A2: "Entwicklerteams stabilisieren das network erfolgreich mit modernen Tools.", B1: "Engineering-Umgebungen verzeichnen beachtliche Skalierungserfolge durch modernisierte verteilte Verarbeitungs-Hubs.", C1: "Engineering-Ökosysteme validieren erhebliche Skalierbarkeitsgewinne durch den Einsatz verteilter Verarbeitungsknoten.", Fluent: "Engineering-Umgebungen melden Skalierungserfolge unter Verwendung modernisierter verteilter Verarbeitungs-Hubs." },
             fi: { A1: "Insinöörit saavuttavat menestystä uusien palvelimien kanssa.", A2: "Kehittäjätiimit onnistuvat vakauttamaan verkon nykyaikaisten työkalujen avulla.", B1: "Suunnitteluympäristöt raportoivat merkittävistä skaalautuvuusmenestyksistä käyttämällä hajautettuja prosessointikeskuksia.", C1: "Suunnitteluekosysteemit vahvistavat huomattavia skaalautuvuushyötyjä ottamalla käyttöön hajautettuja solmuja.", Fluent: "Insinööriympäristöt raportoivat skaalautuvuusmenestyksistä käyttämällä uudistettuja hajautettuja prosessointikeskuksia." }
-        },
-        "nyt_04": {
-            fr: { A1: "Les grandes villes changent les maisons pour la nature.", A2: "Les villes modifient les plans de construction pour éliminer toutes les émissions de carbone.", B1: "Les secteurs métropolitains mondiaux restructurent leurs méthodes de conception vers des mandats stricts sans émissions.", C1: "Les planifications métropolitaines globales articulent la refonte des flux d'ingénierie selon des impératifs d'émissions zéro.", Fluent: "Global metropolitan sectors restructure design workflows toward strict zero-emission mandates." },
-            de: { A1: "Große Städte ändern Häuser für die Natur.", A2: "Städte ändern Baupläne, um alle Kohlenstoffemissionen zu eliminieren.", B1: "Globale Metropolen restrukturieren ihre Design-Workflows in Richtung strenger Null-Emissions-Mandate.", C1: "Globale Metropolenplanungen artikulieren die Neugestaltung von Engineering-Flows nach strengen Null-Emissions-Imperativen.", Fluent: "Globale Metropolenregionen restrukturieren Design-Workflows in Richtung strenger Null-Emissions-Mandate." },
-            fi: { A1: "Suuret kaupungit muuttavat taloja luonnon vuoksi.", A2: "Kaupungit muuttavat rakennussuunnitelmia kaikkien hiilidioksidipäästöjen poistamiseksi.", B1: "Globaalit metropolialueet uudistavat suunnittelun työnkulkuja kohti tiukkoja nollapäästövaatimuksia.", C1: "Sopeutuvat metropolisuunnitelmat jäsentävät suunnittelun työnkulkuja tiukkojen nollapäästövelvoitteiden mukaisesti.", Fluent: "Globaalit metropolialueet uudistavat suunnittelun työnkulkuja kohti tiukkoja nollapäästövaatimuksia." }
         }
     });
 
-    const STORAGE_PREFIX = "lang_immersion_cache_";
-    const CONFIG_KEY_SOURCES = "selected_rss_sources_array";
-    const CONFIG_KEY_TOKEN_DATE = "token_usage_date_string";
-    const CONFIG_KEY_TOKEN_COUNT = "token_accumulated_count_num";
+    const ADVERTISING_VAULT = [{ headline: "Devenez Bilingue avec Babbel Pro", body: "Profitez de 60% de réduction sur les parcours intensifs d'immersion business !" }, { headline: "Garmin Fenix 8 - Édition Premium", body: "Optimisez vos running metrics grâce à la cartographie avancée et l'analyse de foulée." }];
+
+    // Token Tracking Persistent Keys Configuration Block (Issue 7)
+    const STORAGE_KEY_CALLS = "gemini_free_day_calls";
+    const STORAGE_KEY_PROMPT_TOKENS = "gemini_free_prompt_tokens";
+    const STORAGE_KEY_COMP_TOKENS = "gemini_free_comp_tokens";
+    const STORAGE_KEY_WINDOW_TIMESTAMP = "gemini_rolling_window_time";
+    const STORAGE_KEY_WINDOW_TOKENS = "gemini_rolling_window_tokens";
 
     class ApplicationImmersionEngine {
         constructor() {
-            this.selectedSources = [];
+            this.selectedSources = ["lemonde", "lefigaro", "bbc"];
             this.activeArticleId = null;
             this.currentLanguage = "fr";
             this.sliderIndexMap = ["A1", "A2", "B1", "C1", "Fluent"];
             
+            this.wordleSecretWord = "";
+            this.wordleRowsGuessedCount = 0;
+            this.wordleMaxRowAttempts = 6;
+            this.wordsearchActiveWordsArray = [];
+            this.wordsearchSelectedCoordinatesArray = [];
+            
+            this.flashcardsCollection = JSON.parse(localStorage.getItem("user_flashcards_collection_v2") || "[]");
+            this.flashcardIndexPointer = 0;
+            this.flashcardIsFlippedFaceState = false;
+            this.currentlyTargetedLookupToken = null;
+
             this.init();
         }
 
         init() {
-            this.verifyAndResetDailyTokenTracker();
-            this.loadSavedSourcesConfiguration();
+            this.initializeAndSyncTokenHUDCounters();
             this.renderHomeFeedLayout();
             this.syncActiveSourceIndicators();
+            this.updateFlashcardInterfaceDisplayCanvas();
         }
 
-        // Token Analytics & Tracker Subsystem (Issue 7)
-        verifyAndResetDailyTokenTracker() {
-            const today = new Date().toISOString().split('T')[0];
-            const savedDate = localStorage.getItem(CONFIG_KEY_TOKEN_DATE);
+        // Token Estimation & Rate Limit Breaker Engine Core (Critical Guard Component)
+        initializeAndSyncTokenHUDCounters() {
+            // Verify daily epoch rollover state parameters
+            const lastTrackedDay = localStorage.getItem("gemini_last_tracked_date_str");
+            const todayStr = new Date().toISOString().split('T')[0];
+
+            if (lastTrackedDay !== todayStr) {
+                localStorage.setItem("gemini_last_tracked_date_str", todayStr);
+                localStorage.setItem(STORAGE_KEY_CALLS, "0");
+                localStorage.setItem(STORAGE_KEY_PROMPT_TOKENS, "0");
+                localStorage.setItem(STORAGE_KEY_COMP_TOKENS, "0");
+                localStorage.setItem(STORAGE_KEY_WINDOW_TOKENS, "0");
+                localStorage.setItem(STORAGE_KEY_WINDOW_TIMESTAMP, Date.now().toString());
+            }
+
+            document.getElementById('hud-day-calls').textContent = localStorage.getItem(STORAGE_KEY_CALLS) || "0";
+            document.getElementById('hud-prompt-tokens').textContent = localStorage.getItem(STORAGE_KEY_PROMPT_TOKENS) || "0";
+            document.getElementById('hud-comp-tokens').textContent = localStorage.getItem(STORAGE_KEY_COMP_TOKENS) || "0";
             
-            if (savedDate !== today) {
-                localStorage.setItem(CONFIG_KEY_TOKEN_DATE, today);
-                localStorage.setItem(CONFIG_KEY_TOKEN_COUNT, "0");
-                console.log(`[DEV_MODE] New day verified (${today}). Token tracker initialized to 0.`);
+            const total = parseInt(localStorage.getItem(STORAGE_KEY_PROMPT_TOKENS) || "0", 10) + parseInt(localStorage.getItem(STORAGE_KEY_COMP_TOKENS) || "0", 10);
+            document.getElementById('hud-total-tokens').textContent = total.toLocaleString();
+        }
+
+        checkAndEnforceRollingRateLimits(estimatedPromptTokens) {
+            const currentTimeStamp = Date.now();
+            let windowStartTime = parseInt(localStorage.getItem(STORAGE_KEY_WINDOW_TIMESTAMP) || currentTimeStamp, 10);
+            let accumulatedWindowTokens = parseInt(localStorage.getItem(STORAGE_KEY_WINDOW_TOKENS) || "0", 10);
+
+            // If the rolling window time surpasses 60 seconds, clear the rolling memory stack
+            if (currentTimeStamp - windowStartTime > 60000) {
+                windowStartTime = currentTimeStamp;
+                accumulatedWindowTokens = 0;
+                localStorage.setItem(STORAGE_KEY_WINDOW_TIMESTAMP, windowStartTime.toString());
+            }
+
+            const projectedTotal = accumulatedWindowTokens + estimatedPromptTokens;
+            
+            // Check if upcoming token weight triggers free tier overload block
+            if (projectedTotal > 32000) {
+                this.updateHUDSafetyIndicator(true);
+                return false; // Breach imminent: Lock API execution call
+            }
+
+            // Update rolling buffer
+            localStorage.setItem(STORAGE_KEY_WINDOW_TOKENS, projectedTotal.toString());
+            this.updateHUDSafetyIndicator(false);
+            return true; // Secure: Pass processing check
+        }
+
+        updateHUDSafetyIndicator(isBreached) {
+            const indicator = document.getElementById('hud-safety-status');
+            if (!indicator) return;
+
+            if (isBreached) {
+                indicator.style.backgroundColor = "var(--warning)";
+                indicator.style.borderColor = "#f43f5e";
+                indicator.innerHTML = `Statut : <span class="hud-warning">RATE-LIMIT BLOCKED (32k TPM)</span>`;
+            } else {
+                indicator.style.backgroundColor = "#064e3b";
+                indicator.style.borderColor = "#10b981";
+                indicator.innerHTML = `Statut : <span style="color:#34d399;">SÉCURISÉ</span>`;
             }
         }
 
-        accumulateTokensUsed(amount) {
-            this.verifyAndResetDailyTokenTracker();
-            let currentTokens = parseInt(localStorage.getItem(CONFIG_KEY_TOKEN_COUNT) || "0", 10);
-            currentTokens += amount;
-            localStorage.setItem(CONFIG_KEY_TOKEN_COUNT, currentTokens.toString());
-            console.log(`[DEV_MODE LOG] API tokens consumed: +${amount}. Total for today: ${currentTokens}`);
-        }
+        commitTokenCalculationsToStorageHUD(promptTokens, completionTokens) {
+            let dayCalls = parseInt(localStorage.getItem(STORAGE_KEY_CALLS) || "0", 10) + 1;
+            let totalPrompt = parseInt(localStorage.getItem(STORAGE_KEY_PROMPT_TOKENS) || "0", 10) + promptTokens;
+            let totalComp = parseInt(localStorage.getItem(STORAGE_KEY_COMP_TOKENS) || "0", 10) + completionTokens;
 
-        loadSavedSourcesConfiguration() {
-            try {
-                const stored = localStorage.getItem(CONFIG_KEY_SOURCES);
-                if (stored) {
-                    this.selectedSources = JSON.parse(stored);
-                } else {
-                    // Fallback to primary defaults (Issue 10)
-                    this.selectedSources = ["lemonde", "bbc"];
-                    localStorage.setItem(CONFIG_KEY_SOURCES, JSON.stringify(this.selectedSources));
-                }
-            } catch (err) {
-                this.selectedSources = ["lemonde"];
-            }
+            localStorage.setItem(STORAGE_KEY_CALLS, dayCalls.toString());
+            localStorage.setItem(STORAGE_KEY_PROMPT_TOKENS, totalPrompt.toString());
+            localStorage.setItem(STORAGE_KEY_COMP_TOKENS, totalComp.toString());
+
+            this.initializeAndSyncTokenHUDCounters();
         }
 
         renderHomeFeedLayout() {
@@ -319,287 +429,430 @@
             if (!container) return;
             container.innerHTML = "";
 
-            // Filter out collection matching the composite active configuration matrix
-            const displayCollection = CORE_NEWS_DATABASE.filter(article => 
-                this.selectedSources.includes(article.sourceId)
-            );
-
-            if (displayCollection.length === 0) {
-                container.innerHTML = `<div style="padding:20px; color:var(--text-muted); text-align:center;">Aucune source sélectionnée. Veuillez ouvrir la configuration des flux.</div>`;
-                return;
-            }
+            const displayCollection = CORE_NEWS_DATABASE.filter(article => this.selectedSources.includes(article.sourceId));
 
             displayCollection.forEach(article => {
                 const sourceMeta = RSS_SOURCES.find(s => s.id === article.sourceId);
-                
                 const card = document.createElement('div');
-                card.className = `article-card ${this.activeArticleId === article.id ? 'selected' : ''}`;
-                card.id = `node_${article.id}`;
-                card.onclick = () => this.handleArticleEngagementLoop(article.id);
-
+                card.className = "article-card";
                 card.innerHTML = `
-                    <div class="thumb-frame">
-                        <img src="${article.thumb}" class="thumb-img" alt="Thumbnail Assets">
-                    </div>
+                    <div class="thumb-frame"><img src="${article.thumb}" class="thumb-img" alt="Asset"></div>
                     <div class="article-content">
                         <div>
-                            <div class="article-meta">
-                                <span class="source-tag">${sourceMeta ? sourceMeta.name : "RSS"}</span>
-                                <span>${article.timestamp}</span>
-                            </div>
+                            <div class="article-meta"><span class="source-tag">${sourceMeta ? sourceMeta.name : "RSS"}</span><span>${article.timestamp}</span></div>
                             <h3 class="article-title">${article.title}</h3>
                             <p class="article-desc">${article.desc}</p>
                         </div>
                     </div>
                 `;
+                card.onclick = () => this.invokeImmersiveReaderPipelinePopup(article.id);
                 container.appendChild(card);
             });
         }
 
-        // Intercept Engine & Persistent Caching Pipeline Layer (Issues 2, 3 & 4)
-        async handleArticleEngagementLoop(articleId) {
+        async invokeImmersiveReaderPipelinePopup(articleId) {
             this.activeArticleId = articleId;
+            const cacheKey = `lang_immersion_cache_${articleId}`;
             
-            // Re-render highlights
-            document.querySelectorAll('.article-card').forEach(el => el.classList.remove('selected'));
-            const selectedNode = document.getElementById(`node_${articleId}`);
-            if (selectedNode) selectedNode.classList.add('selected');
+            // Calculate simulated payload input data vectors for metric accuracy evaluation
+            const article = CORE_NEWS_DATABASE.find(a => a.id === articleId);
+            const rawTextWeightString = article.title + " " + article.desc;
+            
+            // Gemini Token Metric Formula Approximation Layer
+            const estimatedPromptTokens = Math.ceil(rawTextWeightString.length / 3.8) + 120; // Text weight + system instructions character envelope
+            const estimatedCompTokens = 850; // Average weight of five parsed linguistic output translations
 
-            const cacheKey = `${STORAGE_PREFIX}${articleId}`;
-            const cachedData = localStorage.getItem(cacheKey);
-
-            if (cachedData) {
-                // Persistent Cache Hit! Zero Tokens Consumed (Issue 3)
-                console.log(`[STORAGE CACHE HIT] Loading structured data patterns instantly for article ID: ${articleId}`);
-                this.activateReadingWorkbenchView(articleId);
-            } else {
-                // Cache Miss: Invoke network simulation layer & present advertisement metrics (Issue 4)
-                await this.triggerSponsoredLoaderNetworkSimulation();
+            if (!localStorage.getItem(cacheKey)) {
+                // Rate Limit Breaker Gate Control Evaluation Step
+                const passageAuthorized = this.checkAndEnforceRollingRateLimits(estimatedPromptTokens);
                 
-                // Emulate token computation billing structures (Issue 7)
-                this.accumulateTokensUsed(1420); 
+                if (!passageAuthorized) {
+                    alert("⚠️ ALERTE CRITIQUE : Requête bloquée par l'émulateur Dev-Mode.\nLe volume de jetons dépasse la limite gratuite de 32 000 TPM. Attendez 60 secondes pour réinitialiser la pile.");
+                    return;
+                }
 
-                // Commit mock structure payload safely to localStorage to protect subsequent operations
-                localStorage.setItem(cacheKey, "cached_lock_state");
-                this.activateReadingWorkbenchView(articleId);
-            }
-        }
-
-        triggerSponsoredLoaderNetworkSimulation() {
-            return new Promise(resolve => {
                 const loader = document.getElementById('sponsored-loader');
+                const headline = document.getElementById('loader-headline-txt');
                 const adHeadline = document.getElementById('ad-headline');
                 const adBody = document.getElementById('ad-body');
-
-                // Pick a random advertisement configuration from database block
                 const adItem = ADVERTISING_VAULT[Math.floor(Math.random() * ADVERTISING_VAULT.length)];
+                
                 adHeadline.textContent = adItem.headline;
                 adBody.textContent = adItem.body;
-
+                headline.textContent = `Appel Gemini API : Évaluation de ~${estimatedPromptTokens} tokens...`;
                 if (loader) loader.style.display = "flex";
+                
+                await new Promise(res => setTimeout(res, 1200));
+                if (loader) loader.style.display = "none";
+                
+                // Success: Commit transactions metrics out to dashboard state metrics counters
+                this.commitTokenCalculationsToStorageHUD(estimatedPromptTokens, estimatedCompTokens);
+                localStorage.setItem(cacheKey, "cached_state_true");
+            }
 
-                setTimeout(() => {
-                    if (loader) loader.style.display = "none";
-                    resolve();
-                }, 1200); // Quick load duration matching visual animation targets
-            });
+            document.getElementById('reader-headline-title').textContent = article.title;
+            const slider = document.getElementById('cefr-scale');
+            slider.value = 0;
+
+            this.handleSliderMutation(0);
+            document.getElementById('article-reader-modal').classList.add('active');
+            this.instantiateContextualGamesEngine(article.title + " " + article.desc);
         }
 
-        activateReadingWorkbenchView(articleId) {
-            const workbench = document.getElementById('cefr-workbench');
-            const titleNode = document.getElementById('workbench-title');
-            const metaNode = document.getElementById('workbench-meta');
-            const slider = document.getElementById('cefr-scale');
-
-            const article = CORE_NEWS_DATABASE.find(a => a.id === articleId);
-            if (!article || !workbench) return;
-
-            workbench.classList.add('active');
-            titleNode.textContent = article.title;
-            metaNode.textContent = `Source : ${article.sourceId.toUpperCase()} | Cache local : Activé`;
-            
-            // Sync slider to current structural level view
-            this.handleSliderMutation(slider.value);
-            
-            // Execute interactive gamification parsing logic sequence (Issue 9)
-            this.computePlatformGamesMatrices(article.title + " " + article.desc);
+        closeArticleReaderViewWindow() {
+            document.getElementById('article-reader-modal').classList.remove('active');
+            this.dismissContextPopoverMenu();
         }
 
         handleSliderMutation(sliderValue) {
             const targetLevel = this.sliderIndexMap[parseInt(sliderValue, 10)];
-            const bodyNode = document.getElementById('workbench-transformed-body');
-            if (!bodyNode || !this.activeArticleId) return;
+            document.getElementById('cefr-badge-indicator').textContent = targetLevel;
+            
+            const viewport = document.getElementById('reader-dynamic-body-viewport');
+            if (!viewport || !this.activeArticleId) return;
 
             const translationSet = MULTI_LEVEL_TRANSLATION_MATRIX[this.activeArticleId];
-            if (translationSet && translationSet[this.currentLanguage]) {
-                const textOutput = translationSet[this.currentLanguage][targetLevel];
-                bodyNode.innerHTML = `<strong>[CEFR ${targetLevel}]</strong> — ${textOutput}`;
-            } else {
-                bodyNode.innerHTML = `<span style="color:var(--text-muted);">Traduction non disponible pour cette configuration de langue.</span>`;
+            const rawTextContentString = (translationSet && translationSet[this.currentLanguage]) ? translationSet[this.currentLanguage][targetLevel] : "Text variance not found.";
+            
+            const continuousTokenArray = rawTextContentString.split(/(\s+)/);
+            viewport.innerHTML = "";
+
+            continuousTokenArray.forEach(token => {
+                if (token.trim().length === 0) {
+                    viewport.appendChild(document.createTextNode(token));
+                    return;
+                }
+                const normalizedCleanKey = token.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?"'’]/g, "");
+                const spanNode = document.createElement('span');
+                spanNode.className = "tokenized-word-span";
+                spanNode.textContent = token;
+                spanNode.onclick = (event) => {
+                    event.stopPropagation();
+                    this.executePopoverLookupInvocation(event, normalizedCleanKey);
+                };
+                viewport.appendChild(spanNode);
+            });
+        }
+
+        executePopoverLookupInvocation(event, wordKey) {
+            const popover = document.getElementById('lookup-popover-engine');
+            const termNode = document.getElementById('popover-lexicon-term');
+            const transNode = document.getElementById('popover-lexicon-translation');
+
+            const dictionaryBranch = TRANSLATION_DICTIONARY[this.currentLanguage] || {};
+            const standardTranslation = dictionaryBranch[wordKey] || "Contextual definition available via study block";
+
+            this.currentlyTargetedLookupToken = { foreign: wordKey, english: standardTranslation, lang: this.currentLanguage };
+
+            termNode.textContent = wordKey.toUpperCase();
+            transNode.textContent = `Traduction : "${standardTranslation}"`;
+
+            popover.style.left = `${event.pageX}px`;
+            popover.style.top = `${event.pageY - 85}px`;
+            popover.style.display = "block";
+        }
+
+        dismissContextPopoverMenu() {
+            document.getElementById('lookup-popover-engine').style.display = "none";
+        }
+
+        commitActivePopoverToFlashcards() {
+            if (!this.currentlyTargetedLookupToken) return;
+            if (!this.flashcardsCollection.some(item => item.foreign === this.currentlyTargetedLookupToken.foreign && item.lang === this.currentlyTargetedLookupToken.lang)) {
+                this.flashcardsCollection.push(this.currentlyTargetedLookupToken);
+                localStorage.setItem("user_flashcards_collection_v2", JSON.stringify(this.flashcardsCollection));
             }
+            this.dismissContextPopoverMenu();
+            this.updateFlashcardInterfaceDisplayCanvas();
+        }
+
+        updateFlashcardInterfaceDisplayCanvas() {
+            const textNode = document.getElementById('flashcard-text-canvas');
+            const subNode = document.getElementById('flashcard-sub-indicator');
+            const controls = document.getElementById('flashcard-action-controls');
+            const counterLabel = document.getElementById('flashcard-total-count');
+
+            counterLabel.textContent = this.flashcardsCollection.length;
+
+            if (this.flashcardsCollection.length === 0) {
+                textNode.textContent = "Cliquez sur un mot dans le Pop-up de l'article pour commencer.";
+                subNode.textContent = "Pile vide";
+                if (controls) controls.style.display = "none";
+                return;
+            }
+
+            if (controls) controls.style.display = "flex";
+            if (this.flashcardIndexPointer >= this.flashcardsCollection.length) {
+                this.flashcardIndexPointer = 0;
+            }
+
+            const activeCard = this.flashcardsCollection[this.flashcardIndexPointer];
+            
+            if (this.flashcardIsFlippedFaceState) {
+                textNode.textContent = activeCard.english;
+                textNode.style.color = "var(--success)";
+                subNode.textContent = `Traduction Anglaise [Card ${this.flashcardIndexPointer + 1}/${this.flashcardsCollection.length}]`;
+            } else {
+                textNode.textContent = activeCard.foreign.toUpperCase();
+                textNode.style.color = "var(--text-main)";
+                subNode.textContent = `Terme Source [${activeCard.lang.toUpperCase()}] — Cliquer pour retourner`;
+            }
+        }
+
+        toggleFlashcardFlipState() {
+            if (this.flashcardsCollection.length === 0) return;
+            this.flashcardIsFlippedFaceState = !this.flashcardIsFlippedFaceState;
+            this.updateFlashcardInterfaceDisplayCanvas();
+        }
+
+        cycleFlashcardIndexPointer() {
+            this.flashcardIndexPointer = (this.flashcardIndexPointer + 1) % this.flashcardsCollection.length;
+            this.flashcardIsFlippedFaceState = false;
+            this.updateFlashcardInterfaceDisplayCanvas();
+        }
+
+        deleteActiveFlashcardNode() {
+            if (this.flashcardsCollection.length === 0) return;
+            this.flashcardsCollection.splice(this.flashcardIndexPointer, 1);
+            localStorage.setItem("user_flashcards_collection_v2", JSON.stringify(this.flashcardsCollection));
+            this.flashcardIsFlippedFaceState = false;
+            this.updateFlashcardInterfaceDisplayCanvas();
+        }
+
+        instantiateContextualGamesEngine(compositeTextSource) {
+            const standardTokens = compositeTextSource.toLowerCase()
+                .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?"'’]/g, "")
+                .split(/\s+/)
+                .filter(word => /^[a-zA-Zàâäéèêëîïôöùûüçæœﬁ]+$/.test(word));
+
+            const standardFiveLetterTokens = standardTokens.filter(w => w.length === 5);
+            this.wordleSecretWord = standardFiveLetterTokens.length > 0 ? standardFiveLetterTokens[0] : "monde";
+            this.wordleRowsGuessedCount = 0;
+            
+            this.rebuildWordleInterfaceMarkupDOM();
+
+            this.wordsearchActiveWordsArray = [...new Set(standardTokens.filter(w => w.length >= 4 && w.length <= 7))].slice(0, 4);
+            if (this.wordsearchActiveWordsArray.length === 0) this.wordsearchActiveWordsArray = ["paris", "mode"];
+            
+            this.buildFindAWordInterfaceMarkupDOM();
+        }
+
+        rebuildWordleInterfaceMarkupDOM() {
+            const board = document.getElementById('wordle-target-board');
+            const inputsZone = document.getElementById('wordle-interactive-input-zone');
+            const statusLabel = document.getElementById('wordle-status');
+
+            board.innerHTML = "";
+            inputsZone.style.display = "flex";
+            statusLabel.textContent = "Jeu configuré à partir de l'article actif.";
+            statusLabel.style.color = "var(--accent)";
+
+            for (let row = 0; row < this.wordleMaxRowAttempts; row++) {
+                const targetRowDiv = document.createElement('div');
+                targetRowDiv.className = "wordle-row";
+                targetRowDiv.id = `w_row_${row}`;
+                
+                for (let cell = 0; cell < 5; cell++) {
+                    const blockCell = document.createElement('div');
+                    blockCell.className = "wordle-cell";
+                    blockCell.id = `w_cell_${row}_${cell}`;
+                    
+                    if (row === 0 && cell === 0) {
+                        blockCell.textContent = this.wordleSecretWord[0];
+                        blockCell.classList.add("present");
+                    }
+                    targetRowDiv.appendChild(blockCell);
+                }
+                board.appendChild(targetRowDiv);
+            }
+        }
+
+        submitWordleGuessRow() {
+            const inputField = document.getElementById('wordle-user-field');
+            const statusLabel = document.getElementById('wordle-status');
+            const cleanGuessWord = inputField.value.toLowerCase().trim();
+
+            if (cleanGuessWord.length !== 5 || this.wordleRowsGuessedCount >= this.wordleMaxRowAttempts) return;
+
+            const targetRowIndex = this.wordleRowsGuessedCount;
+            const secretLettersArray = this.wordleSecretWord.split('');
+            let structuralMatchRowCorrectCount = 0;
+
+            for (let colIdx = 0; colIdx < 5; colIdx++) {
+                const targetedDomCell = document.getElementById(`w_cell_${targetRowIndex}_${colIdx}`);
+                const matchingInputLetterChar = cleanGuessWord[colIdx];
+                targetedDomCell.textContent = matchingInputLetterChar;
+
+                if (matchingInputLetterChar === secretLettersArray[colIdx]) {
+                    targetedDomCell.className = "wordle-cell correct";
+                    structuralMatchRowCorrectCount++;
+                } else if (this.wordleSecretWord.includes(matchingInputLetterChar)) {
+                    targetedDomCell.className = "wordle-cell present";
+                } else {
+                    targetedDomCell.className = "wordle-cell absent";
+                }
+            }
+
+            this.wordleRowsGuessedCount++;
+            inputField.value = "";
+
+            if (structuralMatchRowCorrectCount === 5) {
+                statusLabel.textContent = "Félicitations! Vous avez trouvé le mot secret ! 🎉";
+                statusLabel.style.color = "var(--success)";
+                document.getElementById('wordle-interactive-input-zone').style.display = "none";
+            } else if (this.wordleRowsGuessedCount === this.wordleMaxRowAttempts) {
+                statusLabel.textContent = `Dommage! Le mot était: ${this.wordleSecretWord.toUpperCase()}`;
+                statusLabel.style.color = "#dc2626";
+            }
+        }
+
+        buildFindAWordInterfaceMarkupDOM() {
+            const badgesContainer = document.getElementById('wordsearch-target-badges');
+            const gridContainer = document.getElementById('wordsearch-target-grid');
+            const clearBtn = document.getElementById('find-a-word-clear-btn');
+
+            badgesContainer.innerHTML = "";
+            gridContainer.innerHTML = "";
+            clearBtn.style.display = "block";
+            this.wordsearchSelectedCoordinatesArray = [];
+
+            this.wordsearchActiveWordsArray.forEach((word) => {
+                const targetBadge = document.createElement('span');
+                targetBadge.className = "word-badge";
+                targetBadge.id = `ws_badge_${word}`;
+                targetBadge.textContent = word;
+                badgesContainer.appendChild(targetBadge);
+            });
+
+            const rowCountMatrixLimits = 6;
+            const colCountMatrixLimits = 8;
+            const matrixGridArrayRepresentation = Array(rowCountMatrixLimits).fill(null).map(() => Array(colCountMatrixLimits).fill('x'));
+
+            this.wordsearchActiveWordsArray.forEach((word, rowIdx) => {
+                if (rowIdx < rowCountMatrixLimits) {
+                    const standardLength = word.length;
+                    for (let charCol = 0; charCol < standardLength; charCol++) {
+                        matrixGridArrayRepresentation[rowIdx][charCol] = word[charCol];
+                    }
+                }
+            });
+
+            const alphabetSetNoisePattern = "abcdefghijklmnopqrstuvwxyz";
+            for (let r = 0; r < rowCountMatrixLimits; r++) {
+                for (let c = 0; c < colCountMatrixLimits; c++) {
+                    if (matrixGridArrayRepresentation[r][c] === 'x') {
+                        matrixGridArrayRepresentation[r][c] = alphabetSetNoisePattern[Math.floor(Math.random() * alphabetSetNoisePattern.length)];
+                    }
+                }
+            }
+
+            for (let r = 0; r < rowCountMatrixLimits; r++) {
+                for (let c = 0; c < colCountMatrixLimits; c++) {
+                    const nodeCell = document.createElement('div');
+                    nodeCell.className = "matrix-letter-node";
+                    nodeCell.id = `letter_node_${r}_${c}`;
+                    nodeCell.textContent = matrixGridArrayRepresentation[r][c].toUpperCase();
+                    nodeCell.dataset.letter = matrixGridArrayRepresentation[r][c];
+                    nodeCell.dataset.row = r;
+                    nodeCell.dataset.col = c;
+                    nodeCell.onclick = () => this.handleFindAWordLetterSelectionClickEvent(nodeCell);
+                    gridContainer.appendChild(nodeCell);
+                }
+            }
+        }
+
+        handleFindAWordLetterSelectionClickEvent(domElementNode) {
+            if (domElementNode.classList.contains('finalized-run')) return;
+            domElementNode.classList.toggle('selected-run');
+            const row = domElementNode.dataset.row;
+            const col = domElementNode.dataset.col;
+
+            const existingIndex = this.wordsearchSelectedCoordinatesArray.findIndex(item => item.row === row && item.col === col);
+            if (existingIndex > -1) {
+                this.wordsearchSelectedCoordinatesArray.splice(existingIndex, 1);
+            } else {
+                this.wordsearchSelectedCoordinatesArray.push({ row, col, letter: domElementNode.dataset.letter });
+            }
+
+            const synthesisConstructedWordString = this.wordsearchSelectedCoordinatesArray.map(item => item.letter).join('');
+            if (this.wordsearchActiveWordsArray.includes(synthesisConstructedWordString)) {
+                this.wordsearchSelectedCoordinatesArray.forEach(item => {
+                    const el = document.getElementById(`letter_node_${item.row}_${item.col}`);
+                    if (el) el.className = "matrix-letter-node finalized-run";
+                });
+                const targetBadgeElement = document.getElementById(`ws_badge_${synthesisConstructedWordString}`);
+                if (targetBadgeElement) targetBadgeElement.className = "word-badge found";
+                this.wordsearchSelectedCoordinatesArray = [];
+            }
+        }
+
+        clearActiveWordsearchSelectionRun() {
+            document.querySelectorAll('.matrix-letter-node.selected-run').forEach(el => el.classList.remove('selected-run'));
+            this.wordsearchSelectedCoordinatesArray = [];
         }
 
         handleLanguageMutation() {
             const selector = document.getElementById('target-language-matrix');
-            if (!selector) return;
-            this.currentLanguage = selector.value;
-            
+            if (selector) this.currentLanguage = selector.value;
             if (this.activeArticleId) {
                 const slider = document.getElementById('cefr-scale');
                 this.handleSliderMutation(slider.value);
             }
         }
 
-        // Gamification Compilation Core Suite Engines (Issue 9)
-        computePlatformGamesMatrices(sourceTextString) {
-            const cleanTokens = sourceTextString.toLowerCase()
-                .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?"'’]/g, "")
-                .split(/\s+/)
-                .filter(word => word.length >= 4);
-
-            // 1. Compile Wordle Live Targets
-            const fiveLetterTokens = cleanTokens.filter(w => w.length === 5);
-            const wordleAnswer = fiveLetterTokens.length > 0 ? fiveLetterTokens[0] : "monde";
-            
-            const board = document.getElementById('wordle-target-board');
-            const statusLabel = document.getElementById('wordle-status');
-            if (board && statusLabel) {
-                board.innerHTML = "";
-                for (let i = 0; i < 5; i++) {
-                    const cell = document.createElement('div');
-                    cell.className = "wordle-cell";
-                    if (i === 0) {
-                        cell.textContent = wordleAnswer[0];
-                        cell.className = "wordle-cell revealed";
-                    }
-                    board.appendChild(cell);
-                }
-                statusLabel.textContent = "Prêt à jouer (Aide initiale révélée)";
-                statusLabel.style.color = "var(--success)";
-            }
-
-            // 2. Compile Word Search Puzzle Matrix Space
-            const searchTargets = [...new Set(cleanTokens.filter(w => w.length >= 5 && w.length <= 7))].slice(0, 3);
-            const badgesBox = document.getElementById('wordsearch-target-badges');
-            const gridBox = document.getElementById('wordsearch-target-grid');
-
-            if (badgesBox && gridBox) {
-                badgesBox.innerHTML = "";
-                if (searchTargets.length === 0) searchTargets.push("paris", "europe");
-                
-                searchTargets.forEach(word => {
-                    const badge = document.createElement('span');
-                    badge.className = "word-badge";
-                    badge.textContent = word;
-                    badgesBox.appendChild(badge);
+        openModal(targetSystemModalId) {
+            if (targetSystemModalId === 'sources') {
+                const container = document.getElementById('modal-sources-list');
+                if (!container) return;
+                container.innerHTML = "";
+                RSS_SOURCES.forEach(source => {
+                    const isSelected = this.selectedSources.includes(source.id);
+                    const row = document.createElement('div');
+                    row.className = `source-selection-row ${isSelected ? 'selected' : ''}`;
+                    row.onclick = () => {
+                        if (this.selectedSources.includes(source.id)) {
+                            this.selectedSources = this.selectedSources.filter(id => id !== source.id);
+                        } else {
+                            this.selectedSources.push(source.id);
+                        }
+                        row.classList.toggle('selected');
+                    };
+                    row.innerHTML = `<div><div style="font-weight:bold; font-size:14px;">${source.name}</div></div><div class="checkbox-custom"></div>`;
+                    container.appendChild(row);
                 });
-
-                // Generate text lines layout structure embedding keywords
-                let matrixOutputHTML = "";
-                searchTargets.forEach(word => {
-                    const noiseLength = 8 - word.length;
-                    let randomNoise = "";
-                    const pattern = "abcdefghijklmnopqrstuvwxyz";
-                    for(let k=0; k<noiseLength; k++) {
-                        randomNoise += pattern[Math.floor(Math.random() * pattern.length)];
-                    }
-                    matrixOutputHTML += `<div>${(word + randomNoise).toUpperCase()}</div>`;
-                });
-                gridBox.innerHTML = matrixOutputHTML;
+                document.getElementById('source-modal').classList.add('active');
             }
         }
 
-        // Multi-Source System Configuration Overlay Logic (Issue 10)
-        openModal() {
-            const modal = document.getElementById('source-modal');
-            const container = document.getElementById('modal-sources-list');
-            if (!modal || !container) return;
-
-            container.innerHTML = "";
-            RSS_SOURCES.forEach(source => {
-                const isSelected = this.selectedSources.includes(source.id);
-                const row = document.createElement('div');
-                row.className = `source-selection-row ${isSelected ? 'selected' : ''}`;
-                row.onclick = () => {
-                    if (this.selectedSources.includes(source.id)) {
-                        this.selectedSources = this.selectedSources.filter(id => id !== source.id);
-                    } else {
-                        this.selectedSources.push(source.id);
-                    }
-                    row.classList.toggle('selected');
-                };
-
-                row.innerHTML = `
-                    <div>
-                        <div style="font-weight:bold; font-size:14px;">${source.name}</div>
-                        <div style="font-size:11px; color:var(--text-muted);">Flux Régional : [${source.lang.toUpperCase()}]</div>
-                    </div>
-                    <div class="checkbox-custom"></div>
-                `;
-                container.appendChild(row);
-            });
-
-            modal.classList.add('active');
-        }
-
-        closeModal(e) {
-            const modal = document.getElementById('source-modal');
-            if (!e || e.target === modal) {
-                if (modal) modal.classList.remove('active');
-            }
+        closeModal(targetSystemModalId) {
+            if (targetSystemModalId === 'sources') document.getElementById('source-modal').classList.remove('active');
         }
 
         saveModalConfiguration() {
-            localStorage.setItem(CONFIG_KEY_SOURCES, JSON.stringify(this.selectedSources));
-            this.closeModal(null);
+            this.closeModal('sources');
             this.renderHomeFeedLayout();
             this.syncActiveSourceIndicators();
-            
-            // Clean active tracking states if source drops away
-            const stillAvailable = CORE_NEWS_DATABASE.some(a => a.id === this.activeArticleId && this.selectedSources.includes(a.sourceId));
-            if (!stillAvailable) {
-                document.getElementById('cefr-workbench').classList.remove('active');
-                this.activeArticleId = null;
-            }
         }
 
         syncActiveSourceIndicators() {
-            const counter = document.getElementById('active-sources-count');
-            if (counter) counter.textContent = `${this.selectedSources.length} source(s) active(s)`;
+            document.getElementById('active-sources-count').textContent = `${this.selectedSources.length} source(s) active(s)`;
         }
 
         hardReset() {
             localStorage.clear();
-            console.log("[DEV_MODE] System parameters purged successfully.");
             window.location.reload();
         }
     }
 
-    // Bind developer interaction hooks directly to global console runtime environments
     window.addEventListener('DOMContentLoaded', () => {
         window.appEngine = new ApplicationImmersionEngine();
-
-        window.DEV_MODE = Object.freeze({
-            // Terminal Reporter Query Suite (Issue 7)
-            getDailyTokenConsumptionReport: () => {
-                const date = localStorage.getItem(CONFIG_KEY_TOKEN_DATE);
-                const count = localStorage.getItem(CONFIG_KEY_TOKEN_COUNT) || "0";
-                return `📊 [DEV_MODE REPORT]\n---------------------\nDate de suivi  : ${date}\nJetons consommés : ${count} tokens\n---------------------`;
-            },
-            getLocalStorageCacheSummary: () => {
-                const report = {};
-                for (let i = 0; i < localStorage.length; i++) {
-                    const key = localStorage.key(i);
-                    if (key.startsWith(STORAGE_PREFIX)) report[key] = localStorage.getItem(key);
-                }
-                return report;
-            },
-            bypassTokenCacheAndForceAPICharge: (articleId) => {
-                localStorage.removeItem(`${STORAGE_PREFIX}${articleId}`);
-                console.log(`[DEV_MODE] Cache cleared for article ${articleId}. Next request will run full API translation pipeline.`);
-                window.appEngine.handleArticleEngagementLoop(articleId);
-            }
-        });
+        
+        // Manual simulation injection utility hooks for developer console validation testing
+        window.SIMULATE_TOKEN_OVERLOAD_BURST = () => {
+            localStorage.setItem(STORAGE_KEY_WINDOW_TOKENS, "31900");
+            window.appEngine.checkAndEnforceRollingRateLimits(200);
+            console.warn("[⚠️ DEV SIMULATION] Window forced to 31,900 tokens. Next unique article click triggers the circuit breaker.");
+        };
     });
 })();
 </script>
