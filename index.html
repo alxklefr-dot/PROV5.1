@@ -122,23 +122,46 @@
         </div>
     </div>
 
-    <!-- Main Immersive Reader Modal Overlay -->
+   <!-- Main Immersive Reader Modal Overlay -->
     <div class="modal-overlay" id="immersive-reader-modal-root" onclick="if(event.target===this) closeImmersiveReader()">
-        <div class="modal-surface">
-            <div class="modal-header">
-                <div style="display:flex; flex-direction:column; gap:4px;">
+        <div class="modal-surface" style="max-width: 800px; width: 90%;">
+            <div class="modal-header" style="flex-wrap: wrap; gap: 12px;">
+                <div style="display:flex; flex-direction:column; gap:4px; flex: 1; min-width: 250px;">
                     <h3 id="reader-title-node">Article Immersive Workspace</h3>
-                    <!-- RE-INTEGRATED CEFR ADJUSTER ACCENT BADGE NODE -->
                     <div id="reader-cefr-badge-container"></div>
                 </div>
-                <button onclick="closeImmersiveReader()">✕</button>
+                
+                <!-- DYNAMIC CRITICAL CEFR LEVEL & TARGET LANGUAGE CONTROLS INSIDE MODAL -->
+                <div class="modal-live-controls" style="display: flex; gap: 8px; align-items: center; background: var(--bg-primary); padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border-color);">
+                    <div style="display: flex; flex-direction: column; gap: 2px;">
+                        <label style="font-size: 0.7rem; font-weight: bold; color: var(--text-muted);">Target Language</label>
+                        <select id="modal-change-lang" style="padding: 4px; font-size: 0.8rem;" onchange="syncModalLevelAndRegenerate()">
+                            <option value="French">French</option>
+                            <option value="Spanish">Spanish</option>
+                            <option value="German">German</option>
+                            <option value="English">English</option>
+                        </select>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 2px;">
+                        <label style="font-size: 0.7rem; font-weight: bold; color: var(--text-muted);">CEFR Level</label>
+                        <select id="modal-change-level" style="padding: 4px; font-size: 0.8rem;" onchange="syncModalLevelAndRegenerate()">
+                            <option value="A1">A1 Beginner</option>
+                            <option value="A2">A2 Elementary</option>
+                            <option value="B1">B1 Intermediate</option>
+                            <option value="B2">B2 Upper-Int</option>
+                            <option value="C1">C1 Advanced</option>
+                            <option value="C2">C2 Mastery</option>
+                            <option value="Fluent">Fluent Native</option>
+                        </select>
+                    </div>
+                </div>
+                <button onclick="closeImmersiveReader()" style="margin-left: 8px;">✕</button>
             </div>
             <div class="modal-body" id="reader-body-node">
                 <!-- Data injection point -->
             </div>
         </div>
     </div>
-
     <div class="toast-popup" id="toast-notification-node"></div>
 
 </body>
