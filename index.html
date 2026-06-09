@@ -17,20 +17,13 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg-primary); color: var(--text-main); display: flex; flex-direction: column; height: 100vh; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg-primary); color: var(--text-main); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
 
-        header { background: var(--bg-surface); border-bottom: 1px solid var(--border-color); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
-        h1 { font-size: 1.5rem; color: var(--brand-color); }
+        header { background: var(--bg-surface); border-bottom: 1px solid var(--border-color); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; z-index: 10; }
+        h1 { font-size: 1.3rem; color: var(--brand-color); }
 
-        .control-panel { display: flex; gap: 1rem; align-items: center; }
-        select, input, button { padding: 0.5rem 0.75rem; border: 1px solid var(--border-color); border-radius: 6px; font-size: 0.9rem; background: var(--bg-surface); }
-        button { background: var(--brand-color); color: #fff; border: none; cursor: pointer; font-weight: 500; }
-        button:hover { opacity: 0.9; }
-        button.secondary { background: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border-color); }
-
-        .main-workspace { display: flex; flex: 1; overflow: hidden; padding: 1.5rem; gap: 1.5rem; }
-        .feed-container { flex: 3; display: flex; flex-direction: column; gap: 1rem; overflow-y: auto; padding-right: 0.5rem; }
-        .sidebar-panel { flex: 2; display: flex; flex-direction: column; gap: 1.5rem; overflow-y: auto; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.25rem; }
+        .main-workspace { display: flex; flex: 1; overflow-y: auto; padding: 1.5rem 1.5rem 5rem 1.5rem; justify-content: center; }
+        .feed-container { width: 100%; max-width: 850px; display: flex; flex-direction: column; gap: 1rem; padding-bottom: 2rem; }
 
         .news-card { background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.25rem; display: flex; gap: 1.25rem; cursor: pointer; transition: transform 0.2s; position: relative; }
         .news-card:hover { transform: translateY(-2px); border-color: var(--brand-color); }
@@ -39,6 +32,12 @@
         .news-meta { font-size: 0.75rem; color: var(--text-muted); font-weight: 500; }
         .news-title { font-size: 1.1rem; font-weight: 600; line-height: 1.4; }
         .news-snippet { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; }
+
+        /* Bottom App Menu Bar Layer */
+        .bottom-app-bar { position: fixed; bottom: 0; left: 0; right: 0; height: 64px; background: var(--bg-surface); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; align-items: center; padding: 0 1rem; box-shadow: 0 -4px 12px rgba(0,0,0,0.05); z-index: 100; }
+        .nav-button { display: flex; flex-direction: column; align-items: center; background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.75rem; font-weight: 500; gap: 4px; transition: color 0.2s; }
+        .nav-button:hover, .nav-button.active { color: var(--brand-color); }
+        .nav-button svg { width: 22px; height: 22px; fill: currentColor; }
 
         .modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(15, 23, 42, 0.6); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 2rem; }
         .modal-surface { background: var(--bg-surface); width: 100%; max-width: 800px; max-height: 85vh; border-radius: 16px; display: flex; flex-direction: column; overflow: hidden; animation: popUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
@@ -51,7 +50,7 @@
         .clickable-word { cursor: pointer; display: inline-block; padding: 0 1px; border-radius: 3px; transition: background 0.15s; }
         .clickable-word:hover { background: #dbeafe; color: var(--brand-color); }
 
-        .game-card-wrapper { border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; background: var(--bg-primary); }
+        .game-card-wrapper { border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; background: var(--bg-primary); margin-bottom: 1rem; }
         .game-card-wrapper h4 { font-size: 0.95rem; margin-bottom: 0.75rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.25rem; color: var(--brand-color); }
         
         .faw-badge-pool { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
@@ -68,7 +67,7 @@
         .fc-box { background: var(--bg-surface); border: 2px dashed var(--border-color); border-radius: 8px; padding: 1.5rem; text-align: center; cursor: pointer; position: relative; min-height: 80px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         .fc-counter { position: absolute; top: 6px; right: 8px; font-size: 0.7rem; color: var(--text-muted); }
 
-        .toast-popup { position: fixed; bottom: 20px; right: 20px; background: var(--text-main); color: #fff; padding: 0.75rem 1.25rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-size: 0.9rem; display: none; z-index: 2000; animation: toastIn 0.2s ease-out; }
+        .toast-popup { position: fixed; bottom: 80px; right: 20px; background: var(--text-main); color: #fff; padding: 0.75rem 1.25rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-size: 0.9rem; display: none; z-index: 2000; animation: toastIn 0.2s ease-out; }
         @keyframes toastIn { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     </style>
 </head>
@@ -76,47 +75,69 @@
 
     <header>
         <h1>Global Core Reader & Immersive Atelier Engine</h1>
-        <div class="control-panel">
-            <button class="secondary" onclick="toggleEngineSettingsView()">⚙️ System Config</button>
-            <button onclick="cycleActiveFeedBatch()">🔄 Cycle 5 Articles</button>
-        </div>
     </header>
 
     <main class="main-workspace">
         <section class="feed-container" id="news-feed-target-root">
-            </section>
-
-        <aside class="sidebar-panel">
-            <h3>Atelier de Jeux</h3>
-            <p id="lock-state-label" style="font-size: 0.85rem; color: var(--accent-yellow); font-weight: bold; background: #fffbeb; padding: 6px; border-radius: 6px; border: 1px solid #fde68a;">🔒 State: Games locked. Read an article to unlock vocabulary engines.</p>
-            
-            <div class="game-card-wrapper">
-                <h4>Jeu 1: Find-A-Word Matrix</h4>
-                <div id="faw-pool" class="faw-badge-pool"></div>
-                <div id="faw-grid-target" class="faw-grid"></div>
-            </div>
-
-            <div class="game-card-wrapper">
-                <h4>Jeu 2: Wordle Lexical Framework</h4>
-                <div id="wordle-grid-target"></div>
-                <input type="text" id="wordle-hidden-input" maxlength="5" style="position:absolute; top:-1000px; left:-1000px; opacity:0;" autocomplete="off">
-                <p id="wordle-status-hint" style="font-size:0.75rem; color:var(--text-muted); text-align:center; margin-top:6px;"></p>
-            </div>
-
-            <div class="game-card-wrapper">
-                <h4>Jeu 3: Flashcard Compilation Deck</h4>
-                <div class="fc-box" onclick="flipActiveFlashcardNode()">
-                    <div class="fc-counter" id="fc-counter-display">Deck: 0 items</div>
-                    <div id="fc-content-text" style="font-weight: 600;">No lookup metrics active. Tap words inside any reading pop-up.</div>
-                </div>
-                <div style="display:flex; justify-content:space-between; margin-top:8px;">
-                    <button class="secondary" style="padding:2px 8px; font-size:0.75rem;" onclick="cycleFlashcardIndex(-1)">⏮ Prev</button>
-                    <button class="secondary" style="padding:2px 8px; font-size:0.75rem;" onclick="cycleFlashcardIndex(1)">Next ⏭</button>
-                </div>
-            </div>
-        </aside>
+            <!-- Dynamic Feed Target Node -->
+        </section>
     </main>
 
+    <!-- Bottom App Navigation Platform Bar -->
+    <nav class="bottom-app-bar">
+        <button class="nav-button" onclick="cycleActiveFeedBatch()">
+            <svg viewBox="0 0 24 24"><path d="M19 8l-4 4h3c0 3.31-2.69 6-6 6-1.01 0-1.97-.25-2.8-.7l-1.46 1.46C8.97 19.54 10.43 20 12 20c4.42 0 8-3.58 8-8h3l-4-4zM6 12c0-3.31 2.69-6 6-6 1.01 0 1.97.25 2.8.7l1.46-1.46C15.03 4.46 13.57 4 12 4c-4.42 0-8 3.58-8 8H1l4 4 4-4H6z"/></svg>
+            Cycle Feed
+        </button>
+        <button class="nav-button" onclick="toggleAtelierGamesModalView()">
+            <svg viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm3-3c-.83 0-1.5-.67-1.5-1.5S17.67 9 18.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+            Atelier Games
+        </button>
+        <button class="nav-button" onclick="toggleEngineSettingsView()">
+            <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+            Config Setup
+        </button>
+    </nav>
+
+    <!-- Atelier Games Pop-up Window Modal Surface -->
+    <div class="modal-overlay" id="atelier-games-modal-root" onclick="if(event.target===this) toggleAtelierGamesModalView()">
+        <div class="modal-surface">
+            <div class="modal-header">
+                <h3>Atelier de Jeux Vocabulaire</h3>
+                <button onclick="toggleAtelierGamesModalView()">✕</button>
+            </div>
+            <div class="modal-body">
+                <p id="lock-state-label" style="font-size: 0.85rem; color: var(--accent-yellow); font-weight: bold; background: #fffbeb; padding: 10px; border-radius: 6px; border: 1px solid #fde68a;">🔒 State: Games locked. Read an article to load specific word arrays.</p>
+                
+                <div class="game-card-wrapper">
+                    <h4>Jeu 1: Find-A-Word Matrix</h4>
+                    <div id="faw-pool" class="faw-badge-pool"></div>
+                    <div id="faw-grid-target" class="faw-grid"></div>
+                </div>
+
+                <div class="game-card-wrapper">
+                    <h4>Jeu 2: Wordle Lexical Framework</h4>
+                    <div id="wordle-grid-target"></div>
+                    <input type="text" id="wordle-hidden-input" maxlength="5" style="position:absolute; top:-1000px; left:-1000px; opacity:0;" autocomplete="off">
+                    <p id="wordle-status-hint" style="font-size:0.75rem; color:var(--text-muted); text-align:center; margin-top:6px;"></p>
+                </div>
+
+                <div class="game-card-wrapper">
+                    <h4>Jeu 3: Flashcard Compilation Deck</h4>
+                    <div class="fc-box" onclick="flipActiveFlashcardNode()">
+                        <div class="fc-counter" id="fc-counter-display">Deck: 0 items</div>
+                        <div id="fc-content-text" style="font-weight: 600;">No lookup metrics active. Tap words inside any reading pop-up.</div>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; margin-top:8px;">
+                        <button style="background:var(--border-color); color:var(--text-main); padding: 6px 12px;" onclick="cycleFlashcardIndex(-1)">⏮ Prev</button>
+                        <button style="background:var(--border-color); color:var(--text-main); padding: 6px 12px;" onclick="cycleFlashcardIndex(1)">Next ⏭</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Configuration Menu Modal Surface -->
     <div class="modal-overlay" id="settings-config-modal-root" onclick="if(event.target===this) toggleEngineSettingsView()">
         <div class="modal-surface" style="max-width: 500px;">
             <div class="modal-header">
@@ -126,18 +147,17 @@
             <div class="modal-body">
                 <div style="display:flex; flex-direction:column; gap:4px;">
                     <label style="font-weight:600; font-size:0.85rem;">a. Vocabulary Translation Language Target</label>
-                    <select id="config-target-vocab-lang">
+                    <select id="config-target-vocab-lang" onchange="saveConfigPreferencesToLocalStorage()">
                         <option value="English">English</option>
                         <option value="French">French</option>
                         <option value="Spanish">Spanish</option>
                         <option value="German">German</option>
-                        <option value="Australian English">Australian English</option>
                     </select>
                 </div>
                 <div style="display:flex; flex-direction:column; gap:4px;">
                     <label style="font-weight:600; font-size:0.85rem;">b. Article Text Generation Target Language</label>
-                    <select id="config-target-article-lang" onchange="flushFeedAndRebuild()">
-                        <option value="French" selected>French (Default)</option>
+                    <select id="config-target-article-lang" onchange="saveConfigPreferencesToLocalStorage(); flushFeedAndRebuild();">
+                        <option value="French">French</option>
                         <option value="English">English</option>
                         <option value="Spanish">Spanish</option>
                         <option value="German">German</option>
@@ -145,7 +165,7 @@
                 </div>
                 <div style="display:flex; flex-direction:column; gap:4px;">
                     <label style="font-weight:600; font-size:0.85rem;">c. Dynamic Reading Comprehension Level Profile</label>
-                    <select id="config-target-reading-level">
+                    <select id="config-target-reading-level" onchange="saveConfigPreferencesToLocalStorage()">
                         <option value="A1">A1 Beginner Profile</option>
                         <option value="A2">A2 Elementary Profile</option>
                         <option value="B1">B1 Intermediate Profile</option>
@@ -165,6 +185,7 @@
         </div>
     </div>
 
+    <!-- Immersive Workspace Pop-up -->
     <div class="modal-overlay" id="immersive-reader-modal-root" onclick="if(event.target===this) closeImmersiveReader()">
         <div class="modal-surface">
             <div class="modal-header">
@@ -172,119 +193,99 @@
                 <button onclick="closeImmersiveReader()">✕</button>
             </div>
             <div class="modal-body" id="reader-body-node">
-                </div>
+                <!-- Dynamic Text Generation Core -->
+            </div>
         </div>
     </div>
 
     <div class="toast-popup" id="toast-notification-node"></div>
 
     <script>
-        // --- 1. CONFIGURATION AND CORE REGISTRIES ---
+        // --- FEED REGISTER DIRECTORY ---
         const GLOBAL_MAINSTREAM_FEED_DIRECTORY = [
             { name: "Google News Global Feed", url: "https://news.google.com/rss?hl=en-US&gl=US&ceid=US:en" },
             { name: "BBC News World Service", url: "http://feeds.bbci.co.uk/news/world/rss.xml" },
             { name: "Le Monde Unified RSS", url: "https://www.lemonde.fr/rss/une.xml" },
             { name: "CNN International Network", url: "http://rss.cnn.com/rss/edition.rss" },
-            { name: "Reuters Worldwide Wire", url: "https://www.reutersagency.com/feed/" },
-            { name: "Der Spiegel Hauptfeed", url: "https://www.spiegel.de/public/referenz/rss.xml" },
-            { name: "El País Portada Principal", url: "https://rss.elpais.com/elpaismedia/top/index.xml" },
-            { name: "The New York Times Global Feed", url: "https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml" },
-            { name: "ABC News Australia Service", url: "https://www.abc.net.au/news/feed/51120/rss.xml" },
-            { name: "France 24 Actualités Direct", url: "https://www.france24.com/fr/rss" }
+            { name: "Reuters Worldwide Wire", url: "https://www.reutersagency.com/feed/" }
         ];
 
-        // --- UPGRADE A: OPTIMIZED INLINE TRANSLATION LOOKUP MATRIX ---
-        // Pre-indexed Map object minimizing lookup parsing over large paragraph blocks
         const HARMONIZED_LEXICAL_DICTIONARY = new Map([
             ["computer", "ordinateur"], ["system", "système"], ["structure", "structure"], 
             ["window", "fenêtre"], ["language", "langage"], ["learning", "apprentissage"], 
             ["workshop", "atelier"], ["game", "jeu"], ["newspaper", "journal"], 
-            ["reading", "lecture"], ["primary", "primaire"], ["focus", "focalisation"], 
-            ["vocabulary", "vocabulaire"], ["text", "texte"], ["simple", "simple"],
-            ["ordinateur", "computer"], ["système", "system"], ["fenêtre", "window"], 
-            ["langage", "language"], ["apprentissage", "learning"], ["atelier", "workshop"], 
-            ["jeu", "game"], ["journal", "newspaper"], ["lecture", "reading"], 
-            ["primaire", "primary"]
+            ["reading", "lecture"], ["primary", "primaire"], ["focus", "focalisation"]
         ]);
 
-        // Global Orchestration States
         let INGESTED_PARSED_ARTICLES_POOL = [];
         let ACTIVE_FEED_DISPLAY_INDEX = 0;
         let USER_FLASHCARD_REPOSITORY = [];
         let CURRENT_ACTIVE_FLASHCARD_INDEX = 0;
         let IS_FLASHCARD_FLIPPED = false;
 
-        let fawSelectedCoords = [];
         let fawSolutionWordsMapping = {};
         let fawGridDimension = 10;
-
         let wordleActiveTargetKeyword = "";
         let wordleCurrentAttemptRow = 0;
         let wordleIsEngineTerminated = false;
 
-        const CORS_SYSTEM_RESOLVER_PREFIX = "https://api.allorigins.win/get?url=";
+        // --- DUAL-PROXY RESILIENCE HIGH-AVAILABILITY CHANNEL ---
+        const PROXY_PIPELINE_POOL = [
+            "https://corsproxy.io/?url=",
+            "https://api.allorigins.win/get?url="
+        ];
+        let CURRENT_PROXY_INDEX_POINTER = 0;
 
-        // --- UPGRADE B: CLIENT-SIDE LOCAL & API PERSISTENT CACHING LAYER ---
-        const PLATFORM_GENERATION_CACHE = {
-            articles: new Map(), // Key: {articleId}-{lang}-{level} -> Array of Paragraphs
-            translations: new Map() // Key: {word}-{targetLang} -> Translated String
-        };
+        const PLATFORM_GENERATION_CACHE = { articles: new Map(), translations: new Map() };
 
-        // --- UPGRADE C: THE API CIRCUIT BREAKER ARCHITECTURE ---
         const CircuitBreaker = {
-            state: "CLOSED", // "CLOSED", "OPEN", "HALF-OPEN"
-            failureCount: 0,
-            failureThreshold: 3,      // Trip after 3 continuous failures
-            recoveryTimeout: 30000,   // Wait 30 seconds before testing the network again
-            lastStateChange: Date.now(),
-
-            recordSuccess() {
-                this.failureCount = 0;
-                if (this.state !== "CLOSED") {
-                    this.state = "CLOSED";
-                    this.lastStateChange = Date.now();
-                    triggerSystemToastNotification("API Service restored. Circuit Breaker is now CLOSED.");
-                }
-            },
-
-            recordFailure() {
-                this.failureCount++;
-                if (this.failureCount >= this.failureThreshold && this.state !== "OPEN") {
-                    this.state = "OPEN";
-                    this.lastStateChange = Date.now();
-                    triggerSystemToastNotification("🚨 API Token Overload Warning: Circuit Breaker TRIPPED to OPEN state. Falling back to internal engine.");
-                }
-            },
-
-            checkState() {
-                if (this.state === "OPEN") {
-                    if (Date.now() - this.lastStateChange > this.recoveryTimeout) {
-                        this.state = "HALF-OPEN";
-                        this.lastStateChange = Date.now();
-                        console.warn("Circuit Breaker transitioned to HALF-OPEN. Running probe query next.");
-                        return true;
-                    }
-                    return false; // Block execution, circuit is active
-                }
-                return true; // Execution allowed
-            }
+            state: "CLOSED", failureCount: 0, failureThreshold: 3, recoveryTimeout: 30000, lastStateChange: Date.now(),
+            recordSuccess() { this.failureCount = 0; if (this.state !== "CLOSED") { this.state = "CLOSED"; triggerSystemToastNotification("API Service Normal."); } },
+            recordFailure() { this.failureCount++; if (this.failureCount >= this.failureThreshold && this.state !== "OPEN") { this.state = "OPEN"; this.lastStateChange = Date.now(); triggerSystemToastNotification("🚨 Protected State Activated. Local processing online."); } },
+            checkState() { if (this.state === "OPEN") { if (Date.now() - this.lastStateChange > this.recoveryTimeout) { this.state = "HALF-OPEN"; return true; } return false; } return true; }
         };
 
-        // --- 2. LIFE-CYCLE INITIALIZATION ---
+        // --- LIFE-CYCLE INIT ---
         window.addEventListener('DOMContentLoaded', () => {
-            initializeSystemDefaults();
+            loadConfigPreferencesFromLocalStorage();
+            initializeSystemEventListeners();
             fetchComprehensiveRSSNetworkPipeline();
         });
 
-        function initializeSystemDefaults() {
+        function initializeSystemEventListeners() {
             document.getElementById('wordle-hidden-input').addEventListener('input', handleWordleInputStep);
             document.getElementById('wordle-hidden-input').addEventListener('keydown', handleWordleKeydownStep);
         }
 
+        // --- LOCAL STORAGE CACHE IMPLEMENTATION ---
+        function saveConfigPreferencesToLocalStorage() {
+            const preferencesObj = {
+                vocabLang: document.getElementById('config-target-vocab-lang').value,
+                articleLang: document.getElementById('config-target-article-lang').value,
+                readingLevel: document.getElementById('config-target-reading-level').value
+            };
+            localStorage.setItem('CORE_READER_PREFERENCES_V1', JSON.stringify(preferencesObj));
+            console.log("Configuration parameters committed to client LocalStorage context safely.");
+        }
+
+        function loadConfigPreferencesFromLocalStorage() {
+            const cachedData = localStorage.getItem('CORE_READER_PREFERENCES_V1');
+            if (cachedData) {
+                try {
+                    const parsed = JSON.parse(cachedData);
+                    document.getElementById('config-target-vocab-lang').value = parsed.vocabLang || "English";
+                    document.getElementById('config-target-article-lang').value = parsed.articleLang || "French";
+                    document.getElementById('config-target-reading-level').value = parsed.readingLevel || "A1";
+                    console.log("Preferences successfully re-established from local storage cache registry.");
+                } catch(e) {
+                    console.error("Cache recovery parsing variance hit. Restoring engine fallback defaults.");
+                }
+            }
+        }
+
         function triggerSystemToastNotification(messageString) {
             const node = document.getElementById('toast-notification-node');
-            node.textContent = messageString;
-            node.style.display = 'block';
+            node.textContent = messageString; node.style.display = 'block';
             setTimeout(() => { node.style.display = 'none'; }, 3500);
         }
 
@@ -293,16 +294,29 @@
             node.style.display = (node.style.display === 'flex') ? 'none' : 'flex';
         }
 
-        // --- 3. RSS INGESTION INTERNALS ---
+        function toggleAtelierGamesModalView() {
+            const node = document.getElementById('atelier-games-modal-root');
+            node.style.display = (node.style.display === 'flex') ? 'none' : 'flex';
+        }
+
+        // --- RSS ENGINE FETCH REPAIR SEQUENCE ---
         async function fetchComprehensiveRSSNetworkPipeline() {
             INGESTED_PARSED_ARTICLES_POOL = [];
-            triggerSystemToastNotification("Initializing parallel live ingestion across mainstream feeds...");
+            triggerSystemToastNotification("Extracting streams from global wire directory...");
 
-            const fetchPromises = GLOBAL_MAINSTREAM_FEED_DIRECTORY.map(feed => executeXMLExtractionQuery(feed.url, feed.name));
-            await Promise.all(fetchPromises);
+            const extractionPromises = GLOBAL_MAINSTREAM_FEED_DIRECTORY.map(feed => executeXMLExtractionQuery(feed.url, feed.name));
+            await Promise.all(extractionPromises);
 
             if (INGESTED_PARSED_ARTICLES_POOL.length === 0) {
-                triggerSystemToastNotification("CORS Proxy delay encountered. Initializing high-availability structural local fallback.");
+                console.warn("Primary Proxy path failed. Rotating token proxy context variables...");
+                CURRENT_PROXY_INDEX_POINTER = (CURRENT_PROXY_INDEX_POINTER + 1) % PROXY_PIPELINE_POOL.length;
+                
+                const secondAttemptPromises = GLOBAL_MAINSTREAM_FEED_DIRECTORY.map(feed => executeXMLExtractionQuery(feed.url, feed.name));
+                await Promise.all(secondAttemptPromises);
+            }
+
+            if (INGESTED_PARSED_ARTICLES_POOL.length === 0) {
+                triggerSystemToastNotification("Proxy limitations met. Reverting to internal local matrix pools.");
                 generateStructuralLocalFallbackDatabase();
             }
 
@@ -313,77 +327,57 @@
 
         async function executeXMLExtractionQuery(targetURL, sourceChannelName) {
             try {
-                const queryEndpoint = `${CORS_SYSTEM_RESOLVER_PREFIX}${encodeURIComponent(targetURL)}`;
+                const proxyPrefix = PROXY_PIPELINE_POOL[CURRENT_PROXY_INDEX_POINTER];
+                const queryEndpoint = `${proxyPrefix}${encodeURIComponent(targetURL)}`;
                 const rawResponse = await fetch(queryEndpoint);
                 if (!rawResponse.ok) return;
                 
-                const responseJSON = await rawResponse.json();
-                const XMLContentString = responseJSON.contents;
+                let XMLContentString = "";
+                if (proxyPrefix.includes("allorigins")) {
+                    const resJSON = await rawResponse.json();
+                    XMLContentString = resJSON.contents;
+                } else {
+                    XMLContentString = await rawResponse.text();
+                }
+
                 const XMLDOMParser = new DOMParser();
                 const XMLDOMDocument = XMLDOMParser.parseFromString(XMLContentString, "text/xml");
-                const itemNodesCollection = XMLDOMDocument.querySelectorAll("item");
                 
+                if (XMLDOMDocument.querySelector("parsererror")) {
+                    console.error(`XML Syntax mismatch encountered handling target source stream: ${sourceChannelName}`);
+                    return;
+                }
+
+                const itemNodesCollection = XMLDOMDocument.querySelectorAll("item");
                 itemNodesCollection.forEach((item, index) => {
                     if (index > 8) return; 
                     
                     const titleText = item.querySelector("title")?.textContent || "Breaking Updates Encountered";
-                    const coreDescription = item.querySelector("description")?.textContent || "No contextual text body summary provided by source transmitter node.";
+                    const coreDescription = item.querySelector("description")?.textContent || "No text payload provided by source node link channel wrapper context.";
                     const linkAddress = item.querySelector("link")?.textContent || "#";
                     const publishDateString = item.querySelector("pubDate")?.textContent || new Date().toUTCString();
                     
-                    let extractionThumbURL = `https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600&auto=format&fit=crop&q=60`;
+                    let extractionThumbURL = `https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600`;
                     const mediaContent = item.getElementsByTagName("media:content")[0] || item.getElementsByTagName("enclosure")[0];
                     if (mediaContent && mediaContent.getAttribute("url")) {
                         extractionThumbURL = mediaContent.getAttribute("url");
-                    } else {
-                        const matchIMG = coreDescription.match(/<img[^>]+src="([^">]+)"/);
-                        if (matchIMG && matchIMG[1]) extractionThumbURL = matchIMG[1];
                     }
 
                     const sanitizedSnippetText = coreDescription.replace(/<\/?[^>]+(>|$)/g, "").substring(0, 160) + "...";
 
                     INGESTED_PARSED_ARTICLES_POOL.push({
-                        id: 'live-article-node-' + Math.random().toString(36).substr(2, 9),
+                        id: 'live-node-seed-' + Math.random().toString(36).substr(2, 9),
                         rawTitle: titleText,
                         rawBodySnippet: sanitizedSnippetText,
                         originSource: sourceChannelName,
-                        publishTimestamp: formatArticleTimestampString(publishDateString),
+                        publishTimestamp: "Live Source Sync",
                         imageAssetURL: extractionThumbURL,
                         sourceRefLink: linkAddress
                     });
                 });
             } catch (err) {
-                console.warn(`Parallel channel extraction error on source link execution: ${sourceChannelName}`, err);
+                console.warn(`Extraction node skip parameter invoked on stream: ${sourceChannelName}`);
             }
-        }
-
-        function formatArticleTimestampString(rawDateInput) {
-            try {
-                const dateObj = new Date(rawDateInput);
-                if (isNaN(dateObj.getTime())) return "Latest Update";
-                return dateObj.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) + " (Latest)";
-            } catch {
-                return "Latest / Recent Publication";
-            }
-        }
-
-        function registerCustomUserInjectedRSS() {
-            const inputField = document.getElementById('custom-rss-input-field');
-            const targetedCustomURL = inputField.value.trim();
-            if (!targetedCustomURL) {
-                alert("Please declare a valid operational XML transmission endpoint URL.");
-                return;
-            }
-
-            triggerSystemToastNotification("Ingesting user-defined custom RSS stream...");
-            executeXMLExtractionQuery(targetedCustomURL, "User Ingested Custom Feed Layer").then(() => {
-                INGESTED_PARSED_ARTICLES_POOL.sort((a, b) => b.originSource === "User Ingested Custom Feed Layer" ? 1 : -1);
-                ACTIVE_FEED_DISPLAY_INDEX = 0;
-                renderActiveFiveArticlesBatch();
-                toggleEngineSettingsView();
-                triggerSystemToastNotification("Custom endpoint mapped and updated successfully.");
-                inputField.value = "";
-            });
         }
 
         function renderActiveFiveArticlesBatch() {
@@ -392,7 +386,7 @@
 
             const validationSubsetSlice = INGESTED_PARSED_ARTICLES_POOL.slice(ACTIVE_FEED_DISPLAY_INDEX, ACTIVE_FEED_DISPLAY_INDEX + 5);
             if (validationSubsetSlice.length === 0) {
-                displayRoot.innerHTML = `<div style="text-align:center; padding:3rem; color:var(--text-muted);">No further source vectors detected. Trigger Cycle or Config settings to reload system feeds.</div>`;
+                displayRoot.innerHTML = `<div style="text-align:center; padding:3rem; color:var(--text-muted);">No further files found inside pool registry. Click Cycle to reload list indices.</div>`;
                 return;
             }
 
@@ -421,432 +415,266 @@
             ACTIVE_FEED_DISPLAY_INDEX += 5;
             if (ACTIVE_FEED_DISPLAY_INDEX >= INGESTED_PARSED_ARTICLES_POOL.length) {
                 ACTIVE_FEED_DISPLAY_INDEX = 0;
-                triggerSystemToastNotification("Feed cycling sequence complete. Recalibrating index pointers back to initial index entry.");
+                triggerSystemToastNotification("Feed list index pointers refreshed smoothly.");
             }
             renderActiveFiveArticlesBatch();
         }
 
-        function flushFeedAndRebuild() {
-            renderActiveFiveArticlesBatch();
-        }
+        function flushFeedAndRebuild() { renderActiveFiveArticlesBatch(); }
 
         function convertTextStringLanguageSimulation(baseInputString, targetedLanguageString) {
             const syntaxGlossaryMap = {
-                "French": { prefix: "[FR] ", suffix: " optionnel", connectors: "avec la structure" },
-                "Spanish": { prefix: "[ES] El ", suffix: " de la noticia", connectors: "con elements" },
-                "German": { prefix: "[DE] Das ", suffix: " nachrichtenblatt", connectors: "und verarbeitung" }
+                "French": { prefix: "[FR] ", suffix: " (Actu)", connectors: "de la" },
+                "Spanish": { prefix: "[ES] ", suffix: " (Noticia)", connectors: "con el" },
+                "German": { prefix: "[DE] ", suffix: " (Nachrichten)", connectors: "und" }
             };
             const ruleSettings = syntaxGlossaryMap[targetedLanguageString];
             if (!ruleSettings) return baseInputString;
-
-            let cleanArray = baseInputString.split(" ");
-            if(cleanArray.length > 5) {
-                cleanArray.splice(3, 0, ruleSettings.connectors);
-            }
-            return `${ruleSettings.prefix}${cleanArray.join(" ")}${ruleSettings.suffix}`;
+            let arr = baseInputString.split(" ");
+            if(arr.length > 4) arr.splice(2, 0, ruleSettings.connectors);
+            return `${ruleSettings.prefix}${arr.join(" ")}${ruleSettings.suffix}`;
         }
 
-        // --- 4. NETWORK BOUND CEFR ENGINE ROUTE WITH CIRCUIT BREAKER AND CACHING ---
+        // --- PROTECTED ROUTE RETRIEVAL WITH HIGH ENTROPY DIVERSITY ---
         async function fetchCEFRContentMatrixFromAPI(baseSeedString, chosenLevelProfile, targetLanguageString, articleId) {
             const cacheKey = `${articleId}-${targetLanguageString}-${chosenLevelProfile}`;
-            
-            // Check Local Cache Layer (Upgrade B Mitigation)
-            if (PLATFORM_GENERATION_CACHE.articles.has(cacheKey)) {
-                console.log(`Cache intercept successful for payload key: ${cacheKey}`);
-                return PLATFORM_GENERATION_CACHE.articles.get(cacheKey);
-            }
-
-            // Assess Circuit Breaker Threshold State Matrix
-            if (!CircuitBreaker.checkState()) {
-                console.warn("Outbound API execution rejected by Circuit Breaker State rules. Diverting to client processing block.");
-                return fallbackLocalGenerationMatrix(baseSeedString, chosenLevelProfile, targetLanguageString);
-            }
+            if (PLATFORM_GENERATION_CACHE.articles.has(cacheKey)) return PLATFORM_GENERATION_CACHE.articles.get(cacheKey);
+            if (!CircuitBreaker.checkState()) return fallbackLocalGenerationMatrix(baseSeedString, chosenLevelProfile, targetLanguageString);
 
             try {
-                // Mock endpoint representing a production Gemini proxy hook
-                // In production workflow, replace this with your direct backend API url link
                 const response = await fetch('/api/generate-cefr', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ text: baseSeedString, level: chosenLevelProfile, lang: targetLanguageString }),
-                    signal: AbortSignal.timeout(6000) // 6 second defensive threshold timeout
+                    signal: AbortSignal.timeout(4000)
                 });
-
-                if (!response.ok) {
-                    if (response.status === 429 || response.status >= 500) {
-                        CircuitBreaker.recordFailure();
-                    }
-                    throw new Error(`API Endpoint upstream processing state mismatch: ${response.status}`);
-                }
-
+                if (!response.ok) { CircuitBreaker.recordFailure(); throw new Error(); }
                 const data = await response.json();
-                CircuitBreaker.recordSuccess(); // Reset error weights 
-                
-                // Populate structural cache map tracking metrics
+                CircuitBreaker.recordSuccess();
                 PLATFORM_GENERATION_CACHE.articles.set(cacheKey, data.paragraphs);
                 return data.paragraphs;
-
-            } catch (apiError) {
-                console.error("Upstream Generation Pipeline error detected:", apiError);
-                // If circuit breaker was in HALF-OPEN state and failed, immediately trip it back to OPEN
-                if (CircuitBreaker.state === "HALF-OPEN") {
-                    CircuitBreaker.state = "OPEN";
-                    CircuitBreaker.lastStateChange = Date.now();
-                }
-                // Soft fallback safety implementation
+            } catch {
                 return fallbackLocalGenerationMatrix(baseSeedString, chosenLevelProfile, targetLanguageString);
             }
         }
 
-        // --- UPGRADE D: EMBEDDED REFACTORED FALLBACK LOCAL TEXT MATRIX ENGINE ---
         function fallbackLocalGenerationMatrix(baseSeedString, chosenLevelProfile, targetLanguageString) {
-            let coreDictionaryWordsPool = ["lexicon", "paradigm", "integration", "framework", "transmission", "verification", "coordinate", "structure", "engine"];
-            if (targetLanguageString === "French") {
-                coreDictionaryWordsPool = ["ordinateur", "système", "structure", "fenêtre", "langage", "apprentissage", "atelier", "jeu", "journal"];
-            } else if (targetLanguageString === "Spanish") {
-                coreDictionaryWordsPool = ["sistema", "noticia", "lenguaje", "apprentissage", "ventana", "lector", "juego", "estructura", "diario"];
-            }
-
-            let primaryParagraph = `[Level: ${chosenLevelProfile}] Primary Reading Layer Focus. Baseline core segment tracking standard output parameters from original headline summary source matrix. ${baseSeedString}. Check operational verification strings thoroughly.`;
-            let secondaryParagraph = `Secondary expansion framework. Processing development contextual parameters relative to target lexicon values. Utilizing intermediate structural verbs like ${coreDictionaryWordsPool[0]}, ${coreDictionaryWordsPool[1]}, and ${coreDictionaryWordsPool[2]} to reinforce grammatical familiarity within immersive environments.`;
-            let tertiaryParagraph = `Concluding diagnostic thematic alignment matrix. Retaining syntax configurations to stabilize reading stamina metrics. Synthesizing ${coreDictionaryWordsPool[3]} and data flows into clear output parameters using ${coreDictionaryWordsPool[4]} and final parsing validations.`;
-
-            if (chosenLevelProfile === "A1" || chosenLevelProfile === "A2") {
-                primaryParagraph = `[Level: ${chosenLevelProfile}] Base sentence one. This is the simple direct context map. ${baseSeedString}. Very easy vocabulary words like ${coreDictionaryWordsPool[5]} and ${coreDictionaryWordsPool[6]} are introduced here.`;
-                secondaryParagraph = `Paragraph two text block. Small words are useful. We study the core reading flow elements. Look closely at the explicit text node labeled ${coreDictionaryWordsPool[7]}. It helps daily learning mechanics look easy.`;
-                tertiaryParagraph = `Paragraph three final conclusion. You can select single target words anywhere inside this view profile panel interface. Every click transfers records down to the flashcard matrix container tracking module instantly.`;
-            }
-
-            primaryParagraph = convertTextStringLanguageSimulation(primaryParagraph, targetLanguageString);
-            secondaryParagraph = convertTextStringLanguageSimulation(secondaryParagraph, targetLanguageString);
-            tertiaryParagraph = convertTextStringLanguageSimulation(tertiaryParagraph, targetLanguageString);
-
-            return [primaryParagraph, secondaryParagraph, tertiaryParagraph];
+            let terms = targetLanguageString === "French" ? ["ordinateur", "système", "structure"] : ["learning", "workshop", "system"];
+            let p1 = `[Level: ${chosenLevelProfile}] Standard reading comprehension context block processing the core operational metrics of ${baseSeedString}. Check all variables carefully.`;
+            let p2 = `Secondary paragraph unit highlighting parsing variations. Integrating tracking tools such as ${terms[0]} and structural tracking modules like ${terms[1]} to stabilize learner memory matrix profiles.`;
+            let p3 = `Concluding sentence blocks analyzing target values. Ensure data elements map neatly into your core storage registries before closing out the session workflow metrics interface.`;
+            return [p1, p2, p3].map(p => convertTextStringLanguageSimulation(p, targetLanguageString));
         }
 
-        // --- 5. WORKSPACE OVERLAY INTERACTIONS ---
         async function launchImmersiveReaderPopUp(articleObject) {
-            const targetReadingLevel = document.getElementById('config-target-reading-level').value;
-            const targetArticleLang = document.getElementById('config-target-article-lang').value;
-
-            const modalRoot = document.getElementById('immersive-reader-modal-root');
-            const titleNode = document.getElementById('reader-title-node');
+            const lvl = document.getElementById('config-target-reading-level').value;
+            const lang = document.getElementById('config-target-article-lang').value;
+            const modal = document.getElementById('immersive-reader-modal-root');
             const bodyNode = document.getElementById('reader-body-node');
 
-            titleNode.textContent = convertTextStringLanguageSimulation(articleObject.rawTitle, targetArticleLang);
+            document.getElementById('reader-title-node').textContent = convertTextStringLanguageSimulation(articleObject.rawTitle, lang);
             bodyNode.innerHTML = "";
-            
-            const imgElement = document.createElement('img');
-            imgElement.className = "modal-hero-img";
-            imgElement.src = articleObject.imageAssetURL;
-            imgElement.onerror = function() { this.src = 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600'; };
-            bodyNode.appendChild(imgElement);
 
-            // Execute via protected architectural gateway pipeline
-            const textParagraphsArray = await fetchCEFRContentMatrixFromAPI(
-                articleObject.rawBodySnippet, 
-                targetReadingLevel, 
-                targetArticleLang,
-                articleObject.id
-            );
-            
-            textParagraphsArray.forEach(paragraphText => {
-                const pElement = document.createElement('p');
-                pElement.className = "reader-article-p";
+            const img = document.createElement('img'); img.className = "modal-hero-img"; img.src = articleObject.imageAssetURL;
+            bodyNode.appendChild(img);
 
-                const wordsArray = paragraphText.split(/\s+/);
-                wordsArray.forEach(word => {
-                    const cleanCleanWordWord = word.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()""[\]]/g,"");
-                    const spanNode = document.createElement('span');
-                    spanNode.className = "clickable-word";
-                    spanNode.textContent = word + " ";
-                    spanNode.onclick = (e) => {
-                        e.stopPropagation();
-                        executeInteractiveInlineWordLookup(cleanCleanWordWord);
-                    };
-                    pElement.appendChild(spanNode);
+            const paragraphs = await fetchCEFRContentMatrixFromAPI(articleObject.rawBodySnippet, lvl, lang, articleObject.id);
+            paragraphs.forEach(text => {
+                const p = document.createElement('p'); p.className = "reader-article-p";
+                text.split(/\s+/).forEach(word => {
+                    const cleanWord = word.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()""[\]]/g,"");
+                    const span = document.createElement('span'); span.className = "clickable-word"; span.textContent = word + " ";
+                    span.onclick = (e) => { e.stopPropagation(); executeInteractiveInlineWordLookup(cleanWord); };
+                    p.appendChild(span);
                 });
-                bodyNode.appendChild(pElement);
+                bodyNode.appendChild(p);
             });
-            
-            modalRoot.style.display = 'flex';
-            triggerAtelierGamesInitializationPipeline(articleObject, textParagraphsArray.join(" "));
+            modal.style.display = 'flex';
+            triggerAtelierGamesInitializationPipeline(articleObject, paragraphs.join(" "));
         }
 
-        function closeImmersiveReader() {
-            document.getElementById('immersive-reader-modal-root').style.display = 'none';
-        }
+        function closeImmersiveReader() { document.getElementById('immersive-reader-modal-root').style.display = 'none'; }
 
-        // --- 6. HIGH PERFORMANCE INDEX INTERACTIVE TRANSLATOR LINK ---
         function executeInteractiveInlineWordLookup(targetRawWord) {
             if (!targetRawWord.trim()) return;
-            const selectedTranslationLanguage = document.getElementById('config-target-vocab-lang').value;
-            const lowerCaseCleanKey = targetRawWord.toLowerCase();
+            const tgtLang = document.getElementById('config-target-vocab-lang').value;
+            const key = targetRawWord.toLowerCase();
+            const cacheKey = `${key}-${tgtLang}`;
             
-            // Upgrade B Cache Check for Word Lookups
-            const lookupCacheKey = `${lowerCaseCleanKey}-${selectedTranslationLanguage}`;
-            let matchedResultText = "";
+            let translation = PLATFORM_GENERATION_CACHE.translations.get(cacheKey) || HARMONIZED_LEXICAL_DICTIONARY.get(key) || `Lexicon_Match(${tgtLang})`;
+            PLATFORM_GENERATION_CACHE.translations.set(cacheKey, translation);
 
-            if (PLATFORM_GENERATION_CACHE.translations.has(lookupCacheKey)) {
-                matchedResultText = PLATFORM_GENERATION_CACHE.translations.get(lookupCacheKey);
-            } else {
-                // Utilize rapid execution optimized Map structural lookup index
-                matchedResultText = HARMONIZED_LEXICAL_DICTIONARY.get(lowerCaseCleanKey) || `Translated_Variant(${selectedTranslationLanguage})`;
-                PLATFORM_GENERATION_CACHE.translations.set(lookupCacheKey, matchedResultText);
-            }
+            alert(`[Evaluation Term Context Map]\nOriginal string value: "${targetRawWord}"\nMapped Translation Target (${tgtLang}): ${translation}`);
             
-            alert(`[Word Evaluation Context Lookup]\nOriginal: "${targetRawWord}"\nTranslation (${selectedTranslationLanguage}): ${matchedResultText}`);
-            
-            const duplicateCheck = USER_FLASHCARD_REPOSITORY.some(card => card.front.toLowerCase() === lowerCaseCleanKey);
-            if (!duplicateCheck) {
-                USER_FLASHCARD_REPOSITORY.push({
-                    front: targetRawWord,
-                    back: `${matchedResultText} (${selectedTranslationLanguage})`
-                });
+            if (!USER_FLASHCARD_REPOSITORY.some(c => c.front.toLowerCase() === key)) {
+                USER_FLASHCARD_REPOSITORY.push({ front: targetRawWord, back: `${translation} (${tgtLang})` });
                 CURRENT_ACTIVE_FLASHCARD_INDEX = USER_FLASHCARD_REPOSITORY.length - 1;
                 updateFlashcardUIContainerDisplay();
-                triggerSystemToastNotification(`"${targetRawWord}" added to your Flashcard Compilation Deck.`);
             }
         }
 
-        // --- 7. SIDEBAR ATELIER SYSTEMS GAME PLATFORMS ---
+        // --- SIDEBAR GAME ENGINES ATELIER INTERNALS ---
         function triggerAtelierGamesInitializationPipeline(articleObj, fullCombinedArticleText) {
             const indicator = document.getElementById('lock-state-label');
-            indicator.textContent = `🔓 State: Active Games Unlocked from "${articleObj.originSource}" source context.`;
-            indicator.style.color = "var(--correct-color)";
-            indicator.style.background = "#ecfdf5";
-            indicator.style.borderColor = "#a7f3d0";
+            indicator.textContent = `🔓 State: Game datasets generated using "${articleObj.originSource}" article context.`;
+            indicator.style.color = "var(--correct-color)"; indicator.style.background = "#ecfdf5"; indicator.style.borderColor = "#a7f3d0";
             
-            const wordsList = fullCombinedArticleText.toUpperCase().replace(/[^A-Z\s]/g, "").split(/\s+/).filter(w => w.length >= 4 && w.length <= 8);
-            const dynamicUniquePool = [...new Set(wordsList)].slice(0, 4);
-            const fallbackTargetsList = dynamicUniquePool.length >= 3 ? dynamicUniquePool : ["CORE", "FEED", "VIEW", "TEXT"];
-
-            generateFindAWordGameMatrix(fallbackTargetsList);
+            const wordsList = fullCombinedArticleText.toUpperCase().replace(/[^A-Z\s]/g, "").split(/\s+/).filter(w => w.length >= 4 && w.length <= 7);
+            const pool = [...new Set(wordsList)].slice(0, 4);
+            generateFindAWordGameMatrix(pool.length >= 3 ? pool : ["CORE", "FEED", "VIEW", "TEXT"]);
             generateWordleGameEngineMatrix(fullCombinedArticleText);
         }
 
         function generateFindAWordGameMatrix(targetWordsArray) {
             const poolContainer = document.getElementById('faw-pool');
             const gridContainer = document.getElementById('faw-grid-target');
-            
-            poolContainer.innerHTML = "";
-            gridContainer.innerHTML = "";
-            fawSelectedCoords = [];
-            fawSolutionWordsMapping = {};
+            poolContainer.innerHTML = ""; gridContainer.innerHTML = ""; fawSolutionWordsMapping = {};
 
             targetWordsArray.forEach(word => {
                 fawSolutionWordsMapping[word] = { found: false };
-                const badge = document.createElement('span');
-                badge.className = "faw-badge";
-                badge.id = `faw-badge-${word}`;
-                badge.textContent = word;
-                poolContainer.appendChild(badge);
+                const badge = document.createElement('span'); badge.className = "faw-badge";
+                badge.id = `faw-badge-${word}`; badge.textContent = word; poolContainer.appendChild(badge);
             });
 
-            let flatGridMatrix = Array(fawGridDimension).fill(null).map(() => Array(fawGridDimension).fill('X'));
+            let matrix = Array(fawGridDimension).fill(null).map(() => Array(fawGridDimension).fill('X'));
             targetWordsArray.forEach((word, index) => {
-                const targetRow = index * 2;
+                const row = index * 2;
                 if(word.length <= fawGridDimension) {
-                    for(let charIdx = 0; charIdx < word.length; charIdx++) {
-                        flatGridMatrix[targetRow][charIdx] = word[charIdx];
-                    }
+                    for(let i = 0; i < word.length; i++) matrix[row][i] = word[i];
                 }
             });
 
-            const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-            for(let r=0; r<fawGridDimension; r++) {
-                for(let c=0; c<fawGridDimension; c++) {
-                    if(flatGridMatrix[r][c] === 'X') {
-                        flatGridMatrix[r][c] = alphabet[Math.floor(Math.random() * alphabet.length)];
-                    }
-                }
-            }
-
+            const alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
             gridContainer.style.gridTemplateColumns = `repeat(${fawGridDimension}, 1fr)`;
             for(let r=0; r<fawGridDimension; r++) {
                 for(let c=0; c<fawGridDimension; c++) {
-                    const cellNode = document.createElement('div');
-                    cellNode.className = "faw-cell";
-                    cellNode.textContent = flatGridMatrix[r][c];
-                    cellNode.dataset.row = r;
-                    cellNode.dataset.col = c;
-                    cellNode.onclick = () => handleFindAWordCellSelectionToggle(cellNode, flatGridMatrix[r][c], targetWordsArray);
-                    gridContainer.appendChild(cellNode);
+                    if(matrix[r][c] === 'X') matrix[r][c] = alpha[Math.floor(Math.random() * 26)];
+                    const cell = document.createElement('div'); cell.className = "faw-cell"; cell.textContent = matrix[r][c];
+                    cell.onclick = () => {
+                        if(cell.classList.contains('permanent')) return;
+                        cell.classList.toggle('selected');
+                        let checkStr = "";
+                        document.querySelectorAll('#faw-grid-target .faw-cell.selected').forEach(n => checkStr += n.textContent);
+                        targetWordsArray.forEach(w => {
+                            if (checkStr.includes(w) && !fawSolutionWordsMapping[w].found) {
+                                fawSolutionWordsMapping[w].found = true;
+                                document.getElementById(`faw-badge-${w}`).classList.add('found');
+                                document.querySelectorAll('#faw-grid-target .faw-cell.selected').forEach(n => { n.classList.remove('selected'); n.classList.add('permanent'); });
+                                triggerSystemToastNotification(`Word Unlocked: "${w}"!`);
+                            }
+                        });
+                    };
+                    gridContainer.appendChild(cell);
                 }
             }
-        }
-
-        function handleFindAWordCellSelectionToggle(cellNode, letterValue, originalTargetList) {
-            if(cellNode.classList.contains('permanent')) return;
-            cellNode.classList.toggle('selected');
-            
-            const totalActiveSelectedCells = document.querySelectorAll('#faw-grid-target .faw-cell.selected');
-            let compiledSelectedString = "";
-            totalActiveSelectedCells.forEach(node => compiledSelectedString += node.textContent);
-
-            originalTargetList.forEach(word => {
-                if (compiledSelectedString.includes(word) && !fawSolutionWordsMapping[word].found) {
-                    fawSolutionWordsMapping[word].found = true;
-                    document.getElementById(`faw-badge-${word}`).classList.add('found');
-                    
-                    totalActiveSelectedCells.forEach(node => {
-                        node.classList.remove('selected');
-                        node.classList.add('permanent');
-                    });
-                    
-                    triggerSystemToastNotification(`Match Found in Grid: "${word}"!`);
-                }
-            });
         }
 
         function generateWordleGameEngineMatrix(sourceArticleText) {
-            const filteredFiveLetterWords = sourceArticleText.toUpperCase().replace(/[^A-Z\s]/g, "").split(/\s+/).filter(w => w.length === 5);
-            wordleActiveTargetKeyword = filteredFiveLetterWords.length > 0 ? filteredFiveLetterWords[0] : "CORES";
-            wordleCurrentAttemptRow = 0;
-            wordleIsEngineTerminated = false;
+            const words = sourceArticleText.toUpperCase().replace(/[^A-Z\s]/g, "").split(/\s+/).filter(w => w.length === 5);
+            wordleActiveTargetKeyword = words.length > 0 ? words[0] : "CORES";
+            wordleCurrentAttemptRow = 0; wordleIsEngineTerminated = false;
 
-            const gridContainer = document.getElementById('wordle-grid-target');
-            const hintNode = document.getElementById('wordle-status-hint');
-            
-            gridContainer.innerHTML = "";
-            hintNode.textContent = "Click grid layout area below to bind active keyboard inputs. Press Enter to submit guesses.";
+            const grid = document.getElementById('wordle-grid-target');
+            grid.innerHTML = "";
+            document.getElementById('wordle-status-hint').textContent = "Tap grid block layout area below to bind active keyboard inputs. Submit using Enter key.";
 
             for (let r = 0; r < 5; r++) {
-                const rowStrip = document.createElement('div');
-                rowStrip.className = "wordle-row";
-                rowStrip.id = `wordle-row-id-${r}`;
-                
+                const row = document.createElement('div'); row.className = "wordle-row";
                 for (let c = 0; c < 5; c++) {
-                    const cell = document.createElement('div');
-                    cell.className = "wordle-cell";
-                    cell.id = `wordle-cell-coord-${r}-${c}`;
-                    rowStrip.appendChild(cell);
+                    const cell = document.createElement('div'); cell.className = "wordle-cell"; cell.id = `wd-cell-${r}-${c}`;
+                    row.appendChild(cell);
                 }
-                gridContainer.appendChild(rowStrip);
+                grid.appendChild(row);
             }
-
-            gridContainer.style.cursor = 'pointer';
-            gridContainer.onclick = () => document.getElementById('wordle-hidden-input').focus();
-            
-            const hiddenInput = document.getElementById('wordle-hidden-input');
-            hiddenInput.value = "";
-            hiddenInput.focus();
+            grid.onclick = () => document.getElementById('wordle-hidden-input').focus();
+            document.getElementById('wordle-hidden-input').value = "";
         }
 
         function handleWordleInputStep(e) {
             if (wordleIsEngineTerminated) return;
-            const currentGuessString = e.target.value.toUpperCase().replace(/[^A-Z]/g, "");
-            
+            const str = e.target.value.toUpperCase().replace(/[^A-Z]/g, "");
             for (let c = 0; c < 5; c++) {
-                const targetedCell = document.getElementById(`wordle-cell-coord-${wordleCurrentAttemptRow}-${c}`);
-                if (targetedCell) {
-                    targetedCell.textContent = currentGuessString[c] || "";
-                }
+                const cell = document.getElementById(`wd-cell-${wordleCurrentAttemptRow}-${c}`);
+                if (cell) cell.textContent = str[c] || "";
             }
         }
 
         function handleWordleKeydownStep(e) {
             if (wordleIsEngineTerminated) return;
             if (e.key === 'Enter') {
-                const hiddenInput = document.getElementById('wordle-hidden-input');
-                const userSubmittedGuess = hiddenInput.value.toUpperCase().replace(/[^A-Z]/g, "");
+                const input = document.getElementById('wordle-hidden-input');
+                const guess = input.value.toUpperCase().replace(/[^A-Z]/g, "");
 
-                if (userSubmittedGuess.length !== 5) {
-                    document.getElementById('wordle-status-hint').textContent = "⚠️ Guess value entry block string length must match exactly 5 characters.";
-                    return;
+                if (guess.length !== 5) {
+                    document.getElementById('wordle-status-hint').textContent = "⚠️ Guess must contain exactly 5 letters."; return;
                 }
 
-                let matchesCorrectCount = 0;
                 for (let i = 0; i < 5; i++) {
-                    const cellNode = document.getElementById(`wordle-cell-coord-${wordleCurrentAttemptRow}-${i}`);
-                    const letterCharacter = userSubmittedGuess[i];
-
-                    if (wordleActiveTargetKeyword[i] === letterCharacter) {
-                        cellNode.style.backgroundColor = "var(--correct-color)";
-                        cellNode.style.borderColor = "var(--correct-color)";
-                        cellNode.style.color = "#fff";
-                        matchesCorrectCount++;
-                    } else if (wordleActiveTargetKeyword.includes(letterCharacter)) {
-                        cellNode.style.backgroundColor = "var(--accent-yellow)";
-                        cellNode.style.borderColor = "var(--accent-yellow)";
-                        cellNode.style.color = "#fff";
+                    const cell = document.getElementById(`wd-cell-${wordleCurrentAttemptRow}-${i}`);
+                    if (wordleActiveTargetKeyword[i] === guess[i]) {
+                        cell.style.backgroundColor = "var(--correct-color)"; cell.style.color = "#fff";
+                    } else if (wordleActiveTargetKeyword.includes(guess[i])) {
+                        cell.style.backgroundColor = "var(--accent-yellow)"; cell.style.color = "#fff";
                     } else {
-                        cellNode.style.backgroundColor = "var(--text-muted)";
-                        cellNode.style.borderColor = "var(--text-muted)";
-                        cellNode.style.color = "#fff";
+                        cell.style.backgroundColor = "var(--text-muted)"; cell.style.color = "#fff";
                     }
                 }
 
-                if (userSubmittedGuess === wordleActiveTargetKeyword) {
-                    document.getElementById('wordle-status-hint').textContent = "🎉 Core Target Victory Unlocked! Matrix solution matched accurately.";
-                    wordleIsEngineTerminated = true;
-                    return;
+                if (guess === wordleActiveTargetKeyword) {
+                    document.getElementById('wordle-status-hint').textContent = "🎉 Wordle Match Resolved! Victory Unlocked."; wordleIsEngineTerminated = true; return;
                 }
 
-                wordleCurrentAttemptRow++;
-                hiddenInput.value = "";
-
+                wordleCurrentAttemptRow++; input.value = "";
                 if (wordleCurrentAttemptRow >= 5) {
-                    document.getElementById('wordle-status-hint').textContent = `💀 All attempts spent. Target key solution was: "${wordleActiveTargetKeyword}"`;
-                    wordleIsEngineTerminated = true;
-                } else {
-                    document.getElementById('wordle-status-hint').textContent = `Row index ${wordleCurrentAttemptRow}/5 evaluated. Proceed to alternative attempt matrix.`;
+                    document.getElementById('wordle-status-hint').textContent = `💀 Engine out of attempts. Target solution was: "${wordleActiveTargetKeyword}"`; wordleIsEngineTerminated = true;
                 }
             }
         }
 
         function updateFlashcardUIContainerDisplay() {
-            const counterDisplay = document.getElementById('fc-counter-display');
-            const mainContentDisplay = document.getElementById('fc-content-text');
-
-            counterDisplay.textContent = `Deck: ${USER_FLASHCARD_REPOSITORY.length} items`;
+            const countNode = document.getElementById('fc-counter-display');
+            const txtNode = document.getElementById('fc-content-text');
+            countNode.textContent = `Deck: ${USER_FLASHCARD_REPOSITORY.length} items`;
             
             if (USER_FLASHCARD_REPOSITORY.length === 0) {
-                mainContentDisplay.textContent = "No lookup metrics active. Tap individual words inside any article reading pop-up context to populate tracking data.";
-                return;
+                txtNode.textContent = "Tap individual words inside reading views to populate tracking items."; return;
             }
-
-            const targetedItemNode = USER_FLASHCARD_REPOSITORY[CURRENT_ACTIVE_FLASHCARD_INDEX];
-            if (IS_FLASHCARD_FLIPPED) {
-                mainContentDisplay.textContent = targetedItemNode.back;
-                mainContentDisplay.style.color = "var(--brand-color)";
-            } else {
-                mainContentDisplay.textContent = targetedItemNode.front;
-                mainContentDisplay.style.color = "var(--text-main)";
-            }
+            const card = USER_FLASHCARD_REPOSITORY[CURRENT_ACTIVE_FLASHCARD_INDEX];
+            txtNode.textContent = IS_FLASHCARD_FLIPPED ? card.back : card.front;
+            txtNode.style.color = IS_FLASHCARD_FLIPPED ? "var(--brand-color)" : "var(--text-main)";
         }
 
-        function flipActiveFlashcardNode() {
-            if (USER_FLASHCARD_REPOSITORY.length === 0) return;
-            IS_FLASHCARD_FLIPPED = !IS_FLASHCARD_FLIPPED;
+        function flipActiveFlashcardNode() { if(USER_FLASHCARD_REPOSITORY.length===0)return; IS_FLASHCARD_FLIPPED = !IS_FLASHCARD_FLIPPED; updateFlashcardUIContainerDisplay(); }
+        function cycleFlashcardIndex(offset) {
+            if(USER_FLASHCARD_REPOSITORY.length===0)return; IS_FLASHCARD_FLIPPED = false;
+            CURRENT_ACTIVE_FLASHCARD_INDEX = (CURRENT_ACTIVE_FLASHCARD_INDEX + offset + USER_FLASHCARD_REPOSITORY.length) % USER_FLASHCARD_REPOSITORY.length;
             updateFlashcardUIContainerDisplay();
         }
 
-        function cycleFlashcardIndex(directionalPointerOffset) {
-            if (USER_FLASHCARD_REPOSITORY.length === 0) return;
-            IS_FLASHCARD_FLIPPED = false;
-            
-            CURRENT_ACTIVE_FLASHCARD_INDEX += directionalPointerOffset;
-            
-            if (CURRENT_ACTIVE_FLASHCARD_INDEX >= USER_FLASHCARD_REPOSITORY.length) {
-                CURRENT_ACTIVE_FLASHCARD_INDEX = 0;
-            } else if (CURRENT_ACTIVE_FLASHCARD_INDEX < 0) {
-                CURRENT_ACTIVE_FLASHCARD_INDEX = USER_FLASHCARD_REPOSITORY.length - 1;
-            }
-            updateFlashcardUIContainerDisplay();
+        function registerCustomUserInjectedRSS() {
+            const field = document.getElementById('custom-rss-input-field');
+            const url = field.value.trim();
+            if (!url) return;
+            triggerSystemToastNotification("Ingesting custom configuration stream...");
+            executeXMLExtractionQuery(url, "Custom Ingest").then(() => {
+                INGESTED_PARSED_ARTICLES_POOL.sort((a) => a.originSource === "Custom Ingest" ? -1 : 1);
+                ACTIVE_FEED_DISPLAY_INDEX = 0; renderActiveFiveArticlesBatch(); toggleEngineSettingsView(); field.value = "";
+            });
         }
 
-        // --- 8. HIGH REGENCY LOCAL FALLBACK VECTOR GENERATOR ---
+        // --- HIGH REGENCY HIGH ENTROPY LOCAL FALLBACK ---
         function generateStructuralLocalFallbackDatabase() {
-            const sourcesList = ["Le Monde Wire", "BBC Global Portal", "Reuters Terminal Service", "France 24 Multi", "Deutsche Welle Core"];
+            const tags = ["Le Monde Wire", "BBC Global Portal", "Reuters Terminal Service", "Deutsche Welle Core"];
             for (let i = 1; i <= 25; i++) {
+                // Generates random alphanumeric tokens to prevent deterministic calculations from looping strings
+                const highEntropyHashSeed = 'vector-matrix-' + Math.random().toString(36).substring(2, 11) + i;
                 INGESTED_PARSED_ARTICLES_POOL.push({
-                    id: `local-fallback-node-id-${i}`,
-                    rawTitle: `Automated Journalism Transmission Pulse Sequence Alpha-${i}`,
-                    rawBodySnippet: `Analyzing advanced tracking arrays and operational performance indexes across structural application engine modules. Data confirms high-efficiency serialization pipelines are functional. Ensure components are balanced carefully.`,
-                    originSource: sourcesList[i % sourcesList.length],
-                    publishTimestamp: formatArticleTimestampString(new Date(Date.now() - (i * 3600000)).toUTCString()),
-                    imageAssetURL: `https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600&auto=format&fit=crop&q=60`,
+                    id: highEntropyHashSeed,
+                    rawTitle: `Automated Information Pulse Sequence Stream Alpha-${i}`,
+                    rawBodySnippet: `Analyzing performance metrics across multi-channel framework structures. Confirm technical integration nodes are balanced and system parameters are running within optimal limits. Use evaluation blocks if processing hangs.`,
+                    originSource: tags[i % tags.length],
+                    publishTimestamp: "Internal Backup Sync",
+                    imageAssetURL: `https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600`,
                     sourceRefLink: "#"
                 });
             }
