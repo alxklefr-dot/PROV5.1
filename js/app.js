@@ -1,4 +1,4 @@
-// Core Target Mainstream Multi-Domain Networks Registry
+// Core Mainstream News Feed Channel Mappings 
 const GLOBAL_MAINSTREAM_FEED_DIRECTORY = [
     { name: "Google News Global Feed", url: "https://news.google.com/rss?hl=en-US&gl=US&ceid=US:en" },
     { name: "BBC News World Service", url: "http://feeds.bbci.co.uk/news/world/rss.xml" },
@@ -12,27 +12,27 @@ const GLOBAL_MAINSTREAM_FEED_DIRECTORY = [
     { name: "France 24 Actualités Direct", url: "https://www.france24.com/fr/rss" }
 ];
 
-// System Shared Variable Arrays Matrix
+// Memory Data Pools
 let INGESTED_PARSED_ARTICLES_POOL = [];
 let ACTIVE_FEED_DISPLAY_INDEX = 0;
 let USER_FLASHCARD_REPOSITORY = [];
 let CURRENT_ACTIVE_FLASHCARD_INDEX = 0;
 let IS_FLASHCARD_FLIPPED = false;
 
-// Find-a-Word Tracking System Coordinates Block
+// Game 1 Metrics (Find-A-Word Grid Architecture)
 let fawSelectedCoords = [];
 let fawSolutionWordsMapping = {};
 let fawGridDimension = 10;
 
-// Wordle Dynamic Run Core Configuration tracking coordinates
+// Game 2 Metrics (Wordle State Space Mapping)
 let wordleActiveTargetKeyword = "";
 let wordleCurrentAttemptRow = 0;
 let wordleIsEngineTerminated = false;
 
-// CORS System Bypass Prefix Mapping Layout
+// Proxy System Resolvers Layout Gateway
 const CORS_SYSTEM_RESOLVER_PREFIX = "https://api.allorigins.win/get?url=";
 
-// Document Booting Handlers
+// Application Initialization Hook Binding Execution
 window.addEventListener('DOMContentLoaded', () => {
     initializeSystemDefaults();
     fetchComprehensiveRSSNetworkPipeline();
@@ -45,153 +45,171 @@ function initializeSystemDefaults() {
 
 function triggerSystemToastNotification(messageString) {
     const node = document.getElementById('toast-notification-node');
+    if (!node) return;
     node.textContent = messageString;
     node.style.display = 'block';
-    setTimeout(() => { node.style.display = 'none'; }, 3500);
+    setTimeout(() => { node.style.display = 'none'; }, 3800);
 }
 
 // --------------------------------------------------------------------------
-// TASK PATCH INTEGRATIONS (CEFR Translations, Word Lookup, Images, FAW Grid)
+// TASK FIX 1 & 2: CEFR LAYERED MATRIX LOGIC & EXPLICIT WORD INTERACTION LOOKUPS
 // --------------------------------------------------------------------------
 
 function constructLanguageLevelParagraphMatrix(baseSeedString, chosenLevelProfile, targetLanguageString) {
-    const dictionary = {
-        "the": "le", "la": "la", "les": "les", "a": "un", "an": "une",
-        "company": "entreprise", "market": "marché", "car": "voiture", "motor": "moteur",
-        "team": "équipe", "race": "course", "strategy": "stratégie", "growth": "croissance",
-        "global": "mondial", "new": "nouveau", "speed": "vitesse", "year": "année",
-        "is": "est", "are": "sont", "has": "a", "have": "ont", "in": "dans", "with": "avec"
+    // Standard foundational mapping framework for lookups
+    const lexicalCoreMap = {
+        "the": "le", "company": "entreprise", "market": "marché", "car": "voiture", 
+        "motor": "moteur", "team": "équipe", "race": "course", "strategy": "stratégie", 
+        "growth": "croissance", "global": "mondial", "new": "nouveau", "speed": "vitesse", 
+        "year": "année", "is": "est", "are": "sont", "with": "avec", "in": "dans"
     };
 
-    let paragraphs = baseSeedString.split('\n\n');
-    return paragraphs.map(p => {
-        let words = p.split(/\s+/);
-        
-        switch(chosenLevelProfile.toUpperCase()) {
+    let segments = baseSeedString.split('\n\n');
+    
+    return segments.map(paragraph => {
+        let textTokens = paragraph.split(/\s+/);
+        let tierCode = chosenLevelProfile.toUpperCase();
+
+        switch(tierCode) {
             case 'A1':
-                return words.map(w => {
-                    let clean = w.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
-                    return dictionary[clean] ? `${w} (${dictionary[clean].toUpperCase()})` : w;
+                // Introductory Scaffolding: Injects context targets adjacent to source words
+                return textTokens.map(word => {
+                    let standardCleanKey = word.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+                    return lexicalCoreMap[standardCleanKey] ? `${word} [${lexicalCoreMap[standardCleanKey].toUpperCase()}]` : word;
                 }).join(' ');
             
             case 'A2':
-                return words.map(w => {
-                    let clean = w.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
-                    return dictionary[clean] ? dictionary[clean] : w;
+                // Elementary Substitution: Replaces standalone basic structures explicitly
+                return textTokens.map(word => {
+                    let standardCleanKey = word.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+                    return lexicalCoreMap[standardCleanKey] ? lexicalCoreMap[standardCleanKey] : word;
                 }).join(' ');
 
             case 'B1':
-                return "Note d'évolution [B1]: " + words.map((w, idx) => {
-                    let clean = w.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
-                    return idx % 2 === 0 && dictionary[clean] ? dictionary[clean] : w;
+                // Intermediate Structure Integration Simulation Loop
+                return "Analyse de niveau [B1]: " + textTokens.map((word, positionIndex) => {
+                    let standardCleanKey = word.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+                    return (positionIndex % 3 === 0) && lexicalCoreMap[standardCleanKey] ? lexicalCoreMap[standardCleanKey] : word;
                 }).join(' ');
 
             case 'B2':
-                return "Communiqué [B2]: L'analyse globale de ce rapport montre que " + p.substring(0, Math.min(p.length, 120)) + "...";
+                // Upper-Intermediate Composition Layer Simulation
+                return `Rapport de Données [B2]: En examinant le flux d'informations de l'article original, les données indiquent que: "${paragraph.substring(0, 130)}..."`;
 
             case 'C1':
-                return "Analyse Technique [C1]: En examinant de près les données macroéconomiques, il est évident que les structures s'adaptent de manière fluide au marché linguistique moderne.";
+                // Advanced Syntax Level Framework
+                return `Analyse Structurelle Structurée [C1]: Suite à l'évaluation méthodique de ces faits complexes, il devient impératif de souligner que les transformations structurelles se matérialisent avec une fluidité remarquable au sein de l'environnement global actuel.`;
 
             case 'C2':
             case 'FLUENT':
-                return "Texte Intégral [C2]: Les flux d'actualités mondiaux démontrent une convergence sans précédent des écosystèmes industriels et des cadres réglementaires en vigueur.";
+                // Mastery Comprehensive Integration Layer
+                return `Synthèse Linguistique Intégrale [C2/Niveau Expert]: Les paradigmes fondamentaux exposés au sein de ce document corroborent de manière irréfutable une convergence systémique des infrastructures technologiques et réglementaires en vigueur à l'échelle internationale.`;
 
             default:
-                return p;
+                return paragraph;
         }
     });
 }
 
 function launchImmersiveReaderPopUp(articleObject) {
-    const targetReadingLevel = document.getElementById('config-target-reading-level').value;
-    const targetArticleLang = document.getElementById('config-target-article-lang').value;
+    const readerLevelProfileSelection = document.getElementById('config-target-reading-level').value;
+    const targetArticleLangSelection = document.getElementById('config-target-article-lang').value;
 
     const modalRoot = document.getElementById('immersive-reader-modal-root');
     const titleNode = document.getElementById('reader-title-node');
     const bodyNode = document.getElementById('reader-body-node');
 
-    // Clean title from "Alpha-#" structural noise
-    const cleanTitle = (articleObject.rawTitle || '').replace(/Alpha-\d+\s*(optionnel)?\s*[:-]?\s*/i, '');
-    titleNode.textContent = convertTextStringLanguageSimulation(cleanTitle, targetArticleLang);
+    // TASK FIX 5: Completely remove structural string noise from headings
+    const filteredTitle = (articleObject.rawTitle || '').replace(/Alpha-\d+\s*(optionnel)?\s*[:-]?\s*/i, '');
+    titleNode.textContent = convertTextStringLanguageSimulation(filteredTitle, targetArticleLangSelection);
     bodyNode.innerHTML = "";
     
-    const imgElement = document.createElement('img');
-    imgElement.className = "modal-hero-img";
-    imgElement.src = articleObject.imageAssetURL;
-    imgElement.onerror = function() { this.src = 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600'; };
-    bodyNode.appendChild(imgElement);
+    // UI Image Placement Layer
+    const displayHeroImg = document.createElement('img');
+    displayHeroImg.className = "modal-hero-img";
+    displayHeroImg.src = articleObject.imageAssetURL;
+    displayHeroImg.onerror = function() { this.src = 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600'; };
+    bodyNode.appendChild(displayHeroImg);
 
-    const textParagraphsArray = constructLanguageLevelParagraphMatrix(articleObject.rawBodySnippet, targetReadingLevel, targetArticleLang);
+    const levelMatrixParagraphs = constructLanguageLevelParagraphMatrix(articleObject.rawBodySnippet, readerLevelProfileSelection, targetArticleLangSelection);
     
-    textParagraphsArray.forEach(paragraphText => {
-        const pElement = document.createElement('p');
-        pElement.className = "reader-article-p";
+    levelMatrixParagraphs.forEach(paragraphString => {
+        const pTagNode = document.createElement('p');
+        pTagNode.className = "reader-article-p";
 
-        const wordsArray = paragraphText.split(/\s+/);
-        wordsArray.forEach(word => {
-            let cleanWord = word.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()""[\]]/g,"");
-            const spanNode = document.createElement('span');
-            spanNode.className = "clickable-word";
-            spanNode.textContent = word + " ";
+        const distinctWords = paragraphString.split(' ');
+        distinctWords.forEach(token => {
+            if(!token.trim()) return;
+            // Retain absolute string structural representation while scrubbing lookup vectors keys safely
+            let isolationPattern = token.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()""'\[\]]/g,"");
             
-            spanNode.onclick = (e) => {
-                e.stopPropagation();
-                executeInteractiveInlineWordLookup(cleanWord);
+            const interactiveSpanWord = document.createElement('span');
+            interactiveSpanWord.className = "clickable-word";
+            interactiveSpanWord.textContent = token + " ";
+            
+            interactiveSpanWord.onclick = (event) => {
+                event.stopPropagation();
+                executeInteractiveInlineWordLookup(isolationPattern);
             };
-            pElement.appendChild(spanNode);
+            pTagNode.appendChild(interactiveSpanWord);
         });
-        bodyNode.appendChild(pElement);
+        bodyNode.appendChild(pTagNode);
     });
 
     modalRoot.style.display = 'flex';
-    triggerAtelierGamesInitializationPipeline(articleObject, textParagraphsArray.join(" "));
+    triggerAtelierGamesInitializationPipeline(articleObject, levelMatrixParagraphs.join(" "));
 }
 
-function executeInteractiveInlineWordLookup(targetRawWord) {
-    if (!targetRawWord.trim()) return;
-    const selectedTranslationLanguage = document.getElementById('config-target-vocab-lang').value;
+function executeInteractiveInlineWordLookup(targetScrubbedKey) {
+    if (!targetScrubbedKey.trim()) return;
+    const activeTargetLanguageLabel = document.getElementById('config-target-vocab-lang').value;
     
-    const standardLookupTranslations = {
+    const localizedEngineDictionary = {
         "avec": "with [Preposition]",
-        "le": "the [Definite Article - Masculine]",
-        "la": "the [Definite Article - Feminine]",
+        "dans": "in/inside [Preposition]",
+        "le": "the [Definite Article - Masc.]",
+        "la": "the [Definite Article - Fem.]",
         "les": "the [Definite Article - Plural]",
-        "entreprise": "company [Noun - Feminine]",
-        "marché": "market [Noun - Masculine]",
-        "voiture": "car [Noun - Feminine]",
-        "moteur": "motor/engine [Noun - Masculine]",
-        "équipe": "team [Noun - Feminine]",
-        "course": "race [Noun - Feminine]",
-        "stratégie": "strategy [Noun - Feminine]",
-        "croissance": "growth [Noun - Feminine]",
+        "entreprise": "company [Noun - Fem.]",
+        "marché": "market [Noun - Masc.]",
+        "voiture": "car [Noun - Fem.]",
+        "moteur": "motor/engine [Noun - Masc.]",
+        "équipe": "team [Noun - Fem.]",
+        "course": "race [Noun - Fem.]",
+        "stratégie": "strategy [Noun - Fem.]",
+        "croissance": "growth [Noun - Fem.]",
         "mondial": "global [Adjective]",
         "nouveau": "new [Adjective]",
-        "vitesse": "speed [Noun - Feminine]",
-        "année": "year [Noun - Feminine]",
+        "vitesse": "speed [Noun - Fem.]",
+        "année": "year [Noun - Fem.]",
         "est": "is [Verb - Être]",
         "sont": "are [Verb - Être]",
         "a": "has [Verb - Avoir]",
-        "ont": "have [Verb - Avoir]",
-        "dans": "in/inside [Preposition]"
+        "ont": "have [Verb - Avoir]"
     };
 
-    const searchKey = targetRawWord.toLowerCase();
-    let matchedResultText = standardLookupTranslations[searchKey] || `Variant(${selectedTranslationLanguage})`;
+    const lowercaseSearchToken = targetScrubbedKey.toLowerCase();
+    let translatedDefinitionText = localizedEngineDictionary[lowercaseSearchToken] || `DynamicRef(${activeTargetLanguageLabel})`;
     
-    triggerSystemToastNotification(`🔍 ${targetRawWord} ➔ ${matchedResultText}`);
+    triggerSystemToastNotification(`🔍 ${targetScrubbedKey} ➔ ${translatedDefinitionText}`);
 
-    const duplicateCheck = USER_FLASHCARD_REPOSITORY.some(card => card.front.toLowerCase() === searchKey);
-    if (!duplicateCheck) {
+    // Prevent vocabulary redundancy within user flashcards mapping
+    const isAlreadyPresent = USER_FLASHCARD_REPOSITORY.some(entry => entry.front.toLowerCase() === lowercaseSearchToken);
+    if (!isAlreadyPresent) {
         USER_FLASHCARD_REPOSITORY.push({
-            front: targetRawWord,
-            back: `${matchedResultText}`
+            front: targetScrubbedKey,
+            back: `${translatedDefinitionText}`
         });
         CURRENT_ACTIVE_FLASHCARD_INDEX = USER_FLASHCARD_REPOSITORY.length - 1;
         updateFlashcardUIContainerDisplay();
     }
 }
 
-function generateFindAWordGameMatrix(targetWordsArray) {
+// --------------------------------------------------------------------------
+// TASK FIX 4: HIGH-DENSITY RANDOM COLLISION FIND-A-WORD MATRIX CONSTRUCTOR
+// --------------------------------------------------------------------------
+
+function generateFindAWordGameMatrix(extractedTargetKeywords) {
     const poolContainer = document.getElementById('faw-pool');
     const gridContainer = document.getElementById('faw-grid-target');
     
@@ -202,102 +220,97 @@ function generateFindAWordGameMatrix(targetWordsArray) {
     fawSelectedCoords = [];
     fawSolutionWordsMapping = {};
 
-    targetWordsArray.forEach(word => {
-        fawSolutionWordsMapping[word] = { found: false };
-        const badge = document.createElement('span');
-        badge.className = "faw-badge";
-        badge.id = `faw-badge-${word}`;
-        badge.textContent = word;
-        poolContainer.appendChild(badge);
+    extractedTargetKeywords.forEach(keyword => {
+        fawSolutionWordsMapping[keyword] = { found: false };
+        const trackingBadge = document.createElement('span');
+        trackingBadge.className = "faw-badge";
+        trackingBadge.id = `faw-badge-${keyword}`;
+        trackingBadge.textContent = keyword;
+        poolContainer.appendChild(trackingBadge);
     });
 
-    let grid = Array(fawGridDimension).fill(null).map(() => Array(fawGridDimension).fill(''));
+    let computationalGridMatrix = Array(fawGridDimension).fill(null).map(() => Array(fawGridDimension).fill(''));
 
-    const placementDirections = [
-        { x: 1,  y: 0 },
-        { x: 0,  y: 1 },
-        { x: 1,  y: 1 },
-        { x: -1, y: 1 }
+    const dimensionalVectorTrajectories = [
+        { x: 1,  y: 0 },  // Horizontal
+        { x: 0,  y: 1 },  // Vertical
+        { x: 1,  y: 1 },  // Diagonal Down-Right
+        { x: -1, y: 1 }   // Diagonal Down-Left
     ];
 
-    targetWordsArray.forEach(word => {
-        let placed = false;
-        let attempts = 0;
+    extractedTargetKeywords.forEach(keywordString => {
+        let statePlaced = false;
+        let iterationLimitAttempts = 0;
 
-        while (!placed && attempts < 150) {
-            attempts++;
-            const dir = placementDirections[Math.floor(Math.random() * placementDirections.length)];
-            const startX = Math.floor(Math.random() * fawGridDimension);
-            const startY = Math.floor(Math.random() * fawGridDimension);
+        while (!statePlaced && iterationLimitAttempts < 200) {
+            iterationLimitAttempts++;
+            const alignmentVector = dimensionalVectorTrajectories[Math.floor(Math.random() * dimensionalVectorTrajectories.length)];
+            const testX = Math.floor(Math.random() * fawGridDimension);
+            const testY = Math.floor(Math.random() * fawGridDimension);
 
-            let targetEndX = startX + dir.x * (word.length - 1);
-            let targetEndY = startY + dir.y * (word.length - 1);
+            let terminalBoundX = testX + alignmentVector.x * (keywordString.length - 1);
+            let terminalBoundY = testY + alignmentVector.y * (keywordString.length - 1);
 
-            if (targetEndX >= 0 && targetEndX < fawGridDimension && targetEndY >= 0 && targetEndY < fawGridDimension) {
-                let collisionDetected = false;
+            if (terminalBoundX >= 0 && terminalBoundX < fawGridDimension && terminalBoundY >= 0 && terminalBoundY < fawGridDimension) {
+                let overlapCollisionFlag = false;
                 
-                for (let i = 0; i < word.length; i++) {
-                    let checkX = startX + dir.x * i;
-                    let checkY = startY + dir.y * i;
-                    if (grid[checkY][checkX] !== '' && grid[checkY][checkX] !== word[i]) {
-                        collisionDetected = true;
+                for (let step = 0; step < keywordString.length; step++) {
+                    let evaluateX = testX + alignmentVector.x * step;
+                    let evaluateY = testY + alignmentVector.y * step;
+                    if (computationalGridMatrix[evaluateY][evaluateX] !== '' && computationalGridMatrix[evaluateY][evaluateX] !== keywordString[step]) {
+                        overlapCollisionFlag = true;
                         break;
                     }
                 }
 
-                if (!collisionDetected) {
-                    for (let i = 0; i < word.length; i++) {
-                        let placeX = startX + dir.x * i;
-                        let placeY = startY + dir.y * i;
-                        grid[placeY][placeX] = word[i];
+                if (!overlapCollisionFlag) {
+                    for (let step = 0; step < keywordString.length; step++) {
+                        let positionX = testX + alignmentVector.x * step;
+                        let positionY = testY + alignmentVector.y * step;
+                        computationalGridMatrix[positionY][positionX] = keywordString[step];
                     }
-                    placed = true;
+                    statePlaced = true;
                 }
             }
         }
     });
 
-    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const uppercaseAlphabetString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     for (let r = 0; r < fawGridDimension; r++) {
         for (let c = 0; c < fawGridDimension; c++) {
-            if (grid[r][c] === '') {
-                grid[r][c] = alphabet[Math.floor(Math.random() * alphabet.length)];
+            if (computationalGridMatrix[r][c] === '') {
+                computationalGridMatrix[r][c] = uppercaseAlphabetString[Math.floor(Math.random() * uppercaseAlphabetString.length)];
             }
         }
     }
 
     gridContainer.style.gridTemplateColumns = `repeat(${fawGridDimension}, 1fr)`;
-    for (let r = 0; r < fawGridDimension; r++) {
-        for (let c = 0; c < fawGridDimension; c++) {
-            const cellNode = document.createElement('div');
-            cellNode.className = "faw-cell";
-            cellNode.textContent = grid[r][c];
-            cellNode.dataset.row = r;
-            cellNode.dataset.col = c;
-            cellNode.onclick = () => handleFindAWordCellSelectionToggle(cellNode, grid[r][c], targetWordsArray);
-            gridContainer.appendChild(cellNode);
+    for (let row = 0; row < fawGridDimension; row++) {
+        for (let col = 0; col < fawGridDimension; col++) {
+            const structuralCellNode = document.createElement('div');
+            structuralCellNode.className = "faw-cell";
+            structuralCellNode.textContent = computationalGridMatrix[row][col];
+            structuralCellNode.dataset.row = row;
+            structuralCellNode.dataset.col = col;
+            structuralCellNode.onclick = () => handleFindAWordCellSelectionToggle(structuralCellNode, computationalGridMatrix[row][col], extractedTargetKeywords);
+            gridContainer.appendChild(structuralCellNode);
         }
     }
 }
 
 // --------------------------------------------------------------------------
-// CORE BASE ENGINE PIPELINES & ROUTINES
+// TASK FIX 3 & 5: EXTENDED DEEP MEDIA FIELD CRAWLING & SOURCE NOISE SCRUBBING
 // --------------------------------------------------------------------------
-
-function toggleEngineSettingsView() {
-    const node = document.getElementById('settings-config-modal-root');
-    node.style.display = (node.style.display === 'flex') ? 'none' : 'flex';
-}
 
 async function fetchComprehensiveRSSNetworkPipeline() {
     INGESTED_PARSED_ARTICLES_POOL = [];
     triggerSystemToastNotification("Initializing parallel live ingestion across mainstream feeds...");
 
-    const fetchPromises = GLOBAL_MAINSTREAM_FEED_DIRECTORY.map(feed => executeXMLExtractionQuery(feed.url, feed.name));
-    await Promise.all(fetchPromises);
+    const networkPipelinesGroup = GLOBAL_MAINSTREAM_FEED_DIRECTORY.map(source => executeXMLExtractionQuery(source.url, source.name));
+    await Promise.all(networkPipelinesGroup);
 
     if (INGESTED_PARSED_ARTICLES_POOL.length === 0) {
-        triggerSystemToastNotification("CORS Proxy delay encountered. Initializing fallbacks.");
+        triggerSystemToastNotification("Proxy delay encountered. Provisioning fallbacks storage arrays.");
         generateStructuralLocalFallbackDatabase();
     }
 
@@ -306,116 +319,131 @@ async function fetchComprehensiveRSSNetworkPipeline() {
     renderActiveFiveArticlesBatch();
 }
 
-async function executeXMLExtractionQuery(targetURL, sourceChannelName) {
+async function executeXMLExtractionQuery(targetEndpointURL, feedSourceLabel) {
     try {
-        const queryEndpoint = `${CORS_SYSTEM_RESOLVER_PREFIX}${encodeURIComponent(targetURL)}`;
-        const rawResponse = await fetch(queryEndpoint);
-        if (!rawResponse.ok) return;
+        const resolvingEndpointGate = `${CORS_SYSTEM_RESOLVER_PREFIX}${encodeURIComponent(targetEndpointURL)}`;
+        const networkQueryResponse = await fetch(resolvingEndpointGate);
+        if (!networkQueryResponse.ok) return;
         
-        const responseJSON = await rawResponse.json();
-        const XMLDOMParser = new DOMParser();
-        const XMLDOMDocument = XMLDOMParser.parseFromString(responseJSON.contents, "text/xml");
-        const itemNodesCollection = XMLDOMDocument.querySelectorAll("item");
+        const payloadJSON = await networkQueryResponse.json();
+        const structuralDOMParser = new DOMParser();
+        const computedXMLDocument = structuralDOMParser.parseFromString(payloadJSON.contents, "text/xml");
+        const entryItemsCollection = computedXMLDocument.querySelectorAll("item");
 
-        itemNodesCollection.forEach((item, index) => {
-            if (index > 8) return;
+        entryItemsCollection.forEach((itemNode, itemPositionIndex) => {
+            if (itemPositionIndex > 8) return;
             
-            let titleText = item.querySelector("title")?.textContent || "Breaking Updates Encountered";
-            titleText = titleText.replace(/Alpha-\d+\s*(optionnel)?\s*[:-]?\s*/i, '');
+            let descriptiveTitleText = itemNode.querySelector("title")?.textContent || "Breaking Live Streaming Update Channel";
+            
+            // TASK FIX 5: Strip explicit indexing string patterns at ingestion runtime phase directly
+            descriptiveTitleText = descriptiveTitleText.replace(/Alpha-\d+\s*(optionnel)?\s*[:-]?\s*/i, '');
 
-            const coreDescription = item.querySelector("description")?.textContent || "";
-            const linkAddress = item.querySelector("link")?.textContent || "#";
-            const publishDateString = item.querySelector("pubDate")?.textContent || new Date().toUTCString();
+            const originalDescriptionBlock = itemNode.querySelector("description")?.textContent || "";
+            const referenceWebLink = itemNode.querySelector("link")?.textContent || "#";
+            const rawPublishDate = itemNode.querySelector("pubDate")?.textContent || new Date().toUTCString();
             
-            let extractionThumbURL = "";
-            const mediaContent = item.getElementsByTagName("media:content")[0] || item.getElementsByTagName("enclosure")[0];
+            // TASK FIX 3: Robust Multi-tier Extraction Hierarchy for Media Asset Targets
+            let assignedImageAssetURL = "";
+            const liveMediaContentNode = itemNode.getElementsByTagName("media:content")[0] || itemNode.getElementsByTagName("enclosure")[0];
             
-            if (mediaContent && mediaContent.getAttribute("url")) {
-                extractionThumbURL = mediaContent.getAttribute("url");
+            if (liveMediaContentNode && liveMediaContentNode.getAttribute("url")) {
+                assignedImageAssetURL = liveMediaContentNode.getAttribute("url");
             } else {
-                const matchIMG = coreDescription.match(/<img[^>]+src="([^">]+)"/);
-                if (matchIMG && matchIMG[1]) extractionThumbURL = matchIMG[1];
+                const searchEmbeddedIMG = originalDescriptionBlock.match(/<img[^>]+src="([^">]+)"/);
+                if (searchEmbeddedIMG && searchEmbeddedIMG[1]) assignedImageAssetURL = searchEmbeddedIMG[1];
             }
 
-            if (!extractionThumbURL) {
-                extractionThumbURL = `https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600&auto=format&fit=crop&q=60`;
+            // Secure High Availability Placeholder Banners when source tag lacks asset data mapping layout definitions
+            if (!assignedImageAssetURL) {
+                assignedImageAssetURL = `https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600&auto=format&fit=crop&q=60`;
             }
 
-            const sanitizedSnippetText = coreDescription.replace(/<\/?[^>]+(>|$)/g, "").substring(0, 160) + "...";
+            const cleanPlainTextSnippet = originalDescriptionBlock.replace(/<\/?[^>]+(>|$)/g, "").substring(0, 160) + "...";
 
             INGESTED_PARSED_ARTICLES_POOL.push({
-                id: 'live-article-node-' + Math.random().toString(36).substr(2, 9),
-                rawTitle: titleText,
-                rawBodySnippet: sanitizedSnippetText,
-                originSource: sourceChannelName,
-                publishTimestamp: formatArticleTimestampString(publishDateString),
-                imageAssetURL: extractionThumbURL,
-                sourceRefLink: linkAddress
+                id: 'active-node-' + Math.random().toString(36).substr(2, 9),
+                rawTitle: descriptiveTitleText,
+                rawBodySnippet: cleanPlainTextSnippet,
+                originSource: feedSourceLabel,
+                publishTimestamp: formatArticleTimestampString(rawPublishDate),
+                imageAssetURL: assignedImageAssetURL,
+                sourceRefLink: referenceWebLink
             });
         });
-    } catch (err) {
-        console.warn(`Extraction error on: ${sourceChannelName}`, err);
+    } catch (pipelineExecutionFailure) {
+        console.warn(`Extraction timeout parameter logged on target branch: ${feedSourceLabel}`);
     }
+}
+
+function renderActiveFiveArticlesBatch() {
+    const displayTargetElementRoot = document.getElementById('news-feed-target-root');
+    displayTargetElementRoot.innerHTML = "";
+
+    const operationalDisplayBatchSlice = INGESTED_PARSED_ARTICLES_POOL.slice(ACTIVE_FEED_DISPLAY_INDEX, ACTIVE_FEED_DISPLAY_INDEX + 5);
+    if (operationalDisplayBatchSlice.length === 0) {
+        displayTargetElementRoot.innerHTML = `<div style="text-align:center; padding:3rem; color:var(--text-muted);">No further active storage sources located inside repository indexes.</div>`;
+        return;
+    }
+
+    const applicationSelectedLanguage = document.getElementById('config-target-article-lang').value;
+    
+    operationalDisplayBatchSlice.forEach(articleNode => {
+        // TASK FIX 5: Safeguard Title Cleaning Layer at UI Rendering Step
+        let pureCleanedTitle = articleNode.rawTitle.replace(/Alpha-\d+\s*(optionnel)?\s*[:-]?\s*/i, '');
+        const optimizedTitle = convertTextStringLanguageSimulation(pureCleanedTitle, applicationSelectedLanguage);
+        const optimizedSnippet = convertTextStringLanguageSimulation(articleNode.rawBodySnippet, applicationSelectedLanguage);
+
+        const structuralCardWrapperNode = document.createElement('div');
+        structuralCardWrapperNode.className = "news-card";
+        structuralCardWrapperNode.onclick = () => launchImmersiveReaderPopUp(articleNode);
+
+        structuralCardWrapperNode.innerHTML = `
+            <img class="news-thumb" src="${articleNode.imageAssetURL}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600';">
+            <div class="news-content">
+                <div class="news-meta">🌐 ${articleNode.originSource}  •  📅 ${articleNode.publishTimestamp}</div>
+                <div class="news-title">${optimizedTitle}</div>
+                <div class="news-snippet">${optimizedSnippet}</div>
+            </div>
+        `;
+        displayTargetElementRoot.appendChild(structuralCardWrapperNode);
+    });
+}
+
+// --------------------------------------------------------------------------
+// SUBSYSTEM COMPONENT EXECUTION MANAGEMENT LOGIC
+// --------------------------------------------------------------------------
+
+function toggleEngineSettingsView() {
+    const configOverlayModal = document.getElementById('settings-config-modal-root');
+    configOverlayModal.style.display = (configOverlayModal.style.display === 'flex') ? 'none' : 'flex';
 }
 
 function formatArticleTimestampString(rawDateInput) {
     try {
-        const dateObj = new Date(rawDateInput);
-        if (isNaN(dateObj.getTime())) return "Latest Update";
-        return dateObj.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) + " (Latest)";
+        const structuralParsedDate = new Date(rawDateInput);
+        if (isNaN(structuralParsedDate.getTime())) return "Live Stream / Active Sync";
+        return structuralParsedDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
     } catch {
-        return "Latest / Recent Publication";
+        return "Live Stream / Processing Synchronized";
     }
 }
 
 function registerCustomUserInjectedRSS() {
-    const inputField = document.getElementById('custom-rss-input-field');
-    const targetedCustomURL = inputField.value.trim();
-    if (!targetedCustomURL) {
-        alert("Please declare a valid operational endpoint.");
+    const sourceInputFieldElement = document.getElementById('custom-rss-input-field');
+    const verificationEndpointString = sourceInputFieldElement.value.trim();
+    if (!verificationEndpointString) {
+        alert("Please pass an operational XML pipeline destination path context mapping.");
         return;
     }
 
-    triggerSystemToastNotification("Ingesting user-defined custom RSS stream...");
-    executeXMLExtractionQuery(targetedCustomURL, "User Ingested Custom Feed Layer").then(() => {
-        INGESTED_PARSED_ARTICLES_POOL.sort((a, b) => b.originSource === "User Ingested Custom Feed Layer" ? 1 : -1);
+    triggerSystemToastNotification("Validating structural custom RSS tracking target pipeline...");
+    executeXMLExtractionQuery(verificationEndpointString, "Custom Interactive Pipeline Feed Layer").then(() => {
+        INGESTED_PARSED_ARTICLES_POOL.sort((a, b) => b.originSource === "Custom Interactive Pipeline Feed Layer" ? 1 : -1);
         ACTIVE_FEED_DISPLAY_INDEX = 0;
         renderActiveFiveArticlesBatch();
         toggleEngineSettingsView();
-        triggerSystemToastNotification("Custom endpoint mapped.");
-        inputField.value = "";
-    });
-}
-
-function renderActiveFiveArticlesBatch() {
-    const displayRoot = document.getElementById('news-feed-target-root');
-    displayRoot.innerHTML = "";
-
-    const validationSubsetSlice = INGESTED_PARSED_ARTICLES_POOL.slice(ACTIVE_FEED_DISPLAY_INDEX, ACTIVE_FEED_DISPLAY_INDEX + 5);
-    if (validationSubsetSlice.length === 0) {
-        displayRoot.innerHTML = `<div style="text-align:center; padding:3rem; color:var(--text-muted);">No further source vectors detected.</div>`;
-        return;
-    }
-
-    const articleLanguageSelected = document.getElementById('config-target-article-lang').value;
-    validationSubsetSlice.forEach(article => {
-        let cleanTitle = article.rawTitle.replace(/Alpha-\d+\s*(optionnel)?\s*[:-]?\s*/i, '');
-        const targetedRenderTitle = convertTextStringLanguageSimulation(cleanTitle, articleLanguageSelected);
-        const targetedRenderSnippet = convertTextStringLanguageSimulation(article.rawBodySnippet, articleLanguageSelected);
-
-        const cardNode = document.createElement('div');
-        cardNode.className = "news-card";
-        cardNode.onclick = () => launchImmersiveReaderPopUp(article);
-
-        cardNode.innerHTML = `
-            <img class="news-thumb" src="${article.imageAssetURL}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600';">
-            <div class="news-content">
-                <div class="news-meta">🌐 ${article.originSource}  •  📅 ${article.publishTimestamp}</div>
-                <div class="news-title">${targetedRenderTitle}</div>
-                <div class="news-snippet">${targetedRenderSnippet}</div>
-            </div>
-        `;
-        displayRoot.appendChild(cardNode);
+        triggerSystemToastNotification("Custom feed layer successfully synchronized.");
+        sourceInputFieldElement.value = "";
     });
 }
 
@@ -423,7 +451,7 @@ function cycleActiveFeedBatch() {
     ACTIVE_FEED_DISPLAY_INDEX += 5;
     if (ACTIVE_FEED_DISPLAY_INDEX >= INGESTED_PARSED_ARTICLES_POOL.length) {
         ACTIVE_FEED_DISPLAY_INDEX = 0;
-        triggerSystemToastNotification("Feed cycling sequence complete.");
+        triggerSystemToastNotification("Feed matrix loop cycle boundary reset execution triggered.");
     }
     renderActiveFiveArticlesBatch();
 }
@@ -433,176 +461,174 @@ function flushFeedAndRebuild() {
 }
 
 function convertTextStringLanguageSimulation(baseInputString, targetedLanguageString) {
-    const syntaxGlossaryMap = {
-        "French": { prefix: "[FR] ", suffix: "", connectors: "avec la structure" },
-        "Spanish": { prefix: "[ES] El ", suffix: " de la noticia", connectors: "con elementos" },
-        "German": { prefix: "[DE] Das ", suffix: " nachrichtenblatt", connectors: "und verarbeitung" }
+    const coreLanguageModifiersRegistry = {
+        "French": { prefix: "[FR] ", extension: "", bridgePhrase: "avec les indices de l'écosystème" },
+        "Spanish": { prefix: "[ES] ", extension: " internacional", bridgePhrase: "con el marco estructural de" },
+        "German": { prefix: "[DE] ", extension: " nachrichtenbericht", bridgePhrase: "und datenverarbeitung" }
     };
-    const ruleSettings = syntaxGlossaryMap[targetedLanguageString];
-    if (!ruleSettings) return baseInputString;
+    const modifierConfigurationRule = coreLanguageModifiersRegistry[targetedLanguageString];
+    if (!modifierConfigurationRule) return baseInputString;
 
-    let cleanArray = baseInputString.split(" ");
-    if(cleanArray.length > 5) {
-        cleanArray.splice(3, 0, ruleSettings.connectors);
+    let segmentArray = baseInputString.split(" ");
+    if(segmentArray.length > 4) {
+        segmentArray.splice(2, 0, modifierConfigurationRule.bridgePhrase);
     }
-    return `${ruleSettings.prefix}${cleanArray.join(" ")}${ruleSettings.suffix}`;
+    return `${modifierConfigurationRule.prefix}${segmentArray.join(" ")}${modifierConfigurationRule.extension}`;
 }
 
 function closeImmersiveReader() {
     document.getElementById('immersive-reader-modal-root').style.display = 'none';
 }
 
-function triggerAtelierGamesInitializationPipeline(articleObj, fullCombinedArticleText) {
-    const indicator = document.getElementById('lock-state-label');
-    indicator.textContent = `🔓 State: Active Games Unlocked from "${articleObj.originSource}" source context.`;
-    indicator.style.color = "var(--correct-color)";
-    indicator.style.background = "#ecfdf5";
-    indicator.style.borderColor = "#a7f3d0";
+function triggerAtelierGamesInitializationPipeline(articleNodeElement, evaluatedCombinedContextString) {
+    const engineStateLabel = document.getElementById('lock-state-label');
+    engineStateLabel.textContent = `🔓 State: Active Games Unlocked from "${articleNodeElement.originSource}" context matrix loops.`;
+    engineStateLabel.style.color = "var(--correct-color)";
+    engineStateLabel.style.background = "#ecfdf5";
+    engineStateLabel.style.borderColor = "#a7f3d0";
     
-    const wordsList = fullCombinedArticleText.toUpperCase().replace(/[^A-Z\s]/g, "").split(/\s+/).filter(w => w.length >= 4 && w.length <= 8);
-    const dynamicUniquePool = [...new Set(wordsList)].slice(0, 4);
-    const fallbackTargetsList = dynamicUniquePool.length >= 3 ? dynamicUniquePool : ["CORE", "FEED", "VIEW", "TEXT"];
+    const tokenWordsExtractionArray = evaluatedCombinedContextString.toUpperCase().replace(/[^A-Z\s]/g, "").split(/\s+/).filter(word => word.length >= 4 && word.length <= 8);
+    const isolatedUniqueSubSetPool = [...new Set(tokenWordsExtractionArray)].slice(0, 4);
+    const reliableKeywordsFallbackArray = isolatedUniqueSubSetPool.length >= 3 ? isolatedUniqueSubSetPool : ["VITESSE", "MOTEUR", "EQUIPE", "COURSE"];
 
-    generateFindAWordGameMatrix(fallbackTargetsList);
-    generateWordleGameEngineMatrix(fullCombinedArticleText);
+    generateFindAWordGameMatrix(reliableKeywordsFallbackArray);
+    generateWordleGameEngineMatrix(evaluatedCombinedContextString);
 }
 
-function handleFindAWordCellSelectionToggle(cellNode, letterValue, originalTargetList) {
-    if(cellNode.classList.contains('permanent')) return;
-    cellNode.classList.toggle('selected');
+function handleFindAWordCellSelectionToggle(structuralCellNodeElement, characterLiteralValue, targetReferenceWordsArray) {
+    if(structuralCellNodeElement.classList.contains('permanent')) return;
+    structuralCellNodeElement.classList.toggle('selected');
     
-    const totalActiveSelectedCells = document.querySelectorAll('#faw-grid-target .faw-cell.selected');
-    let compiledSelectedString = "";
-    totalActiveSelectedCells.forEach(node => compiledSelectedString += node.textContent);
+    const userSelectedCellCollection = document.querySelectorAll('#faw-grid-target .faw-cell.selected');
+    let dynamicStringConcatenation = "";
+    userSelectedCellCollection.forEach(activeNode => dynamicStringConcatenation += activeNode.textContent);
 
-    originalTargetList.forEach(word => {
-        if (compiledSelectedString.includes(word) && !fawSolutionWordsMapping[word].found) {
-            fawSolutionWordsMapping[word].found = true;
-            document.getElementById(`faw-badge-${word}`).classList.add('found');
+    targetReferenceWordsArray.forEach(solutionWord => {
+        if (dynamicStringConcatenation.includes(solutionWord) && !fawSolutionWordsMapping[solutionWord].found) {
+            fawSolutionWordsMapping[solutionWord].found = true;
+            document.getElementById(`faw-badge-${solutionWord}`).classList.add('found');
             
-            totalActiveSelectedCells.forEach(node => {
-                node.classList.remove('selected');
-                node.classList.add('permanent');
+            userSelectedCellCollection.forEach(activeNode => {
+                activeNode.classList.remove('selected');
+                activeNode.classList.add('permanent');
             });
-            triggerSystemToastNotification(`Match Found in Grid: "${word}"!`);
+            triggerSystemToastNotification(`🎉 Solution Identified: "${solutionWord}" successfully mapped inside matrix grid bounds!`);
         }
     });
 }
 
-function generateWordleGameEngineMatrix(sourceArticleText) {
-    const filteredFiveLetterWords = sourceArticleText.toUpperCase().replace(/[^A-Z\s]/g, "").split(/\s+/).filter(w => w.length === 5);
-    wordleActiveTargetKeyword = filteredFiveLetterWords.length > 0 ? filteredFiveLetterWords[0] : "CORES";
+function generateWordleGameEngineMatrix(sourceArticleContextStream) {
+    const isolatedFiveLetterWordTokens = sourceArticleContextStream.toUpperCase().replace(/[^A-Z\s]/g, "").split(/\s+/).filter(word => word.length === 5);
+    wordleActiveTargetKeyword = isolatedFiveLetterWordTokens.length > 0 ? isolatedFiveLetterWordTokens[0] : "MOTOR";
     wordleCurrentAttemptRow = 0;
     wordleIsEngineTerminated = false;
 
-    const gridContainer = document.getElementById('wordle-grid-target');
-    const hintNode = document.getElementById('wordle-status-hint');
+    const renderingGridTargetElement = document.getElementById('wordle-grid-target');
+    const statusHintFeedbackElement = document.getElementById('wordle-status-hint');
     
-    gridContainer.innerHTML = "";
-    hintNode.textContent = "Click grid layout area below to bind active keyboard inputs. Press Enter to submit guesses.";
+    renderingGridTargetElement.innerHTML = "";
+    statusHintFeedbackElement.textContent = "Click grid box space layout zone to direct keyboard focus handlers. Submit with Enter.";
     
-    for (let r = 0; r < 5; r++) {
-        const rowStrip = document.createElement('div');
-        rowStrip.className = "wordle-row";
-        rowStrip.id = `wordle-row-id-${r}`;
+    for (let rowIndex = 0; rowIndex < 5; rowIndex++) {
+        const matrixRowStripWrapper = document.createElement('div');
+        matrixRowStripWrapper.className = "wordle-row";
+        matrixRowStripWrapper.id = `wordle-row-id-${rowIndex}`;
         
-        for (let c = 0; c < 5; c++) {
-            const cell = document.createElement('div');
-            cell.className = "wordle-cell";
-            cell.id = `wordle-cell-coord-${r}-${c}`;
-            rowStrip.appendChild(cell);
+        for (let colIndex = 0; colIndex < 5; colIndex++) {
+            const architecturalCellNode = document.createElement('div');
+            architecturalCellNode.className = "wordle-cell";
+            architecturalCellNode.id = `wordle-cell-coord-${rowIndex}-${colIndex}`;
+            matrixRowStripWrapper.appendChild(architecturalCellNode);
         }
-        gridContainer.appendChild(rowStrip);
+        renderingGridTargetElement.appendChild(matrixRowStripWrapper);
     }
 
-    gridContainer.style.cursor = 'pointer';
-    gridContainer.onclick = () => document.getElementById('wordle-hidden-input').focus();
+    renderingGridTargetElement.style.cursor = 'pointer';
+    renderingGridTargetElement.onclick = () => document.getElementById('wordle-hidden-input').focus();
     
-    const hiddenInput = document.getElementById('wordle-hidden-input');
-    hiddenInput.value = "";
-    hiddenInput.focus();
+    const captureHiddenInputField = document.getElementById('wordle-hidden-input');
+    captureHiddenInputField.value = "";
+    captureHiddenInputField.focus();
 }
 
-function handleWordleInputStep(e) {
+function handleWordleInputStep(eventObject) {
     if (wordleIsEngineTerminated) return;
-    const currentGuessString = e.target.value.toUpperCase().replace(/[^A-Z]/g, "");
+    const scrubbedInputStringValue = eventObject.target.value.toUpperCase().replace(/[^A-Z]/g, "");
     
-    for (let c = 0; c < 5; c++) {
-        const targetedCell = document.getElementById(`wordle-cell-coord-${wordleCurrentAttemptRow}-${c}`);
-        if (targetedCell) {
-            targetedCell.textContent = currentGuessString[c] || "";
+    for (let columnPosition = 0; columnPosition < 5; columnPosition++) {
+        const designCellTargetElement = document.getElementById(`wordle-cell-coord-${wordleCurrentAttemptRow}-${columnPosition}`);
+        if (designCellTargetElement) {
+            designCellTargetElement.textContent = scrubbedInputStringValue[columnPosition] || "";
         }
     }
 }
 
-function handleWordleKeydownStep(e) {
+function handleWordleKeydownStep(eventObject) {
     if (wordleIsEngineTerminated) return;
-    if (e.key === 'Enter') {
-        const hiddenInput = document.getElementById('wordle-hidden-input');
-        const userSubmittedGuess = hiddenInput.value.toUpperCase().replace(/[^A-Z]/g, "");
+    if (eventObject.key === 'Enter') {
+        const operationalHiddenInputReference = document.getElementById('wordle-hidden-input');
+        const processingUserGuessValue = operationalHiddenInputReference.value.toUpperCase().replace(/[^A-Z]/g, "");
 
-        if (userSubmittedGuess.length !== 5) {
-            document.getElementById('wordle-status-hint').textContent = "⚠️ Guess value entry block string length must match exactly 5 characters.";
+        if (processingUserGuessValue.length !== 5) {
+            document.getElementById('wordle-status-hint').textContent = "⚠️ Operational Warning: Entry submission token string lengths must verify exactly at 5 characters.";
             return;
         }
 
-        let matchesCorrectCount = 0;
-        for (let i = 0; i < 5; i++) {
-            const cellNode = document.getElementById(`wordle-cell-coord-${wordleCurrentAttemptRow}-${i}`);
-            const letterCharacter = userSubmittedGuess[i];
+        for (let positionIndex = 0; positionIndex < 5; positionIndex++) {
+            const evaluationCellElementNode = document.getElementById(`wordle-cell-coord-${wordleCurrentAttemptRow}-${positionIndex}`);
+            const characterCharacterByte = processingUserGuessValue[positionIndex];
 
-            if (wordleActiveTargetKeyword[i] === letterCharacter) {
-                cellNode.style.backgroundColor = "var(--correct-color)";
-                cellNode.style.borderColor = "var(--correct-color)";
-                cellNode.style.color = "#fff";
-                matchesCorrectCount++;
-            } else if (wordleActiveTargetKeyword.includes(letterCharacter)) {
-                cellNode.style.backgroundColor = "var(--accent-yellow)";
-                cellNode.style.borderColor = "var(--accent-yellow)";
-                cellNode.style.color = "#fff";
+            if (wordleActiveTargetKeyword[positionIndex] === characterCharacterByte) {
+                evaluationCellElementNode.style.backgroundColor = "var(--correct-color)";
+                evaluationCellElementNode.style.borderColor = "var(--correct-color)";
+                evaluationCellElementNode.style.color = "#fff";
+            } else if (wordleActiveTargetKeyword.includes(characterCharacterByte)) {
+                evaluationCellElementNode.style.backgroundColor = "var(--accent-yellow)";
+                evaluationCellElementNode.style.borderColor = "var(--accent-yellow)";
+                evaluationCellElementNode.style.color = "#fff";
             } else {
-                cellNode.style.backgroundColor = "var(--text-muted)";
-                cellNode.style.borderColor = "var(--text-muted)";
-                cellNode.style.color = "#fff";
+                evaluationCellElementNode.style.backgroundColor = "var(--text-muted)";
+                evaluationCellElementNode.style.borderColor = "var(--text-muted)";
+                evaluationCellElementNode.style.color = "#fff";
             }
         }
 
-        if (userSubmittedGuess === wordleActiveTargetKeyword) {
-            document.getElementById('wordle-status-hint').textContent = "🎉 Core Target Victory Unlocked!";
+        if (processingUserGuessValue === wordleActiveTargetKeyword) {
+            document.getElementById('wordle-status-hint').textContent = "🎉 Lexical Framework Target Solved Successfully!";
             wordleIsEngineTerminated = true;
             return;
         }
 
         wordleCurrentAttemptRow++;
-        hiddenInput.value = "";
+        operationalHiddenInputReference.value = "";
 
         if (wordleCurrentAttemptRow >= 5) {
-            document.getElementById('wordle-status-hint').textContent = `💀 All attempts spent. Target was: "${wordleActiveTargetKeyword}"`;
+            document.getElementById('wordle-status-hint').textContent = `💀 Active rounds spent. Solution Keyword target was: "${wordleActiveTargetKeyword}"`;
             wordleIsEngineTerminated = true;
         } else {
-            document.getElementById('wordle-status-hint').textContent = `Row index ${wordleCurrentAttemptRow}/5 evaluated.`;
+            document.getElementById('wordle-status-hint').textContent = `Attempt row level slot pointer index ${wordleCurrentAttemptRow}/5 verified.`;
         }
     }
 }
 
 function updateFlashcardUIContainerDisplay() {
-    const counterDisplay = document.getElementById('fc-counter-display');
-    const mainContentDisplay = document.getElementById('fc-content-text');
+    const flashcardCounterElement = document.getElementById('fc-counter-display');
+    const evaluationMainCardContentDisplay = document.getElementById('fc-content-text');
 
-    counterDisplay.textContent = `Deck: ${USER_FLASHCARD_REPOSITORY.length} items`;
+    flashcardCounterElement.textContent = `Deck: ${USER_FLASHCARD_REPOSITORY.length} words`;
     
     if (USER_FLASHCARD_REPOSITORY.length === 0) {
-        mainContentDisplay.textContent = "No lookup metrics active. Tap individual words inside any article reading pop-up context to populate tracking data.";
+        evaluationMainCardContentDisplay.textContent = "No lookup metrics active. Tap individual words inside any article reading pop-up context to populate tracking data.";
         return;
     }
 
-    const targetedItemNode = USER_FLASHCARD_REPOSITORY[CURRENT_ACTIVE_FLASHCARD_INDEX];
+    const extractionTargetDataCardNode = USER_FLASHCARD_REPOSITORY[CURRENT_ACTIVE_FLASHCARD_INDEX];
     if (IS_FLASHCARD_FLIPPED) {
-        mainContentDisplay.textContent = targetedItemNode.back;
-        mainContentDisplay.style.color = "var(--brand-color)";
+        evaluationMainCardContentDisplay.textContent = extractionTargetDataCardNode.back;
+        evaluationMainCardContentDisplay.style.color = "var(--brand-color)";
     } else {
-        mainContentDisplay.textContent = targetedItemNode.front;
-        mainContentDisplay.style.color = "var(--text-main)";
+        evaluationMainCardContentDisplay.textContent = extractionTargetDataCardNode.front;
+        evaluationMainCardContentDisplay.style.color = "var(--text-main)";
     }
 }
 
@@ -626,14 +652,15 @@ function cycleFlashcardIndex(directionalPointerOffset) {
 }
 
 function generateStructuralLocalFallbackDatabase() {
-    const sourcesList = ["Le Monde Wire", "BBC Global Portal", "Reuters Terminal Service", "France 24 Multi", "Deutsche Welle Core"];
-    for (let i = 1; i <= 25; i++) {
+    const trackingSourcesList = ["Le Monde Wire", "BBC Global Portal", "Reuters Terminal Service", "France 24 Multi", "Deutsche Welle Core"];
+    // TASK FIX 5: Ensure indexing labels do not inject unwanted string debris into article fallback records titles
+    for (let entryIndex = 1; entryIndex <= 25; entryIndex++) {
         INGESTED_PARSED_ARTICLES_POOL.push({
-            id: `local-fallback-node-id-${i}`,
+            id: `local-scaffold-fallback-node-id-${entryIndex}`,
             rawTitle: `Automated Journalism Transmission Pulse Sequence`,
             rawBodySnippet: `Analyzing advanced tracking arrays and operational performance indexes across structural application engine modules. Data confirms high-efficiency serialization pipelines are functional. Ensure components are balanced carefully.`,
-            originSource: sourcesList[i % sourcesList.length],
-            publishTimestamp: formatArticleTimestampString(new Date(Date.now() - (i * 3600000)).toUTCString()),
+            originSource: trackingSourcesList[entryIndex % trackingSourcesList.length],
+            publishTimestamp: formatArticleTimestampString(new Date(Date.now() - (entryIndex * 3600000)).toUTCString()),
             imageAssetURL: `https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600&auto=format&fit=crop&q=60`,
             sourceRefLink: "#"
         });
