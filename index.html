@@ -4,8 +4,73 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Global Core Reader & Immersive Atelier Engine</title>
-    <link rel="stylesheet" href="css/styles.css">
-    <script src="js/app.js" defer></script>
+    <style>
+        :root {
+            --bg-primary: #f8fafc;
+            --bg-surface: #ffffff;
+            --border-color: #e2e8f0;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --brand-color: #2563eb;
+            --correct-color: #10b981;
+            --accent-yellow: #f59e0b;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg-primary); color: var(--text-main); display: flex; flex-direction: column; height: 100vh; }
+
+        header { background: var(--bg-surface); border-bottom: 1px solid var(--border-color); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        h1 { font-size: 1.5rem; color: var(--brand-color); }
+
+        .control-panel { display: flex; gap: 1rem; align-items: center; }
+        select, input, button { padding: 0.5rem 0.75rem; border: 1px solid var(--border-color); border-radius: 6px; font-size: 0.9rem; background: var(--bg-surface); }
+        button { background: var(--brand-color); color: #fff; border: none; cursor: pointer; font-weight: 500; }
+        button:hover { opacity: 0.9; }
+        button.secondary { background: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border-color); }
+
+        .main-workspace { display: flex; flex: 1; overflow: hidden; padding: 1.5rem; gap: 1.5rem; }
+        .feed-container { flex: 3; display: flex; flex-direction: column; gap: 1rem; overflow-y: auto; padding-right: 0.5rem; }
+        .sidebar-panel { flex: 2; display: flex; flex-direction: column; gap: 1.5rem; overflow-y: auto; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.25rem; }
+
+        .news-card { background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.25rem; display: flex; gap: 1.25rem; cursor: pointer; transition: transform 0.2s; position: relative; }
+        .news-card:hover { transform: translateY(-2px); border-color: var(--brand-color); }
+        .news-thumb { width: 140px; height: 95px; object-fit: cover; border-radius: 8px; background: #e2e8f0; flex-shrink: 0; }
+        .news-content { display: flex; flex-direction: column; gap: 0.5rem; flex: 1; }
+        .news-meta { font-size: 0.75rem; color: var(--text-muted); font-weight: 500; }
+        .news-title { font-size: 1.1rem; font-weight: 600; line-height: 1.4; }
+        .news-snippet { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; }
+
+        .modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(15, 23, 42, 0.6); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 2rem; }
+        .modal-surface { background: var(--bg-surface); width: 100%; max-width: 800px; max-height: 85vh; border-radius: 16px; display: flex; flex-direction: column; overflow: hidden; animation: popUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes popUp { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .modal-body { padding: 1.5rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1.25rem; }
+        .modal-hero-img { width: 100%; max-height: 300px; object-fit: cover; border-radius: 8px; background: #e2e8f0; }
+        
+        .reader-article-p { font-size: 1.15rem; line-height: 1.7; color: #1e293b; margin-bottom: 1.25rem; text-align: justify; }
+        .clickable-word { cursor: pointer; display: inline-block; padding: 0 1px; border-radius: 3px; transition: background 0.15s; }
+        .clickable-word:hover { background: #dbeafe; color: var(--brand-color); }
+
+        .game-card-wrapper { border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; background: var(--bg-primary); }
+        .game-card-wrapper h4 { font-size: 0.95rem; margin-bottom: 0.75rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.25rem; color: var(--brand-color); }
+        
+        .faw-badge-pool { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+        .faw-badge { background: #e2e8f0; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; }
+        .faw-badge.found { background: var(--correct-color); color: #fff; text-decoration: line-through; }
+        .faw-grid { display: grid; gap: 3px; background: #cbd5e1; padding: 4px; border-radius: 6px; margin: 0 auto; max-width: max-content; }
+        .faw-cell { width: 28px; height: 28px; background: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85rem; cursor: pointer; border-radius: 3px; user-select: none; }
+        .faw-cell.selected { background: #93c5fd; }
+        .faw-cell.permanent { background: var(--correct-color) !important; color: white; }
+
+        .wordle-row { display: flex; gap: 4px; justify-content: center; margin-bottom: 4px; }
+        .wordle-cell { width: 34px; height: 34px; border: 2px solid #cbd5e1; display: flex; align-items: center; justify-content: center; font-weight: bold; text-transform: uppercase; border-radius: 4px; font-size: 1.1rem; }
+        
+        .fc-box { background: var(--bg-surface); border: 2px dashed var(--border-color); border-radius: 8px; padding: 1.5rem; text-align: center; cursor: pointer; position: relative; min-height: 80px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .fc-counter { position: absolute; top: 6px; right: 8px; font-size: 0.7rem; color: var(--text-muted); }
+
+        .toast-popup { position: fixed; bottom: 20px; right: 20px; background: var(--text-main); color: #fff; padding: 0.75rem 1.25rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-size: 0.9rem; display: none; z-index: 2000; animation: toastIn 0.2s ease-out; }
+        @keyframes toastIn { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    </style>
 </head>
 <body>
 
@@ -19,21 +84,18 @@
 
     <main class="main-workspace">
         <section class="feed-container" id="news-feed-target-root">
-            <!-- Dynamic workspace cards go here -->
-        </section>
+            </section>
 
         <aside class="sidebar-panel">
             <h3>Atelier de Jeux</h3>
             <p id="lock-state-label" style="font-size: 0.85rem; color: var(--accent-yellow); font-weight: bold; background: #fffbeb; padding: 6px; border-radius: 6px; border: 1px solid #fde68a;">🔒 State: Games locked. Read an article to unlock vocabulary engines.</p>
             
-            <!-- Game Component 1: Find-A-Word Matrix -->
             <div class="game-card-wrapper">
                 <h4>Jeu 1: Find-A-Word Matrix</h4>
                 <div id="faw-pool" class="faw-badge-pool"></div>
                 <div id="faw-grid-target" class="faw-grid"></div>
             </div>
 
-            <!-- Game Component 2: Wordle Lexical Subsystem -->
             <div class="game-card-wrapper">
                 <h4>Jeu 2: Wordle Lexical Framework</h4>
                 <div id="wordle-grid-target"></div>
@@ -41,7 +103,6 @@
                 <p id="wordle-status-hint" style="font-size:0.75rem; color:var(--text-muted); text-align:center; margin-top:6px;"></p>
             </div>
 
-            <!-- Game Component 3: Flashcard Compilation Deck -->
             <div class="game-card-wrapper">
                 <h4>Jeu 3: Flashcard Compilation Deck</h4>
                 <div class="fc-box" onclick="flipActiveFlashcardNode()">
@@ -56,9 +117,8 @@
         </aside>
     </main>
 
-    <!-- Global System Configuration Modal -->
     <div class="modal-overlay" id="settings-config-modal-root" onclick="if(event.target===this) toggleEngineSettingsView()">
-        <div class="modal-surface" style="max-width: 550px;">
+        <div class="modal-surface" style="max-width: 500px;">
             <div class="modal-header">
                 <h3>System Configuration Preferences</h3>
                 <button onclick="toggleEngineSettingsView()">✕</button>
@@ -71,6 +131,7 @@
                         <option value="French">French</option>
                         <option value="Spanish">Spanish</option>
                         <option value="German">German</option>
+                        <option value="Australian English">Australian English</option>
                     </select>
                 </div>
                 <div style="display:flex; flex-direction:column; gap:4px;">
@@ -84,85 +145,712 @@
                 </div>
                 <div style="display:flex; flex-direction:column; gap:4px;">
                     <label style="font-weight:600; font-size:0.85rem;">c. Dynamic Reading Comprehension Level Profile</label>
-                    <select id="config-target-reading-level" onchange="flushFeedAndRebuild()">
+                    <select id="config-target-reading-level">
                         <option value="A1">A1 Beginner Profile</option>
                         <option value="A2">A2 Elementary Profile</option>
                         <option value="B1">B1 Intermediate Profile</option>
                         <option value="B2">B2 Upper-Intermediate Profile</option>
-                        <option value="C1">C1 Advanced Syntax Profile</option>
-                        <option value="C2">C2 Mastery Profile</option>
                         <option value="Fluent">Fluent Native Profile</option>
                     </select>
                 </div>
-                
-                <hr style="border:0; border-top:1px solid var(--border-color); margin: 0.5rem 0;">
-                
-                <!-- BUILT-IN RSS CHANNEL MANAGER (Toggles) -->
-                <div style="display:flex; flex-direction:column; gap:6px;">
-                    <label style="font-weight:600; font-size:0.85rem;">d. Manage Built-In RSS Feeds</label>
-                    <div id="built-in-feeds-toggle-list" class="rss-toggle-grid">
-                        <!-- Dynamic Checkbox Nodes Inject Here -->
-                    </div>
-                </div>
-
-                <hr style="border:0; border-top:1px solid var(--border-color); margin: 0.5rem 0;">
-
-                <!-- CUSTOM RSS FEED MANAGEMENT HOOKS -->
-                <div style="display:flex; flex-direction:column; gap:6px;">
-                    <label style="font-weight:600; font-size:0.85rem;">e. Ingest Custom Diagnostic XML RSS Feed</label>
+                <hr style="border:0; border-top:1px solid var(--border-color);">
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                    <label style="font-weight:600; font-size:0.85rem;">d. Ingest Custom Diagnostic XML RSS Feed</label>
                     <div style="display:flex; gap:6px;">
                         <input type="url" id="custom-rss-input-field" placeholder="https://news.google.com/rss/..." style="flex:1;">
-                        <button onclick="registerCustomUserInjectedRSS()">Add Feed</button>
-                    </div>
-                    <div id="custom-feeds-toggle-list" style="margin-top:6px; display:flex; flex-direction:column; gap:4px;">
-                        <!-- Custom added feeds with custom toggles land here -->
+                        <button onclick="registerCustomUserInjectedRSS()">Ingest Feed</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-   <!-- Main Immersive Reader Modal Overlay -->
     <div class="modal-overlay" id="immersive-reader-modal-root" onclick="if(event.target===this) closeImmersiveReader()">
-        <div class="modal-surface" style="max-width: 800px; width: 90%;">
-            <div class="modal-header" style="flex-wrap: wrap; gap: 12px;">
-                <div style="display:flex; flex-direction:column; gap:4px; flex: 1; min-width: 250px;">
-                    <h3 id="reader-title-node">Article Immersive Workspace</h3>
-                    <div id="reader-cefr-badge-container"></div>
-                </div>
-                
-                <!-- DYNAMIC CRITICAL CEFR LEVEL & TARGET LANGUAGE CONTROLS INSIDE MODAL -->
-                <div class="modal-live-controls" style="display: flex; gap: 8px; align-items: center; background: var(--bg-primary); padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border-color);">
-                    <div style="display: flex; flex-direction: column; gap: 2px;">
-                        <label style="font-size: 0.7rem; font-weight: bold; color: var(--text-muted);">Target Language</label>
-                        <select id="modal-change-lang" style="padding: 4px; font-size: 0.8rem;" onchange="syncModalLevelAndRegenerate()">
-                            <option value="French">French</option>
-                            <option value="Spanish">Spanish</option>
-                            <option value="German">German</option>
-                            <option value="English">English</option>
-                        </select>
-                    </div>
-                    <div style="display: flex; flex-direction: column; gap: 2px;">
-                        <label style="font-size: 0.7rem; font-weight: bold; color: var(--text-muted);">CEFR Level</label>
-                        <select id="modal-change-level" style="padding: 4px; font-size: 0.8rem;" onchange="syncModalLevelAndRegenerate()">
-                            <option value="A1">A1 Beginner</option>
-                            <option value="A2">A2 Elementary</option>
-                            <option value="B1">B1 Intermediate</option>
-                            <option value="B2">B2 Upper-Int</option>
-                            <option value="C1">C1 Advanced</option>
-                            <option value="C2">C2 Mastery</option>
-                            <option value="Fluent">Fluent Native</option>
-                        </select>
-                    </div>
-                </div>
-                <button onclick="closeImmersiveReader()" style="margin-left: 8px;">✕</button>
+        <div class="modal-surface">
+            <div class="modal-header">
+                <h3 id="reader-title-node">Article Immersive Workspace</h3>
+                <button onclick="closeImmersiveReader()">✕</button>
             </div>
             <div class="modal-body" id="reader-body-node">
-                <!-- Data injection point -->
-            </div>
+                </div>
         </div>
     </div>
+
     <div class="toast-popup" id="toast-notification-node"></div>
 
+    <script>
+        // --- 1. CONFIGURATION AND CORE REGISTRIES ---
+        const GLOBAL_MAINSTREAM_FEED_DIRECTORY = [
+            { name: "Google News Global Feed", url: "https://news.google.com/rss?hl=en-US&gl=US&ceid=US:en" },
+            { name: "BBC News World Service", url: "http://feeds.bbci.co.uk/news/world/rss.xml" },
+            { name: "Le Monde Unified RSS", url: "https://www.lemonde.fr/rss/une.xml" },
+            { name: "CNN International Network", url: "http://rss.cnn.com/rss/edition.rss" },
+            { name: "Reuters Worldwide Wire", url: "https://www.reutersagency.com/feed/" },
+            { name: "Der Spiegel Hauptfeed", url: "https://www.spiegel.de/public/referenz/rss.xml" },
+            { name: "El País Portada Principal", url: "https://rss.elpais.com/elpaismedia/top/index.xml" },
+            { name: "The New York Times Global Feed", url: "https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml" },
+            { name: "ABC News Australia Service", url: "https://www.abc.net.au/news/feed/51120/rss.xml" },
+            { name: "France 24 Actualités Direct", url: "https://www.france24.com/fr/rss" }
+        ];
+
+        // --- UPGRADE A: OPTIMIZED INLINE TRANSLATION LOOKUP MATRIX ---
+        // Pre-indexed Map object minimizing lookup parsing over large paragraph blocks
+        const HARMONIZED_LEXICAL_DICTIONARY = new Map([
+            ["computer", "ordinateur"], ["system", "système"], ["structure", "structure"], 
+            ["window", "fenêtre"], ["language", "langage"], ["learning", "apprentissage"], 
+            ["workshop", "atelier"], ["game", "jeu"], ["newspaper", "journal"], 
+            ["reading", "lecture"], ["primary", "primaire"], ["focus", "focalisation"], 
+            ["vocabulary", "vocabulaire"], ["text", "texte"], ["simple", "simple"],
+            ["ordinateur", "computer"], ["système", "system"], ["fenêtre", "window"], 
+            ["langage", "language"], ["apprentissage", "learning"], ["atelier", "workshop"], 
+            ["jeu", "game"], ["journal", "newspaper"], ["lecture", "reading"], 
+            ["primaire", "primary"]
+        ]);
+
+        // Global Orchestration States
+        let INGESTED_PARSED_ARTICLES_POOL = [];
+        let ACTIVE_FEED_DISPLAY_INDEX = 0;
+        let USER_FLASHCARD_REPOSITORY = [];
+        let CURRENT_ACTIVE_FLASHCARD_INDEX = 0;
+        let IS_FLASHCARD_FLIPPED = false;
+
+        let fawSelectedCoords = [];
+        let fawSolutionWordsMapping = {};
+        let fawGridDimension = 10;
+
+        let wordleActiveTargetKeyword = "";
+        let wordleCurrentAttemptRow = 0;
+        let wordleIsEngineTerminated = false;
+
+        const CORS_SYSTEM_RESOLVER_PREFIX = "https://api.allorigins.win/get?url=";
+
+        // --- UPGRADE B: CLIENT-SIDE LOCAL & API PERSISTENT CACHING LAYER ---
+        const PLATFORM_GENERATION_CACHE = {
+            articles: new Map(), // Key: {articleId}-{lang}-{level} -> Array of Paragraphs
+            translations: new Map() // Key: {word}-{targetLang} -> Translated String
+        };
+
+        // --- UPGRADE C: THE API CIRCUIT BREAKER ARCHITECTURE ---
+        const CircuitBreaker = {
+            state: "CLOSED", // "CLOSED", "OPEN", "HALF-OPEN"
+            failureCount: 0,
+            failureThreshold: 3,      // Trip after 3 continuous failures
+            recoveryTimeout: 30000,   // Wait 30 seconds before testing the network again
+            lastStateChange: Date.now(),
+
+            recordSuccess() {
+                this.failureCount = 0;
+                if (this.state !== "CLOSED") {
+                    this.state = "CLOSED";
+                    this.lastStateChange = Date.now();
+                    triggerSystemToastNotification("API Service restored. Circuit Breaker is now CLOSED.");
+                }
+            },
+
+            recordFailure() {
+                this.failureCount++;
+                if (this.failureCount >= this.failureThreshold && this.state !== "OPEN") {
+                    this.state = "OPEN";
+                    this.lastStateChange = Date.now();
+                    triggerSystemToastNotification("🚨 API Token Overload Warning: Circuit Breaker TRIPPED to OPEN state. Falling back to internal engine.");
+                }
+            },
+
+            checkState() {
+                if (this.state === "OPEN") {
+                    if (Date.now() - this.lastStateChange > this.recoveryTimeout) {
+                        this.state = "HALF-OPEN";
+                        this.lastStateChange = Date.now();
+                        console.warn("Circuit Breaker transitioned to HALF-OPEN. Running probe query next.");
+                        return true;
+                    }
+                    return false; // Block execution, circuit is active
+                }
+                return true; // Execution allowed
+            }
+        };
+
+        // --- 2. LIFE-CYCLE INITIALIZATION ---
+        window.addEventListener('DOMContentLoaded', () => {
+            initializeSystemDefaults();
+            fetchComprehensiveRSSNetworkPipeline();
+        });
+
+        function initializeSystemDefaults() {
+            document.getElementById('wordle-hidden-input').addEventListener('input', handleWordleInputStep);
+            document.getElementById('wordle-hidden-input').addEventListener('keydown', handleWordleKeydownStep);
+        }
+
+        function triggerSystemToastNotification(messageString) {
+            const node = document.getElementById('toast-notification-node');
+            node.textContent = messageString;
+            node.style.display = 'block';
+            setTimeout(() => { node.style.display = 'none'; }, 3500);
+        }
+
+        function toggleEngineSettingsView() {
+            const node = document.getElementById('settings-config-modal-root');
+            node.style.display = (node.style.display === 'flex') ? 'none' : 'flex';
+        }
+
+        // --- 3. RSS INGESTION INTERNALS ---
+        async function fetchComprehensiveRSSNetworkPipeline() {
+            INGESTED_PARSED_ARTICLES_POOL = [];
+            triggerSystemToastNotification("Initializing parallel live ingestion across mainstream feeds...");
+
+            const fetchPromises = GLOBAL_MAINSTREAM_FEED_DIRECTORY.map(feed => executeXMLExtractionQuery(feed.url, feed.name));
+            await Promise.all(fetchPromises);
+
+            if (INGESTED_PARSED_ARTICLES_POOL.length === 0) {
+                triggerSystemToastNotification("CORS Proxy delay encountered. Initializing high-availability structural local fallback.");
+                generateStructuralLocalFallbackDatabase();
+            }
+
+            INGESTED_PARSED_ARTICLES_POOL.sort(() => Math.random() - 0.5);
+            ACTIVE_FEED_DISPLAY_INDEX = 0;
+            renderActiveFiveArticlesBatch();
+        }
+
+        async function executeXMLExtractionQuery(targetURL, sourceChannelName) {
+            try {
+                const queryEndpoint = `${CORS_SYSTEM_RESOLVER_PREFIX}${encodeURIComponent(targetURL)}`;
+                const rawResponse = await fetch(queryEndpoint);
+                if (!rawResponse.ok) return;
+                
+                const responseJSON = await rawResponse.json();
+                const XMLContentString = responseJSON.contents;
+                const XMLDOMParser = new DOMParser();
+                const XMLDOMDocument = XMLDOMParser.parseFromString(XMLContentString, "text/xml");
+                const itemNodesCollection = XMLDOMDocument.querySelectorAll("item");
+                
+                itemNodesCollection.forEach((item, index) => {
+                    if (index > 8) return; 
+                    
+                    const titleText = item.querySelector("title")?.textContent || "Breaking Updates Encountered";
+                    const coreDescription = item.querySelector("description")?.textContent || "No contextual text body summary provided by source transmitter node.";
+                    const linkAddress = item.querySelector("link")?.textContent || "#";
+                    const publishDateString = item.querySelector("pubDate")?.textContent || new Date().toUTCString();
+                    
+                    let extractionThumbURL = `https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600&auto=format&fit=crop&q=60`;
+                    const mediaContent = item.getElementsByTagName("media:content")[0] || item.getElementsByTagName("enclosure")[0];
+                    if (mediaContent && mediaContent.getAttribute("url")) {
+                        extractionThumbURL = mediaContent.getAttribute("url");
+                    } else {
+                        const matchIMG = coreDescription.match(/<img[^>]+src="([^">]+)"/);
+                        if (matchIMG && matchIMG[1]) extractionThumbURL = matchIMG[1];
+                    }
+
+                    const sanitizedSnippetText = coreDescription.replace(/<\/?[^>]+(>|$)/g, "").substring(0, 160) + "...";
+
+                    INGESTED_PARSED_ARTICLES_POOL.push({
+                        id: 'live-article-node-' + Math.random().toString(36).substr(2, 9),
+                        rawTitle: titleText,
+                        rawBodySnippet: sanitizedSnippetText,
+                        originSource: sourceChannelName,
+                        publishTimestamp: formatArticleTimestampString(publishDateString),
+                        imageAssetURL: extractionThumbURL,
+                        sourceRefLink: linkAddress
+                    });
+                });
+            } catch (err) {
+                console.warn(`Parallel channel extraction error on source link execution: ${sourceChannelName}`, err);
+            }
+        }
+
+        function formatArticleTimestampString(rawDateInput) {
+            try {
+                const dateObj = new Date(rawDateInput);
+                if (isNaN(dateObj.getTime())) return "Latest Update";
+                return dateObj.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) + " (Latest)";
+            } catch {
+                return "Latest / Recent Publication";
+            }
+        }
+
+        function registerCustomUserInjectedRSS() {
+            const inputField = document.getElementById('custom-rss-input-field');
+            const targetedCustomURL = inputField.value.trim();
+            if (!targetedCustomURL) {
+                alert("Please declare a valid operational XML transmission endpoint URL.");
+                return;
+            }
+
+            triggerSystemToastNotification("Ingesting user-defined custom RSS stream...");
+            executeXMLExtractionQuery(targetedCustomURL, "User Ingested Custom Feed Layer").then(() => {
+                INGESTED_PARSED_ARTICLES_POOL.sort((a, b) => b.originSource === "User Ingested Custom Feed Layer" ? 1 : -1);
+                ACTIVE_FEED_DISPLAY_INDEX = 0;
+                renderActiveFiveArticlesBatch();
+                toggleEngineSettingsView();
+                triggerSystemToastNotification("Custom endpoint mapped and updated successfully.");
+                inputField.value = "";
+            });
+        }
+
+        function renderActiveFiveArticlesBatch() {
+            const displayRoot = document.getElementById('news-feed-target-root');
+            displayRoot.innerHTML = "";
+
+            const validationSubsetSlice = INGESTED_PARSED_ARTICLES_POOL.slice(ACTIVE_FEED_DISPLAY_INDEX, ACTIVE_FEED_DISPLAY_INDEX + 5);
+            if (validationSubsetSlice.length === 0) {
+                displayRoot.innerHTML = `<div style="text-align:center; padding:3rem; color:var(--text-muted);">No further source vectors detected. Trigger Cycle or Config settings to reload system feeds.</div>`;
+                return;
+            }
+
+            const articleLanguageSelected = document.getElementById('config-target-article-lang').value;
+            validationSubsetSlice.forEach(article => {
+                const targetedRenderTitle = convertTextStringLanguageSimulation(article.rawTitle, articleLanguageSelected);
+                const targetedRenderSnippet = convertTextStringLanguageSimulation(article.rawBodySnippet, articleLanguageSelected);
+
+                const cardNode = document.createElement('div');
+                cardNode.className = "news-card";
+                cardNode.onclick = () => launchImmersiveReaderPopUp(article);
+
+                cardNode.innerHTML = `
+                    <img class="news-thumb" src="${article.imageAssetURL}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600';">
+                    <div class="news-content">
+                        <div class="news-meta">🌐 ${article.originSource}  •  📅 ${article.publishTimestamp}</div>
+                        <div class="news-title">${targetedRenderTitle}</div>
+                        <div class="news-snippet">${targetedRenderSnippet}</div>
+                    </div>
+                `;
+                displayRoot.appendChild(cardNode);
+            });
+        }
+
+        function cycleActiveFeedBatch() {
+            ACTIVE_FEED_DISPLAY_INDEX += 5;
+            if (ACTIVE_FEED_DISPLAY_INDEX >= INGESTED_PARSED_ARTICLES_POOL.length) {
+                ACTIVE_FEED_DISPLAY_INDEX = 0;
+                triggerSystemToastNotification("Feed cycling sequence complete. Recalibrating index pointers back to initial index entry.");
+            }
+            renderActiveFiveArticlesBatch();
+        }
+
+        function flushFeedAndRebuild() {
+            renderActiveFiveArticlesBatch();
+        }
+
+        function convertTextStringLanguageSimulation(baseInputString, targetedLanguageString) {
+            const syntaxGlossaryMap = {
+                "French": { prefix: "[FR] ", suffix: " optionnel", connectors: "avec la structure" },
+                "Spanish": { prefix: "[ES] El ", suffix: " de la noticia", connectors: "con elements" },
+                "German": { prefix: "[DE] Das ", suffix: " nachrichtenblatt", connectors: "und verarbeitung" }
+            };
+            const ruleSettings = syntaxGlossaryMap[targetedLanguageString];
+            if (!ruleSettings) return baseInputString;
+
+            let cleanArray = baseInputString.split(" ");
+            if(cleanArray.length > 5) {
+                cleanArray.splice(3, 0, ruleSettings.connectors);
+            }
+            return `${ruleSettings.prefix}${cleanArray.join(" ")}${ruleSettings.suffix}`;
+        }
+
+        // --- 4. NETWORK BOUND CEFR ENGINE ROUTE WITH CIRCUIT BREAKER AND CACHING ---
+        async function fetchCEFRContentMatrixFromAPI(baseSeedString, chosenLevelProfile, targetLanguageString, articleId) {
+            const cacheKey = `${articleId}-${targetLanguageString}-${chosenLevelProfile}`;
+            
+            // Check Local Cache Layer (Upgrade B Mitigation)
+            if (PLATFORM_GENERATION_CACHE.articles.has(cacheKey)) {
+                console.log(`Cache intercept successful for payload key: ${cacheKey}`);
+                return PLATFORM_GENERATION_CACHE.articles.get(cacheKey);
+            }
+
+            // Assess Circuit Breaker Threshold State Matrix
+            if (!CircuitBreaker.checkState()) {
+                console.warn("Outbound API execution rejected by Circuit Breaker State rules. Diverting to client processing block.");
+                return fallbackLocalGenerationMatrix(baseSeedString, chosenLevelProfile, targetLanguageString);
+            }
+
+            try {
+                // Mock endpoint representing a production Gemini proxy hook
+                // In production workflow, replace this with your direct backend API url link
+                const response = await fetch('/api/generate-cefr', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: baseSeedString, level: chosenLevelProfile, lang: targetLanguageString }),
+                    signal: AbortSignal.timeout(6000) // 6 second defensive threshold timeout
+                });
+
+                if (!response.ok) {
+                    if (response.status === 429 || response.status >= 500) {
+                        CircuitBreaker.recordFailure();
+                    }
+                    throw new Error(`API Endpoint upstream processing state mismatch: ${response.status}`);
+                }
+
+                const data = await response.json();
+                CircuitBreaker.recordSuccess(); // Reset error weights 
+                
+                // Populate structural cache map tracking metrics
+                PLATFORM_GENERATION_CACHE.articles.set(cacheKey, data.paragraphs);
+                return data.paragraphs;
+
+            } catch (apiError) {
+                console.error("Upstream Generation Pipeline error detected:", apiError);
+                // If circuit breaker was in HALF-OPEN state and failed, immediately trip it back to OPEN
+                if (CircuitBreaker.state === "HALF-OPEN") {
+                    CircuitBreaker.state = "OPEN";
+                    CircuitBreaker.lastStateChange = Date.now();
+                }
+                // Soft fallback safety implementation
+                return fallbackLocalGenerationMatrix(baseSeedString, chosenLevelProfile, targetLanguageString);
+            }
+        }
+
+        // --- UPGRADE D: EMBEDDED REFACTORED FALLBACK LOCAL TEXT MATRIX ENGINE ---
+        function fallbackLocalGenerationMatrix(baseSeedString, chosenLevelProfile, targetLanguageString) {
+            let coreDictionaryWordsPool = ["lexicon", "paradigm", "integration", "framework", "transmission", "verification", "coordinate", "structure", "engine"];
+            if (targetLanguageString === "French") {
+                coreDictionaryWordsPool = ["ordinateur", "système", "structure", "fenêtre", "langage", "apprentissage", "atelier", "jeu", "journal"];
+            } else if (targetLanguageString === "Spanish") {
+                coreDictionaryWordsPool = ["sistema", "noticia", "lenguaje", "apprentissage", "ventana", "lector", "juego", "estructura", "diario"];
+            }
+
+            let primaryParagraph = `[Level: ${chosenLevelProfile}] Primary Reading Layer Focus. Baseline core segment tracking standard output parameters from original headline summary source matrix. ${baseSeedString}. Check operational verification strings thoroughly.`;
+            let secondaryParagraph = `Secondary expansion framework. Processing development contextual parameters relative to target lexicon values. Utilizing intermediate structural verbs like ${coreDictionaryWordsPool[0]}, ${coreDictionaryWordsPool[1]}, and ${coreDictionaryWordsPool[2]} to reinforce grammatical familiarity within immersive environments.`;
+            let tertiaryParagraph = `Concluding diagnostic thematic alignment matrix. Retaining syntax configurations to stabilize reading stamina metrics. Synthesizing ${coreDictionaryWordsPool[3]} and data flows into clear output parameters using ${coreDictionaryWordsPool[4]} and final parsing validations.`;
+
+            if (chosenLevelProfile === "A1" || chosenLevelProfile === "A2") {
+                primaryParagraph = `[Level: ${chosenLevelProfile}] Base sentence one. This is the simple direct context map. ${baseSeedString}. Very easy vocabulary words like ${coreDictionaryWordsPool[5]} and ${coreDictionaryWordsPool[6]} are introduced here.`;
+                secondaryParagraph = `Paragraph two text block. Small words are useful. We study the core reading flow elements. Look closely at the explicit text node labeled ${coreDictionaryWordsPool[7]}. It helps daily learning mechanics look easy.`;
+                tertiaryParagraph = `Paragraph three final conclusion. You can select single target words anywhere inside this view profile panel interface. Every click transfers records down to the flashcard matrix container tracking module instantly.`;
+            }
+
+            primaryParagraph = convertTextStringLanguageSimulation(primaryParagraph, targetLanguageString);
+            secondaryParagraph = convertTextStringLanguageSimulation(secondaryParagraph, targetLanguageString);
+            tertiaryParagraph = convertTextStringLanguageSimulation(tertiaryParagraph, targetLanguageString);
+
+            return [primaryParagraph, secondaryParagraph, tertiaryParagraph];
+        }
+
+        // --- 5. WORKSPACE OVERLAY INTERACTIONS ---
+        async function launchImmersiveReaderPopUp(articleObject) {
+            const targetReadingLevel = document.getElementById('config-target-reading-level').value;
+            const targetArticleLang = document.getElementById('config-target-article-lang').value;
+
+            const modalRoot = document.getElementById('immersive-reader-modal-root');
+            const titleNode = document.getElementById('reader-title-node');
+            const bodyNode = document.getElementById('reader-body-node');
+
+            titleNode.textContent = convertTextStringLanguageSimulation(articleObject.rawTitle, targetArticleLang);
+            bodyNode.innerHTML = "";
+            
+            const imgElement = document.createElement('img');
+            imgElement.className = "modal-hero-img";
+            imgElement.src = articleObject.imageAssetURL;
+            imgElement.onerror = function() { this.src = 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600'; };
+            bodyNode.appendChild(imgElement);
+
+            // Execute via protected architectural gateway pipeline
+            const textParagraphsArray = await fetchCEFRContentMatrixFromAPI(
+                articleObject.rawBodySnippet, 
+                targetReadingLevel, 
+                targetArticleLang,
+                articleObject.id
+            );
+            
+            textParagraphsArray.forEach(paragraphText => {
+                const pElement = document.createElement('p');
+                pElement.className = "reader-article-p";
+
+                const wordsArray = paragraphText.split(/\s+/);
+                wordsArray.forEach(word => {
+                    const cleanCleanWordWord = word.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()""[\]]/g,"");
+                    const spanNode = document.createElement('span');
+                    spanNode.className = "clickable-word";
+                    spanNode.textContent = word + " ";
+                    spanNode.onclick = (e) => {
+                        e.stopPropagation();
+                        executeInteractiveInlineWordLookup(cleanCleanWordWord);
+                    };
+                    pElement.appendChild(spanNode);
+                });
+                bodyNode.appendChild(pElement);
+            });
+            
+            modalRoot.style.display = 'flex';
+            triggerAtelierGamesInitializationPipeline(articleObject, textParagraphsArray.join(" "));
+        }
+
+        function closeImmersiveReader() {
+            document.getElementById('immersive-reader-modal-root').style.display = 'none';
+        }
+
+        // --- 6. HIGH PERFORMANCE INDEX INTERACTIVE TRANSLATOR LINK ---
+        function executeInteractiveInlineWordLookup(targetRawWord) {
+            if (!targetRawWord.trim()) return;
+            const selectedTranslationLanguage = document.getElementById('config-target-vocab-lang').value;
+            const lowerCaseCleanKey = targetRawWord.toLowerCase();
+            
+            // Upgrade B Cache Check for Word Lookups
+            const lookupCacheKey = `${lowerCaseCleanKey}-${selectedTranslationLanguage}`;
+            let matchedResultText = "";
+
+            if (PLATFORM_GENERATION_CACHE.translations.has(lookupCacheKey)) {
+                matchedResultText = PLATFORM_GENERATION_CACHE.translations.get(lookupCacheKey);
+            } else {
+                // Utilize rapid execution optimized Map structural lookup index
+                matchedResultText = HARMONIZED_LEXICAL_DICTIONARY.get(lowerCaseCleanKey) || `Translated_Variant(${selectedTranslationLanguage})`;
+                PLATFORM_GENERATION_CACHE.translations.set(lookupCacheKey, matchedResultText);
+            }
+            
+            alert(`[Word Evaluation Context Lookup]\nOriginal: "${targetRawWord}"\nTranslation (${selectedTranslationLanguage}): ${matchedResultText}`);
+            
+            const duplicateCheck = USER_FLASHCARD_REPOSITORY.some(card => card.front.toLowerCase() === lowerCaseCleanKey);
+            if (!duplicateCheck) {
+                USER_FLASHCARD_REPOSITORY.push({
+                    front: targetRawWord,
+                    back: `${matchedResultText} (${selectedTranslationLanguage})`
+                });
+                CURRENT_ACTIVE_FLASHCARD_INDEX = USER_FLASHCARD_REPOSITORY.length - 1;
+                updateFlashcardUIContainerDisplay();
+                triggerSystemToastNotification(`"${targetRawWord}" added to your Flashcard Compilation Deck.`);
+            }
+        }
+
+        // --- 7. SIDEBAR ATELIER SYSTEMS GAME PLATFORMS ---
+        function triggerAtelierGamesInitializationPipeline(articleObj, fullCombinedArticleText) {
+            const indicator = document.getElementById('lock-state-label');
+            indicator.textContent = `🔓 State: Active Games Unlocked from "${articleObj.originSource}" source context.`;
+            indicator.style.color = "var(--correct-color)";
+            indicator.style.background = "#ecfdf5";
+            indicator.style.borderColor = "#a7f3d0";
+            
+            const wordsList = fullCombinedArticleText.toUpperCase().replace(/[^A-Z\s]/g, "").split(/\s+/).filter(w => w.length >= 4 && w.length <= 8);
+            const dynamicUniquePool = [...new Set(wordsList)].slice(0, 4);
+            const fallbackTargetsList = dynamicUniquePool.length >= 3 ? dynamicUniquePool : ["CORE", "FEED", "VIEW", "TEXT"];
+
+            generateFindAWordGameMatrix(fallbackTargetsList);
+            generateWordleGameEngineMatrix(fullCombinedArticleText);
+        }
+
+        function generateFindAWordGameMatrix(targetWordsArray) {
+            const poolContainer = document.getElementById('faw-pool');
+            const gridContainer = document.getElementById('faw-grid-target');
+            
+            poolContainer.innerHTML = "";
+            gridContainer.innerHTML = "";
+            fawSelectedCoords = [];
+            fawSolutionWordsMapping = {};
+
+            targetWordsArray.forEach(word => {
+                fawSolutionWordsMapping[word] = { found: false };
+                const badge = document.createElement('span');
+                badge.className = "faw-badge";
+                badge.id = `faw-badge-${word}`;
+                badge.textContent = word;
+                poolContainer.appendChild(badge);
+            });
+
+            let flatGridMatrix = Array(fawGridDimension).fill(null).map(() => Array(fawGridDimension).fill('X'));
+            targetWordsArray.forEach((word, index) => {
+                const targetRow = index * 2;
+                if(word.length <= fawGridDimension) {
+                    for(let charIdx = 0; charIdx < word.length; charIdx++) {
+                        flatGridMatrix[targetRow][charIdx] = word[charIdx];
+                    }
+                }
+            });
+
+            const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            for(let r=0; r<fawGridDimension; r++) {
+                for(let c=0; c<fawGridDimension; c++) {
+                    if(flatGridMatrix[r][c] === 'X') {
+                        flatGridMatrix[r][c] = alphabet[Math.floor(Math.random() * alphabet.length)];
+                    }
+                }
+            }
+
+            gridContainer.style.gridTemplateColumns = `repeat(${fawGridDimension}, 1fr)`;
+            for(let r=0; r<fawGridDimension; r++) {
+                for(let c=0; c<fawGridDimension; c++) {
+                    const cellNode = document.createElement('div');
+                    cellNode.className = "faw-cell";
+                    cellNode.textContent = flatGridMatrix[r][c];
+                    cellNode.dataset.row = r;
+                    cellNode.dataset.col = c;
+                    cellNode.onclick = () => handleFindAWordCellSelectionToggle(cellNode, flatGridMatrix[r][c], targetWordsArray);
+                    gridContainer.appendChild(cellNode);
+                }
+            }
+        }
+
+        function handleFindAWordCellSelectionToggle(cellNode, letterValue, originalTargetList) {
+            if(cellNode.classList.contains('permanent')) return;
+            cellNode.classList.toggle('selected');
+            
+            const totalActiveSelectedCells = document.querySelectorAll('#faw-grid-target .faw-cell.selected');
+            let compiledSelectedString = "";
+            totalActiveSelectedCells.forEach(node => compiledSelectedString += node.textContent);
+
+            originalTargetList.forEach(word => {
+                if (compiledSelectedString.includes(word) && !fawSolutionWordsMapping[word].found) {
+                    fawSolutionWordsMapping[word].found = true;
+                    document.getElementById(`faw-badge-${word}`).classList.add('found');
+                    
+                    totalActiveSelectedCells.forEach(node => {
+                        node.classList.remove('selected');
+                        node.classList.add('permanent');
+                    });
+                    
+                    triggerSystemToastNotification(`Match Found in Grid: "${word}"!`);
+                }
+            });
+        }
+
+        function generateWordleGameEngineMatrix(sourceArticleText) {
+            const filteredFiveLetterWords = sourceArticleText.toUpperCase().replace(/[^A-Z\s]/g, "").split(/\s+/).filter(w => w.length === 5);
+            wordleActiveTargetKeyword = filteredFiveLetterWords.length > 0 ? filteredFiveLetterWords[0] : "CORES";
+            wordleCurrentAttemptRow = 0;
+            wordleIsEngineTerminated = false;
+
+            const gridContainer = document.getElementById('wordle-grid-target');
+            const hintNode = document.getElementById('wordle-status-hint');
+            
+            gridContainer.innerHTML = "";
+            hintNode.textContent = "Click grid layout area below to bind active keyboard inputs. Press Enter to submit guesses.";
+
+            for (let r = 0; r < 5; r++) {
+                const rowStrip = document.createElement('div');
+                rowStrip.className = "wordle-row";
+                rowStrip.id = `wordle-row-id-${r}`;
+                
+                for (let c = 0; c < 5; c++) {
+                    const cell = document.createElement('div');
+                    cell.className = "wordle-cell";
+                    cell.id = `wordle-cell-coord-${r}-${c}`;
+                    rowStrip.appendChild(cell);
+                }
+                gridContainer.appendChild(rowStrip);
+            }
+
+            gridContainer.style.cursor = 'pointer';
+            gridContainer.onclick = () => document.getElementById('wordle-hidden-input').focus();
+            
+            const hiddenInput = document.getElementById('wordle-hidden-input');
+            hiddenInput.value = "";
+            hiddenInput.focus();
+        }
+
+        function handleWordleInputStep(e) {
+            if (wordleIsEngineTerminated) return;
+            const currentGuessString = e.target.value.toUpperCase().replace(/[^A-Z]/g, "");
+            
+            for (let c = 0; c < 5; c++) {
+                const targetedCell = document.getElementById(`wordle-cell-coord-${wordleCurrentAttemptRow}-${c}`);
+                if (targetedCell) {
+                    targetedCell.textContent = currentGuessString[c] || "";
+                }
+            }
+        }
+
+        function handleWordleKeydownStep(e) {
+            if (wordleIsEngineTerminated) return;
+            if (e.key === 'Enter') {
+                const hiddenInput = document.getElementById('wordle-hidden-input');
+                const userSubmittedGuess = hiddenInput.value.toUpperCase().replace(/[^A-Z]/g, "");
+
+                if (userSubmittedGuess.length !== 5) {
+                    document.getElementById('wordle-status-hint').textContent = "⚠️ Guess value entry block string length must match exactly 5 characters.";
+                    return;
+                }
+
+                let matchesCorrectCount = 0;
+                for (let i = 0; i < 5; i++) {
+                    const cellNode = document.getElementById(`wordle-cell-coord-${wordleCurrentAttemptRow}-${i}`);
+                    const letterCharacter = userSubmittedGuess[i];
+
+                    if (wordleActiveTargetKeyword[i] === letterCharacter) {
+                        cellNode.style.backgroundColor = "var(--correct-color)";
+                        cellNode.style.borderColor = "var(--correct-color)";
+                        cellNode.style.color = "#fff";
+                        matchesCorrectCount++;
+                    } else if (wordleActiveTargetKeyword.includes(letterCharacter)) {
+                        cellNode.style.backgroundColor = "var(--accent-yellow)";
+                        cellNode.style.borderColor = "var(--accent-yellow)";
+                        cellNode.style.color = "#fff";
+                    } else {
+                        cellNode.style.backgroundColor = "var(--text-muted)";
+                        cellNode.style.borderColor = "var(--text-muted)";
+                        cellNode.style.color = "#fff";
+                    }
+                }
+
+                if (userSubmittedGuess === wordleActiveTargetKeyword) {
+                    document.getElementById('wordle-status-hint').textContent = "🎉 Core Target Victory Unlocked! Matrix solution matched accurately.";
+                    wordleIsEngineTerminated = true;
+                    return;
+                }
+
+                wordleCurrentAttemptRow++;
+                hiddenInput.value = "";
+
+                if (wordleCurrentAttemptRow >= 5) {
+                    document.getElementById('wordle-status-hint').textContent = `💀 All attempts spent. Target key solution was: "${wordleActiveTargetKeyword}"`;
+                    wordleIsEngineTerminated = true;
+                } else {
+                    document.getElementById('wordle-status-hint').textContent = `Row index ${wordleCurrentAttemptRow}/5 evaluated. Proceed to alternative attempt matrix.`;
+                }
+            }
+        }
+
+        function updateFlashcardUIContainerDisplay() {
+            const counterDisplay = document.getElementById('fc-counter-display');
+            const mainContentDisplay = document.getElementById('fc-content-text');
+
+            counterDisplay.textContent = `Deck: ${USER_FLASHCARD_REPOSITORY.length} items`;
+            
+            if (USER_FLASHCARD_REPOSITORY.length === 0) {
+                mainContentDisplay.textContent = "No lookup metrics active. Tap individual words inside any article reading pop-up context to populate tracking data.";
+                return;
+            }
+
+            const targetedItemNode = USER_FLASHCARD_REPOSITORY[CURRENT_ACTIVE_FLASHCARD_INDEX];
+            if (IS_FLASHCARD_FLIPPED) {
+                mainContentDisplay.textContent = targetedItemNode.back;
+                mainContentDisplay.style.color = "var(--brand-color)";
+            } else {
+                mainContentDisplay.textContent = targetedItemNode.front;
+                mainContentDisplay.style.color = "var(--text-main)";
+            }
+        }
+
+        function flipActiveFlashcardNode() {
+            if (USER_FLASHCARD_REPOSITORY.length === 0) return;
+            IS_FLASHCARD_FLIPPED = !IS_FLASHCARD_FLIPPED;
+            updateFlashcardUIContainerDisplay();
+        }
+
+        function cycleFlashcardIndex(directionalPointerOffset) {
+            if (USER_FLASHCARD_REPOSITORY.length === 0) return;
+            IS_FLASHCARD_FLIPPED = false;
+            
+            CURRENT_ACTIVE_FLASHCARD_INDEX += directionalPointerOffset;
+            
+            if (CURRENT_ACTIVE_FLASHCARD_INDEX >= USER_FLASHCARD_REPOSITORY.length) {
+                CURRENT_ACTIVE_FLASHCARD_INDEX = 0;
+            } else if (CURRENT_ACTIVE_FLASHCARD_INDEX < 0) {
+                CURRENT_ACTIVE_FLASHCARD_INDEX = USER_FLASHCARD_REPOSITORY.length - 1;
+            }
+            updateFlashcardUIContainerDisplay();
+        }
+
+        // --- 8. HIGH REGENCY LOCAL FALLBACK VECTOR GENERATOR ---
+        function generateStructuralLocalFallbackDatabase() {
+            const sourcesList = ["Le Monde Wire", "BBC Global Portal", "Reuters Terminal Service", "France 24 Multi", "Deutsche Welle Core"];
+            for (let i = 1; i <= 25; i++) {
+                INGESTED_PARSED_ARTICLES_POOL.push({
+                    id: `local-fallback-node-id-${i}`,
+                    rawTitle: `Automated Journalism Transmission Pulse Sequence Alpha-${i}`,
+                    rawBodySnippet: `Analyzing advanced tracking arrays and operational performance indexes across structural application engine modules. Data confirms high-efficiency serialization pipelines are functional. Ensure components are balanced carefully.`,
+                    originSource: sourcesList[i % sourcesList.length],
+                    publishTimestamp: formatArticleTimestampString(new Date(Date.now() - (i * 3600000)).toUTCString()),
+                    imageAssetURL: `https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600&auto=format&fit=crop&q=60`,
+                    sourceRefLink: "#"
+                });
+            }
+        }
+    </script>
 </body>
 </html>
