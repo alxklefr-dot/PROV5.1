@@ -363,3 +363,30 @@ button.secondary {
     from { transform: translateY(10px); opacity: 0; } 
     to { transform: translateY(0); opacity: 1; } 
 }
+/* Responsive Media Query Layer for Mobile Devices */
+@media (max-width: 768px) {
+    .main-workspace {
+        flex-direction: column; /* Stacks the sidebar games underneath the reading feed */
+        padding: 0.75rem;
+        gap: 1rem;
+    }
+
+    .news-card {
+        flex-direction: column; /* Moves the thumbnail image above the text on small screens */
+        gap: 0.75rem;
+    }
+
+    .news-thumb {
+        width: 100%; /* Spans the full width of the mobile card */
+        height: 140px;
+    }
+
+    /* Prevents the Find-A-Word grid from breaking small viewports */
+    .faw-cell {
+        width: calc(8vw - 2px); 
+        height: calc(8vw - 2px);
+        max-width: 32px;
+        max-height: 32px;
+        font-size: 0.75rem;
+    }
+}
