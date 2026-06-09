@@ -19,18 +19,21 @@
 
     <main class="main-workspace">
         <section class="feed-container" id="news-feed-target-root">
-            </section>
+            <!-- Dynamic workspace cards go here -->
+        </section>
 
         <aside class="sidebar-panel">
             <h3>Atelier de Jeux</h3>
             <p id="lock-state-label" style="font-size: 0.85rem; color: var(--accent-yellow); font-weight: bold; background: #fffbeb; padding: 6px; border-radius: 6px; border: 1px solid #fde68a;">🔒 State: Games locked. Read an article to unlock vocabulary engines.</p>
             
+            <!-- Game Component 1: Find-A-Word Matrix -->
             <div class="game-card-wrapper">
                 <h4>Jeu 1: Find-A-Word Matrix</h4>
                 <div id="faw-pool" class="faw-badge-pool"></div>
                 <div id="faw-grid-target" class="faw-grid"></div>
             </div>
 
+            <!-- Game Component 2: Wordle Lexical Subsystem -->
             <div class="game-card-wrapper">
                 <h4>Jeu 2: Wordle Lexical Framework</h4>
                 <div id="wordle-grid-target"></div>
@@ -38,6 +41,7 @@
                 <p id="wordle-status-hint" style="font-size:0.75rem; color:var(--text-muted); text-align:center; margin-top:6px;"></p>
             </div>
 
+            <!-- Game Component 3: Flashcard Compilation Deck -->
             <div class="game-card-wrapper">
                 <h4>Jeu 3: Flashcard Compilation Deck</h4>
                 <div class="fc-box" onclick="flipActiveFlashcardNode()">
@@ -52,8 +56,9 @@
         </aside>
     </main>
 
+    <!-- Global System Configuration Modal -->
     <div class="modal-overlay" id="settings-config-modal-root" onclick="if(event.target===this) toggleEngineSettingsView()">
-        <div class="modal-surface" style="max-width: 500px;">
+        <div class="modal-surface" style="max-width: 550px;">
             <div class="modal-header">
                 <h3>System Configuration Preferences</h3>
                 <button onclick="toggleEngineSettingsView()">✕</button>
@@ -66,7 +71,6 @@
                         <option value="French">French</option>
                         <option value="Spanish">Spanish</option>
                         <option value="German">German</option>
-                        <option value="Australian English">Australian English</option>
                     </select>
                 </div>
                 <div style="display:flex; flex-direction:column; gap:4px;">
@@ -80,7 +84,7 @@
                 </div>
                 <div style="display:flex; flex-direction:column; gap:4px;">
                     <label style="font-weight:600; font-size:0.85rem;">c. Dynamic Reading Comprehension Level Profile</label>
-                    <select id="config-target-reading-level">
+                    <select id="config-target-reading-level" onchange="flushFeedAndRebuild()">
                         <option value="A1">A1 Beginner Profile</option>
                         <option value="A2">A2 Elementary Profile</option>
                         <option value="B1">B1 Intermediate Profile</option>
@@ -90,26 +94,48 @@
                         <option value="Fluent">Fluent Native Profile</option>
                     </select>
                 </div>
-                <hr style="border:0; border-top:1px solid var(--border-color);">
-                <div style="display:flex; flex-direction:column; gap:4px;">
-                    <label style="font-weight:600; font-size:0.85rem;">d. Ingest Custom Diagnostic XML RSS Feed</label>
+                
+                <hr style="border:0; border-top:1px solid var(--border-color); margin: 0.5rem 0;">
+                
+                <!-- BUILT-IN RSS CHANNEL MANAGER (Toggles) -->
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                    <label style="font-weight:600; font-size:0.85rem;">d. Manage Built-In RSS Feeds</label>
+                    <div id="built-in-feeds-toggle-list" class="rss-toggle-grid">
+                        <!-- Dynamic Checkbox Nodes Inject Here -->
+                    </div>
+                </div>
+
+                <hr style="border:0; border-top:1px solid var(--border-color); margin: 0.5rem 0;">
+
+                <!-- CUSTOM RSS FEED MANAGEMENT HOOKS -->
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                    <label style="font-weight:600; font-size:0.85rem;">e. Ingest Custom Diagnostic XML RSS Feed</label>
                     <div style="display:flex; gap:6px;">
                         <input type="url" id="custom-rss-input-field" placeholder="https://news.google.com/rss/..." style="flex:1;">
-                        <button onclick="registerCustomUserInjectedRSS()">Ingest Feed</button>
+                        <button onclick="registerCustomUserInjectedRSS()">Add Feed</button>
+                    </div>
+                    <div id="custom-feeds-toggle-list" style="margin-top:6px; display:flex; flex-direction:column; gap:4px;">
+                        <!-- Custom added feeds with custom toggles land here -->
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Main Immersive Reader Modal Overlay -->
     <div class="modal-overlay" id="immersive-reader-modal-root" onclick="if(event.target===this) closeImmersiveReader()">
         <div class="modal-surface">
             <div class="modal-header">
-                <h3 id="reader-title-node">Article Immersive Workspace</h3>
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                    <h3 id="reader-title-node">Article Immersive Workspace</h3>
+                    <!-- RE-INTEGRATED CEFR ADJUSTER ACCENT BADGE NODE -->
+                    <div id="reader-cefr-badge-container"></div>
+                </div>
                 <button onclick="closeImmersiveReader()">✕</button>
             </div>
             <div class="modal-body" id="reader-body-node">
-                </div>
+                <!-- Data injection point -->
+            </div>
         </div>
     </div>
 
