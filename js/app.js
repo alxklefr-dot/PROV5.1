@@ -700,3 +700,23 @@ function generateStructuralLocalFallbackDatabase() {
     }
     renderActiveFiveArticlesBatch();
 }
+// --- NEW UNIFIED SETTINGS SAVE WORKFLOW ---
+function executeUnifiedSettingsSaveWorkflow() {
+    // 1. Commit preferences to client LocalStorage context
+    const preferencesObj = {
+        vocabLang: document.getElementById('config-target-vocab-lang').value,
+        articleLang: document.getElementById('config-target-article-lang').value,
+        readingLevel: document.getElementById('config-target-reading-level').value
+    };
+    localStorage.setItem('CORE_READER_PREFERENCES_V1', JSON.stringify(preferencesObj));
+    console.log("Configuration preferences committed successfully.");
+
+    // 2. Clear old cached displays and rebuild text layouts instantly
+    flushFeedAndRebuild();
+
+    // 3. Gracefully close out the settings modal viewport view
+    toggleEngineSettingsView();
+
+    // 4. Trigger UI notification to show the user the updates are complete
+    triggerSystemToastNotification("✅ Preferences saved! Article feed updated successfully.");
+}
