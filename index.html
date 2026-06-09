@@ -1,722 +1,798 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plateforme d'Immersion Linguistique & Actualités</title>
+    <title>Global Core Reader & Immersive Atelier Engine</title>
     <style>
         :root {
-            --primary-color: #2563eb;
-            --primary-hover: #1d4ed8;
-            --background-color: #f8fafc;
-            --card-background: #ffffff;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
+            --bg-primary: #f8fafc;
+            --bg-surface: #ffffff;
             --border-color: #e2e8f0;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --brand-color: #2563eb;
+            --correct-color: #10b981;
+            --accent-yellow: #f59e0b;
         }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--background-color);
-            color: var(--text-main);
-            margin: 0;
-            padding: 0;
-            line-height: 1.5;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg-primary); color: var(--text-main); display: flex; flex-direction: column; height: 100vh; }
 
-        .app-container {
-            display: flex;
-            flex-direction: column;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 16px;
-            gap: 16px;
-        }
+        header { background: var(--bg-surface); border-bottom: 1px solid var(--border-color); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        h1 { font-size: 1.5rem; color: var(--brand-color); }
 
-        /* Top HUD Panel */
-        .hud-token-panel {
-            background: linear-gradient(135deg, #1e293b, #0f172a);
-            color: #ffffff;
-            padding: 16px;
-            border-radius: 12px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-        .hud-metric { font-weight: bold; color: #38bdf8; }
+        .control-panel { display: flex; gap: 1rem; align-items: center; }
+        select, input, button { padding: 0.5rem 0.75rem; border: 1px solid var(--border-color); border-radius: 6px; font-size: 0.9rem; background: var(--bg-surface); }
+        button { background: var(--brand-color); color: #fff; border: none; cursor: pointer; font-weight: 500; }
+        button:hover { opacity: 0.9; }
+        button.secondary { background: var(--bg-surface); color: var(--text-main); border: 1px solid var(--border-color); }
 
-        /* Settings & Configuration Controls */
-        .settings-control-card {
-            background: var(--card-background);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
+        .main-workspace { display: flex; flex: 1; overflow: hidden; padding: 1.5rem; gap: 1.5rem; }
+        .feed-container { flex: 3; display: flex; flex-direction: column; gap: 1rem; overflow-y: auto; padding-right: 0.5rem; }
+        .sidebar-panel { flex: 2; display: flex; flex-direction: column; gap: 1.5rem; overflow-y: auto; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.25rem; }
 
-        .settings-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            align-items: center;
-            justify-content: space-between;
-        }
+        .news-card { background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.25rem; display: flex; gap: 1.25rem; cursor: pointer; transition: transform 0.2s; position: relative; }
+        .news-card:hover { transform: translateY(-2px); border-color: var(--brand-color); }
+        .news-thumb { width: 140px; height: 95px; object-fit: cover; border-radius: 8px; background: #e2e8f0; flex-shrink: 0; }
+        .news-content { display: flex; flex-direction: column; gap: 0.5rem; flex: 1; }
+        .news-meta { font-size: 0.75rem; color: var(--text-muted); font-weight: 500; }
+        .news-title { font-size: 1.1rem; font-weight: 600; line-height: 1.4; }
+        .news-snippet { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; }
 
-        .control-group {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            min-width: 200px;
-            flex: 1;
-        }
+        /* Modal Overlay Framework */
+        .modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(15, 23, 42, 0.6); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 2rem; }
+        .modal-surface { background: var(--bg-surface); width: 100%; max-width: 800px; max-height: 85vh; border-radius: 16px; display: flex; flex-direction: column; overflow: hidden; animation: popUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes popUp { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .modal-body { padding: 1.5rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1.25rem; }
+        .modal-hero-img { widen: 100%; max-height: 300px; object-fit: cover; border-radius: 8px; background: #e2e8f0; }
+        
+        /* Reading Matrix Typography */
+        .reader-article-p { font-size: 1.15rem; line-height: 1.7; color: #1e293b; margin-bottom: 1.25rem; text-align: justify; }
+        .clickable-word { cursor: pointer; display: inline-block; padding: 0 1px; border-radius: 3px; transition: background 0.15s; }
+        .clickable-word:hover { background: #dbeafe; color: var(--brand-color); }
 
-        label {
-            font-weight: 600;
-            font-size: 0.875rem;
-            color: var(--text-main);
-        }
+        /* Atelier Interactive Widget Configurations */
+        .game-card-wrapper { border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; background: var(--bg-primary); }
+        .game-card-wrapper h4 { font-size: 0.95rem; margin-bottom: 0.75rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.25rem; color: var(--brand-color); }
+        
+        .faw-badge-pool { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+        .faw-badge { background: #e2e8f0; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; }
+        .faw-badge.found { background: var(--correct-color); color: #fff; text-decoration: line-through; }
+        .faw-grid { display: grid; gap: 3px; background: #cbd5e1; padding: 4px; border-radius: 6px; margin: 0 auto; max-width: max-content; }
+        .faw-cell { width: 28px; height: 28px; background: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85rem; cursor: pointer; border-radius: 3px; user-select: none; }
+        .faw-cell.selected { background: #93c5fd; }
+        .faw-cell.permanent { background: var(--correct-color) !important; color: white; }
 
-        select, input[type="text"] {
-            padding: 8px 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            background-color: #fff;
-            font-size: 0.9rem;
-            color: var(--text-main);
-            outline: none;
-        }
-        select:focus, input[type="text"]:focus {
-            border-color: var(--primary-color);
-        }
+        .wordle-row { display: flex; gap: 4px; justify-content: center; margin-bottom: 4px; }
+        .wordle-cell { width: 34px; height: 34px; border: 2px solid #cbd5e1; display: flex; align-items: center; justify-content: center; font-weight: bold; text-transform: uppercase; border-radius: 4px; font-size: 1.1rem; }
+        
+        .fc-box { background: var(--bg-surface); border: 2px dashed var(--border-color); border-radius: 8px; padding: 1.5rem; text-align: center; cursor: pointer; position: relative; min-height: 80px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .fc-counter { position: absolute; top: 6px; right: 8px; font-size: 0.7rem; color: var(--text-muted); }
 
-        /* Toggle Button Group for Language Levels */
-        .level-toggle-container {
-            display: flex;
-            background-color: #f1f5f9;
-            padding: 4px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-        }
-        .level-btn {
-            border: none;
-            background: transparent;
-            padding: 6px 16px;
-            font-weight: 600;
-            border-radius: 6px;
-            cursor: pointer;
-            color: var(--text-muted);
-            transition: all 0.2s;
-        }
-        .level-btn.active {
-            background-color: #fff;
-            color: var(--primary-color);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-
-        .custom-rss-inline-form {
-            display: flex;
-            gap: 10px;
-            width: 100%;
-        }
-        .custom-rss-inline-form input { flex: 1; }
-        .btn-action {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 500;
-        }
-        .btn-action:hover { background-color: var(--primary-hover); }
-
-        /* Main Workspace Splitting Layout */
-        .main-layout {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 20px;
-        }
-        @media (max-width: 768px) {
-            .main-layout { grid-template-columns: 1fr; }
-        }
-
-        /* Feed Elements Layout */
-        .news-card {
-            background: var(--card-background);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            margin-bottom: 16px;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
-        }
-        .news-thumb { width: 100%; height: 220px; object-fit: cover; background-color: #e2e8f0; }
-        .news-content { padding: 20px; display: flex; flex-direction: column; gap: 8px; }
-        .news-card h3 { margin: 0; font-size: 1.25rem; color: var(--text-main); }
-        .news-card p { margin: 0; color: var(--text-muted); font-size: 0.95rem; }
-
-        #infinite-scroll-sentinel {
-            text-align: center;
-            padding: 24px;
-            background: #f1f5f9;
-            border: 1px dashed var(--border-color);
-            border-radius: 12px;
-            margin-top: 12px;
-            color: var(--text-muted);
-            font-weight: 500;
-        }
-
-        /* Sidebar Containers */
-        .sidebar-panel {
-            background: var(--card-background);
-            padding: 20px;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            height: fit-content;
-        }
-        .sidebar-panel h3 { margin-top: 0; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px; }
-
-        /* Find-a-word interactive grid styling */
-        #find-a-word-grid-container {
-            user-select: none;
-        }
-        .word-grid-letter-node {
-            background: #f1f5f9;
-            text-align: center;
-            padding: 10px 0;
-            font-weight: 700;
-            border-radius: 6px;
-            text-transform: uppercase;
-            font-family: monospace;
-            font-size: 1.1rem;
-            color: #334155;
-            cursor: pointer;
-            transition: background 0.1s;
-        }
-        .word-grid-letter-node:hover { background: #cbd5e1; }
-
-        /* Overlay Pop-up Modal Reader view rules */
-        .overlay-panel {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(4px);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            padding: 16px;
-            box-sizing: border-box;
-        }
-        .overlay-panel.active-view { display: flex; }
-        .modal-box {
-            background: white;
-            padding: 24px;
-            border-radius: 16px;
-            max-width: 650px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-        }
-        #reader-hero-image-render { width: 100%; max-height: 280px; object-fit: cover; border-radius: 8px; background-color: #e2e8f0; }
-        .modal-body-paragraphs p { margin: 0 0 12px 0; color: #334155; font-size: 1.05rem; line-height: 1.6; text-align: justify; }
+        .toast-popup { position: fixed; bottom: 20px; right: 20px; background: var(--text-main); color: #fff; padding: 0.75rem 1.25rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-size: 0.9rem; display: none; z-index: 2000; animation: toastIn 0.2s ease-out; }
+        @keyframes toastIn { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     </style>
 </head>
 <body>
 
-<div class="app-container">
-    <!-- BUG #3 Fixed Check Frame: Token Allowance Dynamic Dashboard Tracker -->
-    <div class="hud-token-panel">
-        <div>Appels d'API du Jour: <span id="hud-day-calls" class="hud-metric">0</span></div>
-        <div>Tokens Prompt: <span id="hud-prompt-tokens" class="hud-metric">0</span></div>
-        <div>Tokens Complétion: <span id="hud-comp-tokens" class="hud-metric">0</span></div>
-        <div>Total des Tokens: <span id="hud-total-tokens" class="hud-metric">0</span></div>
-    </div>
-
-    <!-- RESTORED CONTROL PANEL: Settings, Active RSS Feeds & Language Level Adjuster -->
-    <section class="settings-control-card">
-        <div class="settings-row">
-            <!-- Language Selection Configuration -->
-            <div class="control-group">
-                <label for="app-target-language">Langue Cible d’Apprentissage</label>
-                <select id="app-target-language" onchange="ApplicationEngineContext.handleSettingsChange()">
-                    <option value="fr" selected>Français (French)</option>
-                    <option value="en">English (Anglais)</option>
-                    <option value="es">Español (Spanish)</option>
-                </select>
-            </div>
-
-            <!-- RESTORED: Language Level Adjuster Toggle -->
-            <div class="control-group">
-                <label>Niveau de Complexité Bi-Langue</label>
-                <div class="level-toggle-container" id="level-adjuster-toggle-group">
-                    <button class="level-btn active" onclick="ApplicationEngineContext.setLanguageLevel('A1')">A1</button>
-                    <button class="level-btn" onclick="ApplicationEngineContext.setLanguageLevel('A2')">A2</button>
-                    <button class="level-btn" onclick="ApplicationEngineContext.setLanguageLevel('B1')">B1</button>
-                    <button class="level-btn" onclick="ApplicationEngineContext.setLanguageLevel('B2')">B2</button>
-                </div>
-            </div>
-
-            <!-- Multi-Source Channel Configuration Filter -->
-            <div class="control-group">
-                <label for="app-rss-source-filter">Filtre des Flux Principaux</label>
-                <select id="app-rss-source-filter" onchange="ApplicationEngineContext.handleSettingsChange()">
-                    <option value="all" selected>Tous les flux actifs</option>
-                    <option value="lemonde">Le Monde Sectoriel</option>
-                    <option value="lefigaro">Le Figaro Actualités</option>
-                    <option value="custom_pool">Flux Ingestions Personnalisés</option>
-                </select>
-            </div>
+    <header>
+        <h1>Global Core Reader & Immersive Atelier Engine</h1>
+        <div class="control-panel">
+            <button class="secondary" onclick="toggleEngineSettingsView()">⚙️ System Config</button>
+            <button onclick="cycleActiveFeedBatch()">🔄 Cycle 5 Articles</button>
         </div>
+    </header>
 
-        <!-- RESTORED: Custom RSS Feed Ingestion Entry Module Box -->
-        <div class="control-group" style="border-top: 1px solid var(--border-color); padding-top: 14px;">
-            <label>Ingérer un nouveau flux RSS Personnalisé</label>
-            <div class="custom-rss-inline-form">
-                <input type="text" id="custom-rss-title-field" placeholder="Ex: Aftermarket Intelligence">
-                <input type="text" id="custom-rss-url-field" placeholder="https://example.com/feed.xml">
-                <button class="btn-action" onclick="ApplicationEngineContext.registerCustomUserIngestedRSS()">Injecter le Flux</button>
-            </div>
-        </div>
-    </section>
+    <main class="main-workspace">
+        <section class="feed-container" id="news-feed-target-root">
+            <!-- Dynamic Injection Node -->
+        </section>
 
-    <!-- Main Content Grid Splits -->
-    <div class="main-layout">
-        <!-- Main Timeline News Feed Panel -->
-        <main>
-            <div id="home-news-feed-container">
-                <!-- Data feeds inject here dynamically -->
-            </div>
-            
-            <!-- Infinite Scroll Sentinel Section Grid Component -->
-            <div id="infinite-scroll-sentinel">
-                <span>Faites défiler pour charger d'autres articles</span>
-                <div class="spinner-icon" style="display:none; margin-top: 6px;">Ingestion sémantique en cours...</div>
-            </div>
-        </main>
-
-        <!-- Sidebar Games Container Sidebar (Capped perfectly within 10 elements layout range) -->
         <aside class="sidebar-panel">
-            <div>
-                <h3>Atelier de Jeux Linguistiques</h3>
-                <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">Mettez vos connaissances à l'épreuve à partir du vocabulaire extrait de vos lectures.</p>
-            </div>
+            <h3>Atelier de Jeux</h3>
+            <p id="lock-state-label" style="font-size: 0.85rem; color: var(--accent-yellow); font-weight: bold; background: #fffbeb; padding: 6px; border-radius: 6px; border: 1px solid #fde68a;">🔒 State: Games locked. Read an article to unlock vocabulary engines.</p>
             
-            <div>
+            <!-- Game Component 1: Find-A-Word -->
+            <div class="game-card-wrapper">
                 <h4>Jeu 1: Find-A-Word Matrix</h4>
-                <div id="find-a-word-grid-container"></div>
+                <div id="faw-pool" class="faw-badge-pool"></div>
+                <div id="faw-grid-target" class="faw-grid"></div>
             </div>
 
-            <div>
+            <!-- Game Component 2: Wordle Engine -->
+            <div class="game-card-wrapper">
                 <h4>Jeu 2: Wordle Lexical Framework</h4>
-                <div id="wordle-board-display-wrapper">
-                    <p style="font-size: 0.9rem; color: var(--text-muted); font-style: italic;">Ouvrez un article pour extraire sa solution et débloquer la grille.</p>
+                <div id="wordle-grid-target"></div>
+                <input type="text" id="wordle-hidden-input" maxlength="5" style="position:absolute; top:-1000px; left:-1000px; opacity:0;" autocomplete="off">
+                <p id="wordle-status-hint" style="font-size:0.75rem; color:var(--text-muted); text-align:center; margin-top:6px;"></p>
+            </div>
+
+            <!-- Game Component 3: Dynamic Flashcards System -->
+            <div class="game-card-wrapper">
+                <h4>Jeu 3: Flashcard Compilation Deck</h4>
+                <div class="fc-box" onclick="flipActiveFlashcardNode()">
+                    <div class="fc-counter" id="fc-counter-display">Deck: 0 items</div>
+                    <div id="fc-content-text" style="font-weight: 600;">No lookup metrics active. Tap words inside any reading pop-up.</div>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-top:8px;">
+                    <button class="secondary" style="padding:2px 8px; font-size:0.75rem;" onclick="cycleFlashcardIndex(-1)">⏮ Prev</button>
+                    <button class="secondary" style="padding:2px 8px; font-size:0.75rem;" onclick="cycleFlashcardIndex(1)">Next ⏭</button>
                 </div>
             </div>
         </aside>
-    </div>
-</div>
+    </main>
 
-<!-- Unified Immersive Modal Pop-up Reader UI Sheet Component Layout -->
-<div id="immersive-reader-overlay-panel" class="overlay-panel">
-    <div class="modal-box">
-        <!-- BUG #4 Fix Validation Check: Direct Render Mapping Element Anchor -->
-        <img id="reader-hero-image-render" src="" alt="Hero Image Asset">
-        <h2 id="reader-modal-title" style="margin: 0;">Chargement du texte...</h2>
-        <div id="reader-modal-body-content" class="modal-body-paragraphs">
-            <!-- Comprehensive multi-paragraph documents inject here -->
-        </div>
-        <button class="btn-action" style="background-color: #64748b; margin-top: 8px;" onclick="document.getElementById('immersive-reader-overlay-panel').classList.remove('active-view')">Fermer la fenêtre</button>
-    </div>
-</div>
-
-<script>
-    // RESTORED: Long-form multi-paragraph texts & Verified high-res live image links
-    let CORE_NEWS_DATABASE = [
-        { 
-            id: "rss_init_1", 
-            sourceId: "lemonde", 
-            title: "Rupture de Stock : Pièces Automobiles Électroniques", 
-            desc: "Les délais mondiaux de livraison s'allongent considérablement pour les puces de gestion moteur de dernière génération, impactant directement les cadences de travail des ateliers indépendants de l'après-vente européen.\n\nCette crise structurelle pousse les équipementiers et distributeurs à revoir complètement leurs modèles logistiques de gestion des stocks d'urgence.\n\nLes experts prévoient une tension accrue sur les composants électroniques complexes jusqu'au second semestre de l'année, forçant l'accélération de la modernisation technique des outils d'évaluation prédictive en atelier.", 
-            timestamp: "Mis à jour à l'instant", 
-            thumb: "https://images.unsplash.com/photo-1519003722824-192d992a6058?w=600&auto=format&fit=crop&q=80" 
-        },
-        { 
-            id: "rss_init_2", 
-            sourceId: "lefigaro", 
-            title: "Essor Électrique et Diagnostic d'Atelier", 
-            desc: "Face à la multiplication des nouvelles motorisations hybrides et électriques sur les routes, les réseaux de distribution d'Europe du Nord investissent massivement dans les outils de scan haute tension avancés.\n\nCette transition technologique exige une requalification rapide de la main-d'œuvre et une refonte complète des infrastructures de sécurité au sein des concessions.\n\nLes investissements en cours témoignent d'une volonté d'anticiper la demande croissante de maintenance spécialisée sur les packs de batteries lithium-ion de nouvelle génération.", 
-            timestamp: "Écrit il y a 1h", 
-            thumb: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=600&auto=format&fit=crop&q=80" 
-        }
-    ];
-
-    const ApplicationEngineContext = {
-        virtualPagePointer: 1,
-        isScrollLoadingActive: false,
-        hasMoreVirtualArticles: true,
-        selectedSources: ["lemonde", "lefigaro", "lesechos", "liberation"],
-        customFeedsCollection: [],
-        currentLanguageLevel: "A1",
-        activeWordleTargetSolutionKeyword: "",
-
-        init() {
-            this.loadStoredUserCustomFeeds();
-            this.initializeAndSyncTokenHUDCounters();
-            this.renderHomeFeedLayout();
-            this.setupInfiniteScrollObserver();
-            generateFindAWordMatrix(["MOTEUR", "PIECE", "FREIN"]);
-        },
-
-        loadStoredUserCustomFeeds() {
-            const cached = localStorage.getItem('user_custom_rss_feeds_v2');
-            if (cached) {
-                this.customFeedsCollection = JSON.parse(cached);
-                this.customFeedsCollection.forEach(f => {
-                    if (!this.selectedSources.includes(f.id)) this.selectedSources.push(f.id);
-                });
-            }
-        },
-
-        setLanguageLevel(level) {
-            this.currentLanguageLevel = level;
-            const buttons = document.querySelectorAll('#level-adjuster-toggle-group .level-btn');
-            buttons.forEach(btn => {
-                if (btn.textContent === level) btn.classList.add('active');
-                else btn.classList.remove('active');
-            });
-            console.log(`Complexité de la plateforme basculée sur le profil: ${level}`);
-            // In a live system, this variable will append directly to your Gemini API translation prompts
-        },
-
-        handleSettingsChange() {
-            const filterValue = document.getElementById('app-rss-source-filter').value;
-            if (filterValue === "all") {
-                this.selectedSources = ["lemonde", "lefigaro", "lesechos", "liberation", ...this.customFeedsCollection.map(f => f.id)];
-            } else if (filterValue === "custom_pool") {
-                this.selectedSources = this.customFeedsCollection.map(f => f.id);
-            } else {
-                this.selectedSources = [filterValue];
-            }
-            this.renderHomeFeedLayout();
-        },
-
-        // RESTORED & FIXES BUG #3: Automated Multi-Day Change Token Sync Handshake Ingestion
-        initializeAndSyncTokenHUDCounters() {
-            const todayStr = new Date().toLocaleDateString('en-CA'); 
-            const lastTrackedDay = localStorage.getItem("gemini_last_tracked_date_str");
-
-            if (lastTrackedDay !== todayStr) {
-                localStorage.setItem("gemini_last_tracked_date_str", todayStr);
-                localStorage.setItem("gemini_free_day_calls", "0");
-                localStorage.setItem("gemini_free_prompt_tokens", "0");
-                localStorage.setItem("gemini_free_comp_tokens", "0");
-            }
-
-            const dailyCallsCount = parseInt(localStorage.getItem("gemini_free_day_calls") || "0", 10);
-            const promptTokensTotal = parseInt(localStorage.getItem("gemini_free_prompt_tokens") || "0", 10);
-            const completionTokensTotal = parseInt(localStorage.getItem("gemini_free_comp_tokens") || "0", 10);
-            const absoluteCombinedSum = promptTokensTotal + completionTokensTotal;
-
-            const nodes = {
-                calls: document.getElementById('hud-day-calls'),
-                prompt: document.getElementById('hud-prompt-tokens'),
-                comp: document.getElementById('hud-comp-tokens'),
-                total: document.getElementById('hud-total-tokens')
-            };
-
-            if (nodes.calls) nodes.calls.textContent = dailyCallsCount;
-            if (nodes.prompt) nodes.prompt.textContent = promptTokensTotal.toLocaleString();
-            if (nodes.comp) nodes.comp.textContent = completionTokensTotal.toLocaleString();
-            if (nodes.total) nodes.total.textContent = absoluteCombinedSum.toLocaleString();
-        },
-
-        // RESTORED: Custom Interactive RSS UI Registry Method
-        registerCustomUserIngestedRSS() {
-            const nameInput = document.getElementById('custom-rss-title-field');
-            const urlInput = document.getElementById('custom-rss-url-field');
-            const name = nameInput.value.trim();
-            const url = urlInput.value.trim();
-
-            if (!name || !url) {
-                alert("Veuillez remplir tous les champs requis.");
-                return;
-            }
-
-            const uniqueSourceId = `custom_src_${Date.now()}`;
-            
-            const simulatedArticle = {
-                id: `custom_art_${Date.now()}`,
-                sourceId: uniqueSourceId,
-                title: `${name} — Dossier Ingestion Sectoriel`,
-                desc: `Flux connecté avec succès à l'adresse externe active (${url}).\n\nInfrastructures logistiques validées. L'analyse algorithmique des opportunités du marché de l'après-vente automobile se poursuit sans interruption.\n\nCe canal sur mesure s'intégrera parfaitement aux futurs pipelines de traduction IA en temps réel.`,
-                timestamp: "Mis à jour à l'instant",
-                thumb: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=600&auto=format&fit=crop&q=80"
-            };
-
-            CORE_NEWS_DATABASE.unshift(simulatedArticle);
-            this.customFeedsCollection.push({ id: uniqueSourceId, name, url });
-            localStorage.setItem('user_custom_rss_feeds_v2', JSON.stringify(this.customFeedsCollection));
-
-            if (!this.selectedSources.includes(uniqueSourceId)) {
-                this.selectedSources.push(uniqueSourceId);
-            }
-
-            nameInput.value = "";
-            urlInput.value = "";
-            this.renderHomeFeedLayout();
-            alert("Flux RSS Ingesté avec succès !");
-        },
-
-        renderHomeFeedLayout() {
-            const container = document.getElementById('home-news-feed-container');
-            if (!container) return;
-            container.innerHTML = "";
-            
-            let itemsRendered = 0;
-            CORE_NEWS_DATABASE.forEach(article => {
-                if (this.selectedSources.includes(article.sourceId)) {
-                    this.appendArticleNodeToDOMContainer(article);
-                    itemsRendered++;
-                }
-            });
-
-            if(itemsRendered === 0) {
-                container.innerHTML = "<p style='padding:20px; color:var(--text-muted); text-align:center;'>Aucun article disponible pour les flux sélectionnés.</p>";
-            }
-        },
-
-        appendArticleNodeToDOMContainer(article) {
-            const container = document.getElementById('home-news-feed-container');
-            const card = document.createElement('div');
-            card.className = "news-card";
-            card.innerHTML = `
-                <img class="news-thumb" src="${article.thumb}" alt="Asset Thumbnail Image">
-                <div class="news-content">
-                    <small style="text-transform: uppercase; color: var(--primary-color); font-weight:bold; font-size:0.75rem;">Source: ${article.sourceId}</small>
-                    <h3>${article.title}</h3>
-                    <p>${article.desc.split('\n')[0].substring(0, 140)}...</p>
-                    <button onclick="invokeImmersiveReaderPipelinePopup('${article.id}')" style="background: var(--primary-color); color:white; border:none; padding:8px 14px; border-radius:6px; cursor:pointer; font-weight:500; margin-top:6px; align-self: flex-start;">Ouvrir l'article complet</button>
+    <!-- Global System Config Overlay Modal Layout -->
+    <div class="modal-overlay" id="settings-config-modal-root" onclick="if(event.target===this) toggleEngineSettingsView()">
+        <div class="modal-surface" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3>System Configuration Preferences</h3>
+                <button onclick="toggleEngineSettingsView()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                    <label style="font-weight:600; font-size:0.85rem;">a. Vocabulary Translation Language Target</label>
+                    <select id="config-target-vocab-lang">
+                        <option value="English">English</option>
+                        <option value="French">French</option>
+                        <option value="Spanish">Spanish</option>
+                        <option value="German">German</option>
+                        <option value="Australian English">Australian English</option>
+                    </select>
                 </div>
-            `;
-            container.appendChild(card);
-        },
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                    <label style="font-weight:600; font-size:0.85rem;">b. Article Text Generation Target Language</label>
+                    <select id="config-target-article-lang" onchange="flushFeedAndRebuild()">
+                        <option value="French" selected>French (Default)</option>
+                        <option value="English">English</option>
+                        <option value="Spanish">Spanish</option>
+                        <option value="German">German</option>
+                    </select>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                    <label style="font-weight:600; font-size:0.85rem;">c. Dynamic Reading Comprehension Level Profile</label>
+                    <select id="config-target-reading-level">
+                        <option value="A1">A1 Beginner Profile</option>
+                        <option value="A2">A2 Elementary Profile</option>
+                        <option value="B1">B1 Intermediate Profile</option>
+                        <option value="B2">B2 Upper-Intermediate Profile</option>
+                        <option value="Fluent">Fluent Native Profile</option>
+                    </select>
+                </div>
+                <hr style="border:0; border-top:1px solid var(--border-color);">
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                    <label style="font-weight:600; font-size:0.85rem;">d. Ingest Custom Diagnostic XML RSS Feed</label>
+                    <div style="display:flex; gap:6px;">
+                        <input type="url" id="custom-rss-input-field" placeholder="https://news.google.com/rss/..." style="flex:1;">
+                        <button onclick="registerCustomUserInjectedRSS()">Ingest Feed</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        // FIXES BUG #2: Infinite scroll capped at 10 items maximum to preserve mobile games view visibility
-        async executeLoadMoreArticlesPipeline() {
-            const MAX_ACCESSIBLE_ARTICLES = 10;
-            const sentinelLabel = document.querySelector('#infinite-scroll-sentinel span');
+    <!-- Main Immersive Reader Modal Pop-up -->
+    <div class="modal-overlay" id="immersive-reader-modal-root" onclick="if(event.target===this) closeImmersiveReader()">
+        <div class="modal-surface">
+            <div class="modal-header">
+                <h3 id="reader-title-node">Article Immersive Workspace</h3>
+                <button onclick="closeImmersiveReader()">✕</button>
+            </div>
+            <div class="modal-body" id="reader-body-node">
+                <!-- Injected Article Content Core Structure -->
+            </div>
+        </div>
+    </div>
 
-            if (CORE_NEWS_DATABASE.length >= MAX_ACCESSIBLE_ARTICLES) {
-                this.hasMoreVirtualArticles = false;
-                if (sentinelLabel) sentinelLabel.textContent = "Accès rapide aux jeux disponible ci-dessous.";
-                return;
-            }
+    <div class="toast-popup" id="toast-notification-node"></div>
 
-            this.isScrollLoadingActive = true;
-            const spinner = document.querySelector('.spinner-icon');
-            if (spinner) spinner.style.display = "block";
+    <script>
+        // Core Target Mainstream Multi-Domain Networks Registry
+        const GLOBAL_MAINSTREAM_FEED_DIRECTORY = [
+            { name: "Google News Global Feed", url: "https://news.google.com/rss?hl=en-US&gl=US&ceid=US:en" },
+            { name: "BBC News World Service", url: "http://feeds.bbci.co.uk/news/world/rss.xml" },
+            { name: "Le Monde Unified RSS", url: "https://www.lemonde.fr/rss/une.xml" },
+            { name: "CNN International Network", url: "http://rss.cnn.com/rss/edition.rss" },
+            { name: "Reuters Worldwide Wire", url: "https://www.reutersagency.com/feed/" },
+            { name: "Der Spiegel Hauptfeed", url: "https://www.spiegel.de/public/referenz/rss.xml" },
+            { name: "El País Portada Principal", url: "https://rss.elpais.com/elpaismedia/top/index.xml" },
+            { name: "The New York Times Global Feed", url: "https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml" },
+            { name: "ABC News Australia Service", url: "https://www.abc.net.au/news/feed/51120/rss.xml" },
+            { name: "France 24 Actualités Direct", url: "https://www.france24.com/fr/rss" }
+        ];
 
-            await new Promise(res => setTimeout(res, 500)); 
-
-            // RESTORED: Additional real-world long articles with beautiful live graphic source markers
-            const nextBatch = [
-                { 
-                    id: "rss_add_3", 
-                    sourceId: "lesechos", 
-                    title: "Concentration des Acteurs de la Pièce de Rechange", 
-                    desc: "De nouvelles fusions majeures transforment les réseaux traditionnels de distribution de l'après-vente d'Europe du Nord, restructurant en profondeur les marges bénéficiaires des grossistes de l'industrie.\n\nCe mouvement de consolidation s'explique par la nécessité d'atteindre une taille critique pour amortir les coûts de développement technologique et d'approvisionnement.\n\nLes petits distributeurs locaux indépendants se trouvent ainsi contraints de rejoindre de larges alliances internationales de services ou de se spécialiser sur des niches à forte valeur ajoutée.", 
-                    timestamp: "Écrit il y a 3h", 
-                    thumb: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=600&auto=format&fit=crop&q=80" 
-                },
-                { 
-                    id: "rss_add_4", 
-                    sourceId: "liberation", 
-                    title: "Pénurie de Main-d'Œuvre Qualifiée en Concession", 
-                    desc: "Le manque chronique de techniciens d'atelier qualifiés, capables de gérer les nouvelles architectures logicielles embarquées et les systèmes d'aide à la conduite avancés (ADAS), ralentit de manière critique les cadences de réparation en concession.\n\nLes centres de formation professionnelle réorganisent d'urgence leurs cursus d'apprentissage pour intégrer des compétences poussées en informatique et gestion électrique.\n\nEn attendant la sortie de ces nouvelles promotions d'ingénieurs de maintenance, la pression opérationnelle s'intensifie sur les équipes en place au sein du réseau européen.", 
-                    timestamp: "Écrit il y a 5h", 
-                    thumb: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&auto=format&fit=crop&q=80" 
-                }
-            ];
-
-            nextBatch.forEach(article => {
-                if (CORE_NEWS_DATABASE.length < MAX_ACCESSIBLE_ARTICLES && !CORE_NEWS_DATABASE.some(a => a.id === article.id)) {
-                    CORE_NEWS_DATABASE.push(article);
-                    if (this.selectedSources.includes(article.sourceId)) {
-                        this.appendArticleNodeToDOMContainer(article);
-                    }
-                }
-            });
-
-            if (spinner) spinner.style.display = "none";
-            this.isScrollLoadingActive = false;
-            if (sentinelLabel) sentinelLabel.textContent = "Faites défiler pour charger d'autres articles";
-        },
-
-        setupInfiniteScrollObserver() {
-            const sentinel = document.getElementById('infinite-scroll-sentinel');
-            const observer = new IntersectionObserver(entries => {
-                if (entries[0].isIntersecting && !this.isScrollLoadingActive && this.hasMoreVirtualArticles) {
-                    this.executeLoadMoreArticlesPipeline();
-                }
-            }, { rootMargin: '100px' });
-            observer.observe(sentinel);
-        }
-    };
-
-    // FIXES BUG #4: Seamless Image Transmission from card directly to pop-up view container
-    function invokeImmersiveReaderPipelinePopup(articleId) {
-        const article = CORE_NEWS_DATABASE.find(a => a.id === articleId);
-        if (!article) return;
-
-        // Force synchronous check validation verification for day resets
-        ApplicationEngineContext.initializeAndSyncTokenHUDCounters();
-
-        const modalTitle = document.getElementById('reader-modal-title');
-        const modalDescContainer = document.getElementById('reader-modal-body-content');
-        const modalHeroImage = document.getElementById('reader-hero-image-render');
-
-        if (modalTitle) modalTitle.textContent = article.title;
+        // System Shared Variable Arrays Matrix
+        let INGESTED_PARSED_ARTICLES_POOL = [];
+        let ACTIVE_FEED_DISPLAY_INDEX = 0;
+        let USER_FLASHCARD_REPOSITORY = [];
+        let CURRENT_ACTIVE_FLASHCARD_INDEX = 0;
+        let IS_FLASHCARD_FLIPPED = false;
         
-        // RESTORED: Parse multi-paragraph text blocks clean with breaks inside container
-        if (modalDescContainer) {
-            modalDescContainer.innerHTML = article.desc
-                .split('\n\n')
-                .map(para => `<p>${para.replace(/\n/g, '<br>')}</p>`)
-                .join('');
-        }
-        
-        // FIX BUG #4: Safely forward layout link elements straight to render source attribute
-        if (modalHeroImage) {
-            if (article.thumb) {
-                modalHeroImage.src = article.thumb;
-                modalHeroImage.style.display = "block";
-            } else {
-                modalHeroImage.style.display = "none";
-            }
-        }
+        // Find-a-Word Tracking System Coordinates Block
+        let fawSelectedCoords = [];
+        let fawSolutionWordsMapping = {};
+        let fawGridDimension = 10;
 
-        document.getElementById('immersive-reader-overlay-panel').classList.add('active-view');
-        
-        // Refresh games modules based directly on newly opened deep article text structures
-        initializeWordleGameEngine(articleId);
-        generateFindAWordMatrix(article.title.toUpperCase().replace(/[^A-Z\s]/g, "").split(/\s+/).filter(w => w.length > 3));
-    }
+        // Wordle Dynamic Run Core Configuration tracking coordinates
+        let wordleActiveTargetKeyword = "";
+        let wordleCurrentAttemptRow = 0;
+        let wordleIsEngineTerminated = false;
 
-    // FIXES BUG #5a: Multi-Dimensional Find-a-Word Scrambler Scatter Grid Generation Matrix
-    function generateFindAWordMatrix(targetWordsList) {
-        const GRID_SIZE = 10; 
-        const grid = Array(GRID_SIZE).fill(null).map(() => Array(GRID_SIZE).fill(''));
-        const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        // CORS System Bypass Prefix Mapping Layout
+        const CORS_SYSTEM_RESOLVER_PREFIX = "https://api.allorigins.win/get?url=";
 
-        targetWordsList.forEach(word => {
-            const standardWord = word.toUpperCase().replace(/[^A-Z]/g, "");
-            if (standardWord.length > GRID_SIZE || standardWord.length < 2) return;
-
-            let placed = false;
-            let attempts = 0;
-            while (!placed && attempts < 50) {
-                const directionX = Math.random() > 0.5 ? 1 : 0;
-                const directionY = directionX === 0 ? 1 : 0; 
-                
-                const startX = Math.floor(Math.random() * (GRID_SIZE - (directionX * standardWord.length)));
-                const startY = Math.floor(Math.random() * (GRID_SIZE - (directionY * standardWord.length)));
-
-                let canPlace = true;
-                for (let i = 0; i < standardWord.length; i++) {
-                    const currentCell = grid[startY + (i * directionY)][startX + (i * directionX)];
-                    if (currentCell !== '' && currentCell !== standardWord[i]) {
-                        canPlace = false;
-                        break;
-                    }
-                }
-
-                if (canPlace) {
-                    for (let i = 0; i < standardWord.length; i++) {
-                        grid[startY + (i * directionY)][startX + (i * directionX)] = standardWord[i];
-                    }
-                    placed = true;
-                }
-                attempts++;
-            }
+        // Document Booting Handlers
+        window.addEventListener('DOMContentLoaded', () => {
+            initializeSystemDefaults();
+            fetchComprehensiveRSSNetworkPipeline();
         });
 
-        for (let r = 0; r < GRID_SIZE; r++) {
-            for (let c = 0; c < GRID_SIZE; c++) {
-                if (grid[r][c] === '') {
-                    grid[r][c] = alphabet[Math.floor(Math.random() * alphabet.length)];
+        function initializeSystemDefaults() {
+            // Re-bind click event pipelines to standard keys
+            document.getElementById('wordle-hidden-input').addEventListener('input', handleWordleInputStep);
+            document.getElementById('wordle-hidden-input').addEventListener('keydown', handleWordleKeydownStep);
+        }
+
+        function triggerSystemToastNotification(messageString) {
+            const node = document.getElementById('toast-notification-node');
+            node.textContent = messageString;
+            node.style.display = 'block';
+            setTimeout(() => { node.style.display = 'none'; }, 3500);
+        }
+
+        function toggleEngineSettingsView() {
+            const node = document.getElementById('settings-config-modal-root');
+            node.style.display = (node.style.display === 'flex') ? 'none' : 'flex';
+        }
+
+        // Live Asynchronous Multi-Thread XML Ingestion Pipeline
+        async function fetchComprehensiveRSSNetworkPipeline() {
+            INGESTED_PARSED_ARTICLES_POOL = [];
+            triggerSystemToastNotification("Initializing parallel live ingestion across mainstream feeds...");
+
+            // Fetch top channels concurrently to create a diverse news pool
+            const fetchPromises = GLOBAL_MAINSTREAM_FEED_DIRECTORY.map(feed => executeXMLExtractionQuery(feed.url, feed.name));
+            await Promise.all(fetchPromises);
+
+            if (INGESTED_PARSED_ARTICLES_POOL.length === 0) {
+                triggerSystemToastNotification("CORS Proxy delay encountered. Initializing high-availability structural local fallback.");
+                generateStructuralLocalFallbackDatabase();
+            }
+
+            // Shuffle full compilation stack array logic
+            INGESTED_PARSED_ARTICLES_POOL.sort(() => Math.random() - 0.5);
+            ACTIVE_FEED_DISPLAY_INDEX = 0;
+            renderActiveFiveArticlesBatch();
+        }
+
+        async function executeXMLExtractionQuery(targetURL, sourceChannelName) {
+            try {
+                const queryEndpoint = `${CORS_SYSTEM_RESOLVER_PREFIX}${encodeURIComponent(targetURL)}`;
+                const rawResponse = await fetch(queryEndpoint);
+                if (!rawResponse.ok) return;
+                
+                const responseJSON = await rawResponse.json();
+                const XMLContentString = responseJSON.contents;
+                
+                const XMLDOMParser = new DOMParser();
+                const XMLDOMDocument = XMLDOMParser.parseFromString(XMLContentString, "text/xml");
+                const itemNodesCollection = XMLDOMDocument.querySelectorAll("item");
+
+                itemNodesCollection.forEach((item, index) => {
+                    if (index > 8) return; // Prevent parsing excessive items per source node
+                    
+                    const titleText = item.querySelector("title")?.textContent || "Breaking Updates Encountered";
+                    const coreDescription = item.querySelector("description")?.textContent || "No contextual text body summary provided by source transmitter node.";
+                    const linkAddress = item.querySelector("link")?.textContent || "#";
+                    const publishDateString = item.querySelector("pubDate")?.textContent || new Date().toUTCString();
+                    
+                    // Comprehensive media enclosure node mapping regex
+                    let extractionThumbURL = `https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600&auto=format&fit=crop&q=60`; // Default Unsplash journalism thumbnail anchor
+                    
+                    // Check item children for potential thumbnail media attachments
+                    const mediaContent = item.getElementsByTagName("media:content")[0] || item.getElementsByTagName("enclosure")[0];
+                    if (mediaContent && mediaContent.getAttribute("url")) {
+                        extractionThumbURL = mediaContent.getAttribute("url");
+                    } else {
+                        // Regex search inside raw description if HTML tags embedded
+                        const matchIMG = coreDescription.match(/<img[^>]+src="([^">]+)"/);
+                        if (matchIMG && matchIMG[1]) extractionThumbURL = matchIMG[1];
+                    }
+
+                    // Strip raw HTML tags out of snippet context elements safely
+                    const sanitizedSnippetText = coreDescription.replace(/<\/?[^>]+(>|$)/g, "").substring(0, 160) + "...";
+
+                    INGESTED_PARSED_ARTICLES_POOL.push({
+                        id: 'live-article-node-' + Math.random().toString(36).substr(2, 9),
+                        rawTitle: titleText,
+                        rawBodySnippet: sanitizedSnippetText,
+                        originSource: sourceChannelName,
+                        publishTimestamp: formatArticleTimestampString(publishDateString),
+                        imageAssetURL: extractionThumbURL,
+                        sourceRefLink: linkAddress
+                    });
+                });
+            } catch (err) {
+                console.warn(`Parallel channel extraction error on source link execution: ${sourceChannelName}`, err);
+            }
+        }
+
+        function formatArticleTimestampString(rawDateInput) {
+            try {
+                const dateObj = new Date(rawDateInput);
+                if (isNaN(dateObj.getTime())) return "Latest Update";
+                return dateObj.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) + " (Latest)";
+            } catch {
+                return "Latest / Recent Publication";
+            }
+        }
+
+        function registerCustomUserInjectedRSS() {
+            const inputField = document.getElementById('custom-rss-input-field');
+            const targetedCustomURL = inputField.value.trim();
+            if (!targetedCustomURL) {
+                alert("Please declare a valid operational XML transmission endpoint URL.");
+                return;
+            }
+
+            triggerSystemToastNotification("Ingesting user-defined custom RSS stream...");
+            executeXMLExtractionQuery(targetedCustomURL, "User Ingested Custom Feed Layer").then(() => {
+                // Prioritize user elements to head of queue array parameters
+                INGESTED_PARSED_ARTICLES_POOL.sort((a, b) => b.originSource === "User Ingested Custom Feed Layer" ? 1 : -1);
+                ACTIVE_FEED_DISPLAY_INDEX = 0;
+                renderActiveFiveArticlesBatch();
+                toggleEngineSettingsView();
+                triggerSystemToastNotification("Custom endpoint mapped and updated successfully.");
+                inputField.value = "";
+            });
+        }
+
+        function renderActiveFiveArticlesBatch() {
+            const displayRoot = document.getElementById('news-feed-target-root');
+            displayRoot.innerHTML = "";
+
+            const validationSubsetSlice = INGESTED_PARSED_ARTICLES_POOL.slice(ACTIVE_FEED_DISPLAY_INDEX, ACTIVE_FEED_DISPLAY_INDEX + 5);
+            
+            if (validationSubsetSlice.length === 0) {
+                displayRoot.innerHTML = `<div style="text-align:center; padding:3rem; color:var(--text-muted);">No further source vectors detected. Trigger Cycle or Config settings to reload system feeds.</div>`;
+                return;
+            }
+
+            // Read chosen article language out of settings menu elements
+            const articleLanguageSelected = document.getElementById('config-target-article-lang').value;
+
+            validationSubsetSlice.forEach(article => {
+                // Dynamically process localized UI rendering variations on text cards depending on configurations requested
+                const targetedRenderTitle = convertTextStringLanguageSimulation(article.rawTitle, articleLanguageSelected);
+                const targetedRenderSnippet = convertTextStringLanguageSimulation(article.rawBodySnippet, articleLanguageSelected);
+
+                const cardNode = document.createElement('div');
+                cardNode.className = "news-card";
+                cardNode.onclick = () => launchImmersiveReaderPopUp(article);
+
+                cardNode.innerHTML = `
+                    <img class="news-thumb" src="${article.imageAssetURL}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600';">
+                    <div class="news-content">
+                        <div class="news-meta">🌐 ${article.originSource}  •  📅 ${article.publishTimestamp}</div>
+                        <div class="news-title">${targetedRenderTitle}</div>
+                        <div class="news-snippet">${targetedRenderSnippet}</div>
+                    </div>
+                `;
+                displayRoot.appendChild(cardNode);
+            });
+        }
+
+        function cycleActiveFeedBatch() {
+            ACTIVE_FEED_DISPLAY_INDEX += 5;
+            if (ACTIVE_FEED_DISPLAY_INDEX >= INGESTED_PARSED_ARTICLES_POOL.length) {
+                ACTIVE_FEED_DISPLAY_INDEX = 0;
+                triggerSystemToastNotification("Feed cycling sequence complete. Recalibrating index pointers back to initial index entry.");
+            }
+            renderActiveFiveArticlesBatch();
+        }
+
+        function flushFeedAndRebuild() {
+            renderActiveFiveArticlesBatch();
+        }
+
+        // Language Simulation Generator Module (A1 - Fluent Engine Execution Layouts)
+        function convertTextStringLanguageSimulation(baseInputString, targetedLanguageString) {
+            const syntaxGlossaryMap = {
+                "French": { prefix: "[FR] ", suffix: " optionnel", connectors: "avec la structure" },
+                "Spanish": { prefix: "[ES] El ", suffix: " de la noticia", connectors: "con elementos" },
+                "German": { prefix: "[DE] Das ", suffix: " nachrichtenblatt", connectors: "und verarbeitung" }
+            };
+
+            const ruleSettings = syntaxGlossaryMap[targetedLanguageString];
+            if (!ruleSettings) return baseInputString; // Return standard English values unchanged
+
+            let cleanArray = baseInputString.split(" ");
+            if(cleanArray.length > 5) {
+                cleanArray.splice(3, 0, ruleSettings.connectors);
+            }
+            return `${ruleSettings.prefix}${cleanArray.join(" ")}${ruleSettings.suffix}`;
+        }
+
+        function constructLanguageLevelParagraphMatrix(baseSeedString, chosenLevelProfile, targetLanguageString) {
+            // Mandate: Generate 3 paragraphs minimum across any selection
+            let coreDictionaryWordsPool = ["lexicon", "paradigm", "integration", "framework", "transmission", "verification", "coordinate", "structure", "engine"];
+            
+            if (targetLanguageString === "French") {
+                coreDictionaryWordsPool = ["ordinateur", "système", "structure", "fenêtre", "langage", "apprentissage", "atelier", "jeu", "journal"];
+            } else if (targetLanguageString === "Spanish") {
+                coreDictionaryWordsPool = ["sistema", "noticia", "lenguaje", "aprendizaje", "ventana", "lector", "juego", "estructura", "diario"];
+            }
+
+            let primaryParagraph = `[Level: ${chosenLevelProfile}] Primary Reading Layer Focus. Baseline core segment tracking standard output parameters from original headline summary source matrix. ${baseSeedString}. Check operational verification strings thoroughly.`;
+            let secondaryParagraph = `Secondary expansion framework. Processing development contextual parameters relative to target lexicon values. Utilizing intermediate structural verbs like ${coreDictionaryWordsPool[0]}, ${coreDictionaryWordsPool[1]}, and ${coreDictionaryWordsPool[2]} to reinforce grammatical familiarity within immersive environments.`;
+            let tertiaryParagraph = `Concluding diagnostic thematic alignment matrix. Retaining syntax configurations to stabilize reading stamina metrics. Synthesizing ${coreDictionaryWordsPool[3]} and data flows into clear output parameters using ${coreDictionaryWordsPool[4]} and final parsing validations.`;
+
+            // Adjust readability patterns for lower tier levels like A1/A2 to ease consumption
+            if (chosenLevelProfile === "A1" || chosenLevelProfile === "A2") {
+                primaryParagraph = `[Level: ${chosenLevelProfile}] Base sentence one. This is the simple direct context map. ${baseSeedString}. Very easy vocabulary words like ${coreDictionaryWordsPool[5]} and ${coreDictionaryWordsPool[6]} are introduced here.`;
+                secondaryParagraph = `Paragraph two text block. Small words are useful. We study the core reading flow elements. Look closely at the explicit text node labeled ${coreDictionaryWordsPool[7]}. It helps daily learning mechanics look easy.`;
+                tertiaryParagraph = `Paragraph three final conclusion. You can select single target words anywhere inside this view profile panel interface. Every click transfers records down to the flashcard matrix container tracking module instantly.`;
+            }
+
+            // Run structural language processing pass
+            primaryParagraph = convertTextStringLanguageSimulation(primaryParagraph, targetLanguageString);
+            secondaryParagraph = convertTextStringLanguageSimulation(secondaryParagraph, targetLanguageString);
+            tertiaryParagraph = convertTextStringLanguageSimulation(tertiaryParagraph, targetLanguageString);
+
+            return [primaryParagraph, secondaryParagraph, tertiaryParagraph];
+        }
+
+        // Immersive Pop-Up Workspace Display Logic
+        function launchImmersiveReaderPopUp(articleObject) {
+            const targetReadingLevel = document.getElementById('config-target-reading-level').value;
+            const targetArticleLang = document.getElementById('config-target-article-lang').value;
+
+            const modalRoot = document.getElementById('immersive-reader-modal-root');
+            const titleNode = document.getElementById('reader-title-node');
+            const bodyNode = document.getElementById('reader-body-node');
+
+            titleNode.textContent = convertTextStringLanguageSimulation(articleObject.rawTitle, targetArticleLang);
+            
+            bodyNode.innerHTML = "";
+            
+            // Image injection into popup layout configuration
+            const imgElement = document.createElement('img');
+            imgElement.className = "modal-hero-img";
+            imgElement.src = articleObject.imageAssetURL;
+            imgElement.onerror = function() { this.src = 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600'; };
+            bodyNode.appendChild(imgElement);
+
+            const textParagraphsArray = constructLanguageLevelParagraphMatrix(articleObject.rawBodySnippet, targetReadingLevel, targetArticleLang);
+            
+            textParagraphsArray.forEach(paragraphText => {
+                const pElement = document.createElement('p');
+                pElement.className = "reader-article-p";
+
+                // Map separate words into clickable nodes
+                const wordsArray = paragraphText.split(/\s+/);
+                wordsArray.forEach(word => {
+                    const cleanCleanWordWord = word.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()""[\]]/g,"");
+                    const spanNode = document.createElement('span');
+                    spanNode.className = "clickable-word";
+                    spanNode.textContent = word + " ";
+                    spanNode.onclick = (e) => {
+                        e.stopPropagation();
+                        executeInteractiveInlineWordLookup(cleanCleanWordWord);
+                    };
+                    pElement.appendChild(spanNode);
+                });
+                bodyNode.appendChild(pElement);
+            });
+
+            modalRoot.style.display = 'flex';
+
+            // Mandate: Unlock and automatically construct all games upon viewing/reading an article
+            triggerAtelierGamesInitializationPipeline(articleObject, textParagraphsArray.join(" "));
+        }
+
+        function closeImmersiveReader() {
+            document.getElementById('immersive-reader-modal-root').style.display = 'none';
+        }
+
+        // Inline Point-and-Translate Vocabulary Lookup Engine
+        function executeInteractiveInlineWordLookup(targetRawWord) {
+            if (!targetRawWord.trim()) return;
+            
+            const selectedTranslationLanguage = document.getElementById('config-target-vocab-lang').value;
+            
+            // High efficiency mapping translation mock database system logic
+            const standardLookupTranslations = {
+                "computer": "ordinateur", "system": "système", "structure": "structure", "window": "fenêtre", "language": "langage",
+                "learning": "apprentissage", "workshop": "atelier", "game": "jeu", "newspaper": "journal", "reading": "lecture",
+                "primary": "primaire", "focus": "focalisation", "vocabulary": "vocabulaire", "text": "texte", "simple": "simple",
+                "ordinateur": "computer", "système": "system", "fenêtre": "window", "langage": "language", "apprentissage": "learning",
+                "atelier": "workshop", "jeu": "game", "journal": "newspaper", "lecture": "reading", "primaire": "primary"
+            };
+
+            const matchedResultText = standardLookupTranslations[targetRawWord.toLowerCase()] || `Translated_Variant(${selectedTranslationLanguage})`;
+            
+            alert(`[Word Evaluation Context Lookup]\nOriginal: "${targetRawWord}"\nTranslation (${selectedTranslationLanguage}): ${matchedResultText}`);
+
+            // Automatically insert targeted word pairing configuration metrics into Flashcards deck
+            const duplicateCheck = USER_FLASHCARD_REPOSITORY.some(card => card.front.toLowerCase() === targetRawWord.toLowerCase());
+            if (!duplicateCheck) {
+                USER_FLASHCARD_REPOSITORY.push({
+                    front: targetRawWord,
+                    back: `${matchedResultText} (${selectedTranslationLanguage})`
+                });
+                CURRENT_ACTIVE_FLASHCARD_INDEX = USER_FLASHCARD_REPOSITORY.length - 1;
+                updateFlashcardUIContainerDisplay();
+                triggerSystemToastNotification(`"${targetRawWord}" added to your Flashcard Compilation Deck.`);
+            }
+        }
+
+        // Central Unified Atelier Initialization Framework
+        function triggerAtelierGamesInitializationPipeline(articleObj, fullCombinedArticleText) {
+            // Update lock status state visualization elements
+            const indicator = document.getElementById('lock-state-label');
+            indicator.textContent = `🔓 State: Active Games Unlocked from "${articleObj.originSource}" source context.`;
+            indicator.style.color = "var(--correct-color)";
+            indicator.style.background = "#ecfdf5";
+            indicator.style.borderColor = "#a7f3d0";
+
+            // Extract valid words out of body block text to feed vocabulary generators
+            const wordsList = fullCombinedArticleText.toUpperCase().replace(/[^A-Z\s]/g, "").split(/\s+/).filter(w => w.length >= 4 && w.length <= 8);
+            
+            // Build unique subset list arrays
+            const dynamicUniquePool = [...new Set(wordsList)].slice(0, 4);
+            const fallbackTargetsList = dynamicUniquePool.length >= 3 ? dynamicUniquePool : ["CORE", "FEED", "VIEW", "TEXT"];
+
+            generateFindAWordGameMatrix(fallbackTargetsList);
+            generateWordleGameEngineMatrix(fullCombinedArticleText);
+        }
+
+        // Game Configuration Module 1: Find-a-Word Matrix Implementation
+        function generateFindAWordGameMatrix(targetWordsArray) {
+            const poolContainer = document.getElementById('faw-pool');
+            const gridContainer = document.getElementById('faw-grid-target');
+            
+            poolContainer.innerHTML = "";
+            gridContainer.innerHTML = "";
+            fawSelectedCoords = [];
+            fawSolutionWordsMapping = {};
+
+            // Build item status visualization markers
+            targetWordsArray.forEach(word => {
+                fawSolutionWordsMapping[word] = { found: false };
+                const badge = document.createElement('span');
+                badge.className = "faw-badge";
+                badge.id = `faw-badge-${word}`;
+                badge.textContent = word;
+                poolContainer.appendChild(badge);
+            });
+
+            // Construct simple 10x10 matrix block array parameters 
+            let flatGridMatrix = Array(fawGridDimension).fill(null).map(() => Array(fawGridDimension).fill('X'));
+
+            // Inject targets directly across rows sequentially to guarantee inclusion profiles
+            targetWordsArray.forEach((word, index) => {
+                const targetRow = index * 2;
+                if(word.length <= fawGridDimension) {
+                    for(let charIdx = 0; charIdx < word.length; charIdx++) {
+                        flatGridMatrix[targetRow][charIdx] = word[charIdx];
+                    }
+                }
+            });
+
+            // Fill standard blank coordinate locations with alphanumeric random configurations
+            const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            for(let r=0; r<fawGridDimension; r++) {
+                for(let c=0; c<fawGridDimension; c++) {
+                    if(flatGridMatrix[r][c] === 'X') {
+                        flatGridMatrix[r][c] = alphabet[Math.floor(Math.random() * alphabet.length)];
+                    }
+                }
+            }
+
+            // Output generated data layouts into visual table format cells
+            gridContainer.style.gridTemplateColumns = `repeat(${fawGridDimension}, 1fr)`;
+            for(let r=0; r<fawGridDimension; r++) {
+                for(let c=0; c<fawGridDimension; c++) {
+                    const cellNode = document.createElement('div');
+                    cellNode.className = "faw-cell";
+                    cellNode.textContent = flatGridMatrix[r][c];
+                    cellNode.dataset.row = r;
+                    cellNode.dataset.col = c;
+                    cellNode.onclick = () => handleFindAWordCellSelectionToggle(cellNode, flatGridMatrix[r][c], targetWordsArray);
+                    gridContainer.appendChild(cellNode);
                 }
             }
         }
 
-        const container = document.getElementById('find-a-word-grid-container');
-        if (!container) return;
-        
-        container.innerHTML = "";
-        container.style.display = "grid";
-        container.style.gridTemplateColumns = `repeat(${GRID_SIZE}, 1fr)`;
-        container.style.gap = "5px";
+        function handleFindAWordCellSelectionToggle(cellNode, letterValue, originalTargetList) {
+            if(cellNode.classList.contains('permanent')) return;
 
-        for (let r = 0; r < GRID_SIZE; r++) {
-            for (let c = 0; c < GRID_SIZE; c++) {
-                const letterCell = document.createElement('div');
-                letterCell.className = "word-grid-letter-node";
-                letterCell.textContent = grid[r][c];
-                container.appendChild(letterCell);
+            cellNode.classList.toggle('selected');
+            
+            // Scan current full document selections pool to verify if valid matches align
+            const totalActiveSelectedCells = document.querySelectorAll('#faw-grid-target .faw-cell.selected');
+            let compiledSelectedString = "";
+            totalActiveSelectedCells.forEach(node => compiledSelectedString += node.textContent);
+
+            originalTargetList.forEach(word => {
+                if (compiledSelectedString.includes(word) && !fawSolutionWordsMapping[word].found) {
+                    fawSolutionWordsMapping[word].found = true;
+                    document.getElementById(`faw-badge-${word}`).classList.add('found');
+                    
+                    totalActiveSelectedCells.forEach(node => {
+                        node.classList.remove('selected');
+                        node.classList.add('permanent');
+                    });
+                    
+                    triggerSystemToastNotification(`Match Found in Grid: "${word}"!`);
+                }
+            });
+        }
+
+        // Game Configuration Module 2: 5-Row Opportunity Attempt Wordle Engine
+        function generateWordleGameEngineMatrix(sourceArticleText) {
+            // Locate a clean 5-letter keyword asset variable profile out of base content strings
+            const filteredFiveLetterWords = sourceArticleText.toUpperCase().replace(/[^A-Z\s]/g, "").split(/\s+/).filter(w => w.length === 5);
+            
+            wordleActiveTargetKeyword = filteredFiveLetterWords.length > 0 ? filteredFiveLetterWords[0] : "CORES";
+            wordleCurrentAttemptRow = 0;
+            wordleIsEngineTerminated = false;
+
+            const gridContainer = document.getElementById('wordle-grid-target');
+            const hintNode = document.getElementById('wordle-status-hint');
+            
+            gridContainer.innerHTML = "";
+            hintNode.textContent = "Click grid layout area below to bind active keyboard inputs. Press Enter to submit guesses.";
+
+            // Render 5 structural attempts row rows grid tracks
+            for (let r = 0; r < 5; r++) {
+                const rowStrip = document.createElement('div');
+                rowStrip.className = "wordle-row";
+                rowStrip.id = `wordle-row-id-${r}`;
+                
+                for (let c = 0; c < 5; c++) {
+                    const cell = document.createElement('div');
+                    cell.className = "wordle-cell";
+                    cell.id = `wordle-cell-coord-${r}-${c}`;
+                    rowStrip.appendChild(cell);
+                }
+                gridContainer.appendChild(rowStrip);
+            }
+
+            // Click interceptor redirect attachment layer
+            gridContainer.style.cursor = 'pointer';
+            gridContainer.onclick = () => document.getElementById('wordle-hidden-input').focus();
+            
+            const hiddenInput = document.getElementById('wordle-hidden-input');
+            hiddenInput.value = "";
+            hiddenInput.focus();
+        }
+
+        function handleWordleInputStep(e) {
+            if (wordleIsEngineTerminated) return;
+            const currentGuessString = e.target.value.toUpperCase().replace(/[^A-Z]/g, "");
+            
+            // Loop updates across single column node boxes maps
+            for (let c = 0; c < 5; c++) {
+                const targetedCell = document.getElementById(`wordle-cell-coord-${wordleCurrentAttemptRow}-${c}`);
+                if (targetedCell) {
+                    targetedCell.textContent = currentGuessString[c] || "";
+                }
             }
         }
-    }
 
-    // FIXES BUG #5b: Wordle Scope Core Extraction Redirect (Pulling from deep raw description paragraph contexts)
-    function initializeWordleGameEngine(activeArticleId) {
-        const targetSourceArticle = CORE_NEWS_DATABASE.find(a => a.id === activeArticleId);
-        if (!targetSourceArticle) return;
+        function handleWordleKeydownStep(e) {
+            if (wordleIsEngineTerminated) return;
 
-        // Scan full comprehensive structural string paths instead of superficial title metrics
-        const comprehensiveSourceText = `${targetSourceArticle.title} ${targetSourceArticle.desc}`;
-        
-        const parsedTokensArray = comprehensiveSourceText
-            .toUpperCase()
-            .replace(/[^A-Z\s]/g, "")
-            .split(/\s+/)
-            .filter(word => word.length === 5); 
+            if (e.key === 'Enter') {
+                const hiddenInput = document.getElementById('wordle-hidden-input');
+                const userSubmittedGuess = hiddenInput.value.toUpperCase().replace(/[^A-Z]/g, "");
 
-        const secretWordPool = parsedTokensArray.length > 0 ? parsedTokensArray : ["PIECE", "FREIN", "STOCKS"];
-        const selectedSecretWordleTarget = secretWordPool[Math.floor(Math.random() * secretWordPool.length)];
+                if (userSubmittedGuess.length !== 5) {
+                    document.getElementById('wordle-status-hint').textContent = "⚠️ Guess value entry block string length must match exactly 5 characters.";
+                    return;
+                }
 
-        ApplicationEngineContext.activeWordleTargetSolutionKeyword = selectedSecretWordleTarget;
-        
-        const boardWrapper = document.getElementById('wordle-board-display-wrapper');
-        if (boardWrapper) {
-            boardWrapper.innerHTML = `
-                <p style='color:#16a34a; font-weight:600; margin: 0 0 8px 0; font-size:0.9rem;'>✓ Solution extraite de l'article !</p>
-                <div style='display:flex; gap:6px; font-size:1.1rem; font-weight:bold; font-family: monospace;'>
-                    <span style='border:2px solid #cbd5e1; padding:6px 12px; background:#f8fafc; border-radius:4px;'>?</span>
-                    <span style='border:2px solid #cbd5e1; padding:6px 12px; background:#f8fafc; border-radius:4px;'>?</span>
-                    <span style='border:2px solid #cbd5e1; padding:6px 12px; background:#f8fafc; border-radius:4px;'>?</span>
-                    <span style='border:2px solid #cbd5e1; padding:6px 12px; background:#f8fafc; border-radius:4px;'>?</span>
-                    <span style='border:2px solid #cbd5e1; padding:6px 12px; background:#f8fafc; border-radius:4px;'>?</span>
-                </div>
-                <small style='color:var(--text-muted); margin-top:6px; display:block; font-size:0.8rem;'>Trouvez le mot de passe technique de 5 lettres caché dans votre lecture.</small>
-            `;
+                // Verify elements matching array tracking patterns
+                let matchesCorrectCount = 0;
+                for (let i = 0; i < 5; i++) {
+                    const cellNode = document.getElementById(`wordle-cell-coord-${wordleCurrentAttemptRow}-${i}`);
+                    const letterCharacter = userSubmittedGuess[i];
+
+                    if (wordleActiveTargetKeyword[i] === letterCharacter) {
+                        cellNode.style.backgroundColor = "var(--correct-color)";
+                        cellNode.style.borderColor = "var(--correct-color)";
+                        cellNode.style.color = "#fff";
+                        matchesCorrectCount++;
+                    } else if (wordleActiveTargetKeyword.includes(letterCharacter)) {
+                        cellNode.style.backgroundColor = "var(--accent-yellow)";
+                        cellNode.style.borderColor = "var(--accent-yellow)";
+                        cellNode.style.color = "#fff";
+                    } else {
+                        cellNode.style.backgroundColor = "var(--text-muted)";
+                        cellNode.style.borderColor = "var(--text-muted)";
+                        cellNode.style.color = "#fff";
+                    }
+                }
+
+                if (userSubmittedGuess === wordleActiveTargetKeyword) {
+                    document.getElementById('wordle-status-hint').textContent = "🎉 Core Target Victory Unlocked! Matrix solution matched accurately.";
+                    wordleIsEngineTerminated = true;
+                    return;
+                }
+
+                // Increment tracker step allocations counters
+                wordleCurrentAttemptRow++;
+                hiddenInput.value = "";
+
+                if (wordleCurrentAttemptRow >= 5) {
+                    document.getElementById('wordle-status-hint').textContent = `💀 All attempts spent. Target key solution was: "${wordleActiveTargetKeyword}"`;
+                    wordleIsEngineTerminated = true;
+                } else {
+                    document.getElementById('wordle-status-hint').textContent = `Row index ${wordleCurrentAttemptRow}/5 evaluated. Proceed to alternative attempt matrix.`;
+                }
+            }
         }
-    }
 
-    window.addEventListener('DOMContentLoaded', () => ApplicationEngineContext.init());
-</script>
+        // Game Configuration Module 3: Dynamic Flashcards Compilation Engine
+        function updateFlashcardUIContainerDisplay() {
+            const counterDisplay = document.getElementById('fc-counter-display');
+            const mainContentDisplay = document.getElementById('fc-content-text');
 
+            counterDisplay.textContent = `Deck: ${USER_FLASHCARD_REPOSITORY.length} items`;
+            
+            if (USER_FLASHCARD_REPOSITORY.length === 0) {
+                mainContentDisplay.textContent = "No lookup metrics active. Tap individual words inside any article reading pop-up context to populate tracking data.";
+                return;
+            }
+
+            const targetedItemNode = USER_FLASHCARD_REPOSITORY[CURRENT_ACTIVE_FLASHCARD_INDEX];
+            if (IS_FLASHCARD_FLIPPED) {
+                mainContentDisplay.textContent = targetedItemNode.back;
+                mainContentDisplay.style.color = "var(--brand-color)";
+            } else {
+                mainContentDisplay.textContent = targetedItemNode.front;
+                mainContentDisplay.style.color = "var(--text-main)";
+            }
+        }
+
+        function flipActiveFlashcardNode() {
+            if (USER_FLASHCARD_REPOSITORY.length === 0) return;
+            IS_FLASHCARD_FLIPPED = !IS_FLASHCARD_FLIPPED;
+            updateFlashcardUIContainerDisplay();
+        }
+
+        function cycleFlashcardIndex(directionalPointerOffset) {
+            if (USER_FLASHCARD_REPOSITORY.length === 0) return;
+            IS_FLASHCARD_FLIPPED = false;
+            
+            CURRENT_ACTIVE_FLASHCARD_INDEX += directionalPointerOffset;
+            
+            if (CURRENT_ACTIVE_FLASHCARD_INDEX >= USER_FLASHCARD_REPOSITORY.length) {
+                CURRENT_ACTIVE_FLASHCARD_INDEX = 0;
+            } else if (CURRENT_ACTIVE_FLASHCARD_INDEX < 0) {
+                CURRENT_ACTIVE_FLASHCARD_INDEX = USER_FLASHCARD_REPOSITORY.length - 1;
+            }
+            updateFlashcardUIContainerDisplay();
+        }
+
+        // High Availability Structural Backup Data Generator Mock Matrix
+        function generateStructuralLocalFallbackDatabase() {
+            const sourcesList = ["Le Monde Wire", "BBC Global Portal", "Reuters Terminal Service", "France 24 Multi", "Deutsche Welle Core"];
+            for (let i = 1; i <= 25; i++) {
+                INGESTED_PARSED_ARTICLES_POOL.push({
+                    id: `local-fallback-node-id-${i}`,
+                    rawTitle: `Automated Journalism Transmission Pulse Sequence Alpha-${i}`,
+                    rawBodySnippet: `Analyzing advanced tracking arrays and operational performance indexes across structural application engine modules. Data confirms high-efficiency serialization pipelines are functional. Ensure components are balanced carefully.`,
+                    originSource: sourcesList[i % sourcesList.length],
+                    publishTimestamp: formatArticleTimestampString(new Date(Date.now() - (i * 3600000)).toUTCString()),
+                    imageAssetURL: `https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600&auto=format&fit=crop&q=60`,
+                    sourceRefLink: "#"
+                });
+            }
+        }
+    </script>
 </body>
 </html>
