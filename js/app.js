@@ -151,8 +151,8 @@ const TARGET_TO_LEARNER_DICTIONARY = {
 
 const IMMERSIVE_LANGUAGE_TRANSLATION_DICTIONARY = {
     "French": {
-        "A1": { prefix: "Rapport d'actualité élémentaire (Niveau A1).", bodyTemplates: ["Regardez cette mise à jour importante du marché mondial. L'économie globale change rapidement chaque jour et les équipes locales travaillent très dur. Ils adoptent maintenant la nouvelle stratégie de croissance durable. La voiture électrique moderne et le nouveau moteur propre transforment complètement toute l'industrie automobile cette année. Les clients aiment beaucoup cette technologie.\n\nUne grande analyse de l'entreprise moderne montre des résultats intéressants. Les directeurs étudient le marché avec une attention spéciale. La vitesse de développement est cruciale pour l'équipe cette saison. Tout le monde participe activement à la course internationale pour l'innovation numérique."] },
-        "A2": { prefix: "Analyse Élémentaire Suivie (Niveau A2).", bodyTemplates: ["Cette grande entreprise internationale commence un projet important sur le marché mondial. Les ingénieurs construisent une nouvelle voiture électrique avec un moteur très efficace. L'équipe technique change sa stratégie de croissance pour réussir cette année dans des conditions difficiles. Les ouvriers d'usine collaborent pour réduire les coûts de fabrication de manière significative."] },
+        "A1": { prefix: "Rapport d'actualité élémentaire (Niveau A1).", bodyTemplates: ["Regardez cette mise à jour importante du marché mondial. L'économie globale change rapidement chaque jour et les équipes locales travaillent très dur. Ils adoptent maintenant la nouvelle stratégie de croissance durable. La voiture électrique moderne et le nouveau moteur propre transforment complètement toute l'industrie automobile cette année. Les clients aiment beaucoup cette technologie.\n\nUne grande analyse de l'entreprise moderne shows des résultats intéressants. Les directeurs étudient le marché avec une attention spéciale. La vitesse de développement est cruciale pour l'équipe cette saison. Tout le monde participe activement à la course internationale pour l'innovation numérique."] },
+        "A2": { prefix: "Analyse Élémentaire Suivie (Niveau A2).", bodyTemplates: ["Cette grande entreprise internationale commence un projet important sur le marché mondial. Les ingénieurs construisent une nouvelle voiture électrique avec un moteur très efficace. L'équipe technique change sa stratégie de croissance pour réussir cette année dans des conditions difficiles. Les ouvriers d'usine collaborent pour réduire les coûts de fabrication de manière de manière significative."] },
         "B1": { prefix: "Développement Thématique Structurel (Niveau Intermédiaire B1).", bodyTemplates: ["L'évolution récente du marché mondial suscite des discussions stratégiques majeures au sein de l'entreprise. En examinant les données de croissance sectorielles, les experts constatent une accélération notable de la production de voitures propres. Les nouveaux moteurs hybrides affichent une efficacité énergétique record, ce qui permet à l'équipe de consolider sa position face à la concurrence internationale cette année."] },
         "B2": { prefix: "Rapport Analytique Avancé (Niveau Élevé B2).", bodyTemplates: ["Les indicateurs macroéconomiques actuels révèlent une mutation profonde des structures opérationnelles de l'entreprise. La convergence de l'intelligence artificielle et de la gestion de réseau a permis de maximiser l'efficacité globale sur le marché. De plus, les ingénieurs de l'équipe ont validé un prototype de moteur révolutionnaire destiné à équiper la future gamme de voitures autonomes."] },
         "C1": { prefix: "Synthèse Institutionnelle Complexe (Niveau Avancé C1).", bodyTemplates: ["L'examen approfondi des dynamiques systémiques qui régissent le marché mondial met en exergue l'impératif de restructuration pour toute entreprise aspirant à la pérennité. Les transformations actuelles ne se limitent pas à une simple transition technologique; elles exigent une refonte holistique de la stratégie de croissance industrielle."] },
@@ -298,8 +298,11 @@ async function fetchComprehensiveRSSNetworkPipeline() {
     const networkPipelinesGroup = unifiedExecutionList.map(source => executeXMLExtractionQuery(source.url, source.name));
     await Promise.all(networkPipelinesGroup);
 
+    // CRITICAL CONTROL CHECK: Only trigger fallback matrix if absolutely zero live feeds succeeded
     if (INGESTED_PARSED_ARTICLES_POOL.length === 0) {
+        console.warn("All live streams failed or returned empty data. Activating fallback matrix.");
         generateStructuralLocalFallbackDatabase();
+        return; // <-- FIX: Terminates method execution here so network races won't clash
     }
 
     INGESTED_PARSED_ARTICLES_POOL.sort(() => Math.random() - 0.5);
@@ -310,26 +313,51 @@ async function fetchComprehensiveRSSNetworkPipeline() {
 async function executeXMLExtractionQuery(targetEndpointURL, feedSourceLabel) {
     try {
         const resolvingEndpointGate = `${CORS_SYSTEM_RESOLVER_PREFIX}${encodeURIComponent(targetEndpointURL)}`;
-        const networkQueryResponse = await fetch(resolvingEndpointGate);
-        if (!networkQueryResponse.ok) return;
+        
+        // Add a reasonable timeout configuration to prevent hanging connections
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 7000); // 7-second cutoff
+
+        const networkQueryResponse = await fetch(resolvingEndpointGate, { signal: controller.signal });
+        clearTimeout(timeoutId);
+
+        if (!networkQueryResponse.ok) {
+            console.error(`HTTP Error on ${feedSourceLabel}: Status ${networkQueryResponse.status}`);
+            return;
+        }
         
         const payloadJSON = await networkQueryResponse.json();
+
+        // FIX: Explicitly verify AllOrigins proxy data object wrapper properties safely before processing
+        if (!payloadJSON || !payloadJSON.contents) {
+            console.warn(`Proxy wrapper returned empty payload for ${feedSourceLabel}`);
+            return;
+        }
+
         const DOMPars = new DOMParser();
         const xmlDoc = DOMPars.parseFromString(payloadJSON.contents, "text/xml");
+
+        // FIX: Fail-safe structural parsing error check to prevent execution on corrupted strings
+        if (xmlDoc.querySelector("parsererror")) {
+            console.error(`XML Parse failure structural error for feed source: ${feedSourceLabel}`);
+            return;
+        }
+
         const items = xmlDoc.querySelectorAll("item");
+        if (items.length === 0) return;
 
         items.forEach((itemNode, idx) => {
-            if (idx > 5) return;
+            if (idx >= 5) return; // FIX: Strict inequality upper bounds limit calculation loop correctly
+            
             let refLink = itemNode.querySelector("link")?.textContent || "#";
             let pubD = itemNode.querySelector("pubDate")?.textContent || new Date().toUTCString();
             
-            // FIX: Extracts real data strings from structural XML tree nodes
             let extractedContent = itemNode.querySelector("description")?.textContent || 
                                    itemNode.querySelector("encoded")?.textContent || "";
             
             let imgUrl = "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600";
-            
             const uniqueIdCode = 'node-' + Math.random().toString(36).substr(2, 9);
+            
             INGESTED_PARSED_ARTICLES_POOL.push({
                 id: uniqueIdCode, 
                 originSource: feedSourceLabel, 
@@ -340,7 +368,7 @@ async function executeXMLExtractionQuery(targetEndpointURL, feedSourceLabel) {
             });
         });
     } catch (e) { 
-        console.warn("XML Extraction step bypassed for " + feedSourceLabel); 
+        console.warn(`XML Extraction step failed or timed out for ${feedSourceLabel}:`, e.message); 
     }
 }
 
@@ -352,7 +380,7 @@ function renderActiveFiveArticlesBatch() {
     const sliceBatch = INGESTED_PARSED_ARTICLES_POOL.slice(ACTIVE_FEED_DISPLAY_INDEX, ACTIVE_FEED_DISPLAY_INDEX + 5);
     const targetArticleLangSelection = document.getElementById('config-target-article-lang').value;
     
-    // FIX: Level mapped via normalization utility layer safely
+    // Level mapped via normalization utility layer safely
     const rawLevelProfile = document.getElementById('config-target-reading-level').value;
     const readerLevelProfileSelection = normalizeReadingLevelProfile(rawLevelProfile);
     
