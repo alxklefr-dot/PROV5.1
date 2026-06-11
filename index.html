@@ -3,749 +3,395 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Global Core Reader & Immersive Atelier Engine</title>
-    <style>
-        :root {
-            --bg-primary: #f8fafc;
-            --bg-surface: #ffffff;
-            --border-color: #e2e8f0;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --brand-color: #2563eb;
-            --correct-color: #10b981;
-            --accent-yellow: #f59e0b;
-            --danger-color: #ef4444;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-            background-color: var(--bg-primary); 
-            color: var(--text-main); 
-            display: flex; 
-            flex-direction: column; 
-            height: 100vh; 
-            overflow: hidden; 
-        }
-
-        header { background: var(--bg-surface); border-bottom: 1px solid var(--border-color); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; z-index: 10; }
-        h1 { font-size: 1.3rem; color: var(--brand-color); }
-
-        /* Circuit Breaker Status Pill Badge Styles */
-        .breaker-status-panel { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; font-weight: 600; }
-        .status-pill { padding: 4px 10px; border-radius: 12px; color: white; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em; }
-        .status-pill.closed { background-color: var(--correct-color); }
-        .status-pill.open { background-color: var(--danger-color); animation: pulse 1.5s infinite; }
-        .status-pill.half-open { background-color: var(--accent-yellow); }
-
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
-
-        .main-workspace { 
-            flex: 1; 
-            overflow-y: auto; 
-            padding: 1.5rem 1.5rem 80px 1.5rem; 
-            display: flex;
-            justify-content: center;
-            -webkit-overflow-scrolling: touch; 
-        }
-        
-        .feed-container { width: 100%; max-width: 850px; display: flex; flex-direction: column; gap: 1rem; padding-bottom: 2rem; }
-
-        .news-card { background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.25rem; display: flex; gap: 1.25rem; cursor: pointer; transition: transform 0.2s; position: relative; }
-        .news-card:hover { transform: translateY(-2px); border-color: var(--brand-color); }
-        .news-thumb { width: 140px; height: 95px; object-fit: cover; border-radius: 8px; background: #e2e8f0; flex-shrink: 0; }
-        .news-content { display: flex; flex-direction: column; gap: 0.5rem; flex: 1; }
-        .news-meta { font-size: 0.75rem; color: var(--text-muted); font-weight: 500; }
-        .news-title { font-size: 1.1rem; font-weight: 600; line-height: 1.4; }
-        .news-snippet { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; }
-
-        .bottom-app-bar { position: fixed; bottom: 0; left: 0; right: 0; height: 64px; background: var(--bg-surface); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; align-items: center; padding: 0 1rem; box-shadow: 0 -4px 12px rgba(0,0,0,0.05); z-index: 100; }
-        .nav-button { display: flex; flex-direction: column; align-items: center; background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.75rem; font-weight: 500; gap: 4px; transition: color 0.2s; }
-        .nav-button:hover, .nav-button.active { color: var(--brand-color); }
-        .nav-button svg { width: 22px; height: 22px; fill: currentColor; }
-
-        .modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(15, 23, 42, 0.6); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 2rem; }
-        .modal-surface { background: var(--bg-surface); width: 100%; max-width: 800px; max-height: 85vh; border-radius: 16px; display: flex; flex-direction: column; overflow: hidden; animation: popUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
-        @keyframes popUp { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        .modal-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
-        .modal-body { padding: 1.5rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1.25rem; }
-        .modal-hero-img { width: 100%; max-height: 300px; object-fit: cover; border-radius: 8px; background: #e2e8f0; }
-        
-        .reader-article-p { font-size: 1.15rem; line-height: 1.7; color: #1e293b; margin-bottom: 1.25rem; text-align: justify; }
-        .clickable-word { cursor: pointer; display: inline-block; padding: 0 1px; border-radius: 3px; transition: background 0.15s; }
-        .clickable-word:hover { background: #dbeafe; color: var(--brand-color); }
-
-        .game-card-wrapper { border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; background: var(--bg-primary); margin-bottom: 1rem; }
-        .game-card-wrapper h4 { font-size: 0.95rem; margin-bottom: 0.75rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.25rem; color: var(--brand-color); }
-        
-        .faw-badge-pool { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
-        .faw-badge { background: #e2e8f0; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; }
-        .faw-badge.found { background: var(--correct-color); color: #fff; text-decoration: line-through; }
-        .faw-grid { display: grid; gap: 3px; background: #cbd5e1; padding: 4px; border-radius: 6px; margin: 0 auto; max-width: max-content; }
-        .faw-cell { width: 28px; height: 28px; background: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85rem; cursor: pointer; border-radius: 3px; user-select: none; }
-        .faw-cell.selected { background: #93c5fd; }
-        .faw-cell.permanent { background: var(--correct-color) !important; color: white; }
-
-        .wordle-row { display: flex; gap: 4px; justify-content: center; margin-bottom: 4px; }
-        .wordle-cell { width: 34px; height: 34px; border: 2px solid #cbd5e1; display: flex; align-items: center; justify-content: center; font-weight: bold; text-transform: uppercase; border-radius: 4px; font-size: 1.1rem; }
-        
-        .fc-box { background: var(--bg-surface); border: 2px dashed var(--border-color); border-radius: 8px; padding: 1.5rem; text-align: center; cursor: pointer; position: relative; min-height: 80px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .fc-counter { position: absolute; top: 6px; right: 8px; font-size: 0.7rem; color: var(--text-muted); }
-
-        .toast-popup { position: fixed; bottom: 80px; right: 20px; background: var(--text-main); color: #fff; padding: 0.75rem 1.25rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-size: 0.9rem; display: none; z-index: 2000; animation: toastIn 0.2s ease-out; }
-        @keyframes toastIn { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
-        #save-settings-cta-btn { background: var(--brand-color); color: #ffffff; font-weight: 600; border: none; border-radius: 8px; cursor: pointer; transition: background 0.2s; }
-        #save-settings-cta-btn:hover { background: #1d4ed8; }
-        .config-select-menu { width: 100%; padding: 0.5rem; border-radius: 6px; border: 1px solid var(--border-color); font-size: 0.9rem; background: var(--bg-surface); }
-    </style>
+    <title>Atelier LingoFeed Framework - Advanced CEFR Language Matrix Portal</title>
+    <!-- FONTS DEPENDENCY DEPLOYMENT -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="platform-theme-matrix v-light-mode">
 
-    <header>
-        <h1>Global Core Reader & Immersive Atelier Engine</h1>
-        <div class="breaker-status-panel">
-            <span>Engine Core API:</span>
-            <div id="circuit-breaker-indicator" class="status-pill closed">Ready</div>
-        </div>
-    </header>
+    <!-- GLOBAL NOTIFICATION LAYER -->
+    <div id="global-toast-notification-hub" class="toast-stack-container" aria-live="polite"></div>
 
-    <main class="main-workspace">
-        <section class="feed-container" id="news-feed-target-root">
-            </section>
-    </main>
+    <!-- MAIN APP WRAPPER GRID SYSTEM -->
+    <div class="app-shell-grid-container">
 
-    <nav class="bottom-app-bar">
-        <button class="nav-button" onclick="cycleActiveFeedBatch()">
-            <svg viewBox="0 0 24 24"><path d="M19 8l-4 4h3c0 3.31-2.69 6-6 6-1.01 0-1.97-.25-2.8-.7l-1.46 1.46C8.97 19.54 10.43 20 12 20c4.42 0 8-3.58 8-8h3l-4-4zM6 12c0-3.31 2.69-6 6-6 1.01 0 1.97.25 2.8.7l1.46-1.46C15.03 4.46 13.57 4 12 4c-4.42 0-8 3.58-8 8H1l4 4 4-4H6z"/></svg>
-            Cycle Feed
-        </button>
-        <button class="nav-button" onclick="toggleAtelierGamesModalView()">
-            <svg viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm3-3c-.83 0-1.5-.67-1.5-1.5S17.67 9 18.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
-            Atelier Games
-        </button>
-        <button class="nav-button" onclick="toggleEngineSettingsView()">
-            <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
-            Config Setup
-        </button>
-    </nav>
-
-    <div class="modal-overlay" id="atelier-games-modal-root" onclick="if(event.target===this) toggleAtelierGamesModalView()">
-        <div class="modal-surface">
-            <div class="modal-header">
-                <h3>Atelier de Jeux Vocabulaire</h3>
-                <button onclick="toggleAtelierGamesModalView()">✕</button>
+        <!-- LEFT NAVIGATION BAR & CONTROL SIDEBAR PANEL -->
+        <aside class="app-sidebar-navigation-panel" id="primary-sidebar-node">
+            <div class="sidebar-branding-wrapper">
+                <div class="brand-logo-graphics">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 14.7255 3.09032 17.1962 4.85857 19L3 21L5 20.1414C6.93144 21.3142 9.20815 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M8 9H16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M8 13H14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="brand-text-block">
+                    <h2>LingoFeed <span class="brand-engine-tag">Atelier</span></h2>
+                    <p>CEFR Data Extraction Engine</p>
+                </div>
             </div>
-            <div class="modal-body">
-                <p id="lock-state-label" style="font-size: 0.85rem; color: var(--accent-yellow); font-weight: bold; background: #fffbeb; padding: 10px; border-radius: 6px; border: 1px solid #fde68a;">🔒 State: Games locked. Read an article to load specific word arrays.</p>
+
+            <!-- SIDEBAR SECTIONS AND WORKSPACE ROUTING LINK PANELS -->
+            <nav class="sidebar-navigation-routing-group">
+                <div class="nav-section-header">Core Workspace</div>
                 
-                <div class="game-card-wrapper">
-                    <h4>Jeu 1: Find-A-Word Matrix</h4>
-                    <div id="faw-pool" class="faw-badge-pool"></div>
-                    <div id="faw-grid-target" class="faw-grid"></div>
-                </div>
+                <a href="#" class="nav-routing-link active-route" id="route-to-feed-view">
+                    <span class="nav-icon-box">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4 4H10V12H4V4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M14 4H20V10H14V4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M14 14H20V20H14V14Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M4 16H10V20H4V16Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <span class="nav-route-label">Unified News Stream</span>
+                </a>
 
-                <div class="game-card-wrapper">
-                    <h4>Jeu 2: Wordle Lexical Framework</h4>
-                    <div id="wordle-grid-target"></div>
-                    <input type="text" id="wordle-hidden-input" maxlength="5" style="position:absolute; top:-1000px; left:-1000px; opacity:0;" autocomplete="off">
-                    <p id="wordle-status-hint" style="font-size:0.75rem; color:var(--text-muted); text-align:center; margin-top:6px;"></p>
-                </div>
+                <a href="#" class="nav-routing-link" id="route-to-dictionary-view">
+                    <span class="nav-icon-box">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4 19.5C4 18.837 4.26339 18.2011 4.73223 17.7322C5.20107 17.2634 5.83696 17 6.5 17H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M6.5 2H20V22H6.5C5.83696 22 5.20107 21.7366 4.73223 21.2678C4.26339 20.7989 4 20.163 4 19.5V4.5C4 3.83696 4.26339 3.20107 4.73223 2.73223C5.20107 2.26339 5.83696 2 6.5 2V2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <span class="nav-route-label">My Lexicon Matrix</span>
+                    <span class="nav-pill-counter" id="sidebar-vocab-counter-badge">0</span>
+                </a>
 
-                <div class="game-card-wrapper">
-                    <h4>Jeu 3: Flashcard Compilation Deck</h4>
-                    <div class="fc-box" onclick="flipActiveFlashcardNode()">
-                        <div class="fc-counter" id="fc-counter-display">Deck: 0 items</div>
-                        <div id="fc-content-text" style="font-weight: 600;">No lookup metrics active. Tap words inside any reading pop-up.</div>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; margin-top:8px;">
-                        <button style="background:var(--border-color); color:var(--text-main); padding: 6px 12px; border:none; cursor:pointer;" onclick="cycleFlashcardIndex(-1)">⏮ Prev</button>
-                        <button style="background:var(--border-color); color:var(--text-main); padding: 6px 12px; border:none; cursor:pointer;" onclick="cycleFlashcardIndex(1)">Next ⏭</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+                <a href="#" class="nav-routing-link" id="route-to-analytics-view">
+                    <span class="nav-icon-box">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M18 20V10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12 20V4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M6 20V14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <span class="nav-route-label">Performance Analytics</span>
+                </a>
 
-    <div class="modal-overlay" id="settings-config-modal-root" onclick="if(event.target===this) toggleEngineSettingsView()">
-        <div class="modal-surface" style="max-width: 500px;">
-            <div class="modal-header">
-                <h3>System Configuration Preferences</h3>
-                <button onclick="toggleEngineSettingsView()">✕</button>
-            </div>
-            <div class="modal-body">
-                <div style="display:flex; flex-direction:column; gap:4px; background: #f0fdf4; padding: 12px; border-radius: 8px; border: 1px solid #bbf7d0; margin-bottom: 8px;">
-                    <label style="font-weight:700; font-size:0.85rem; color: #166534;">🔑 Global AI Engine Key (Gemini API)</label>
-                    <input type="password" id="config-engine-api-key" placeholder="AIzaSy..." style="width: 100%; padding: 0.5rem; border-radius:6px; border:1px solid #a7f3d0; background: #fff;">
-                    <span style="font-size: 0.7rem; color: #15803d; margin-top: 2px;">Stored locally in your client runtime partition for parsing security.</span>
-                </div>
-
-                <div style="display:flex; flex-direction:column; gap:4px;">
-                    <label style="font-weight:600; font-size:0.85rem;">a. Vocabulary Translation Language Target</label>
-                    <select id="config-target-vocab-lang" class="config-select-menu">
-                        <option value="English">English</option>
-                        <option value="French">French</option>
-                        <option value="Spanish">Spanish</option>
-                        <option value="German">German</option>
-                    </select>
-                </div>
-                <div style="display:flex; flex-direction:column; gap:4px; margin-top: 8px;">
-                    <label style="font-weight:600; font-size:0.85rem;">b. Article Text Generation Target Language</label>
-                    <select id="config-target-article-lang" class="config-select-menu">
-                        <option value="French">French</option>
-                        <option value="English">English</option>
-                        <option value="Spanish">Spanish</option>
-                        <option value="German">German</option>
-                    </select>
-                </div>
-                <div style="display:flex; flex-direction:column; gap:4px; margin-top: 8px;">
-                    <label style="font-weight:600; font-size:0.85rem;">c. Dynamic Reading Comprehension Level Profile</label>
-                    <select id="config-target-reading-level" class="config-select-menu">
-                        <option value="A1A2B1">A1-A2-B1 (Beginner / Elementary)</option>
-                        <option value="B1B2C1">B1-B2-C1 (Intermediate / Independent)</option>
-                        <option value="C1c2fluent">C1-C2-Fluent (Advanced Proficiency)</option>
-                    </select>
-                </div>
-                <hr style="border:0; border-top:1px solid var(--border-color); margin: 1rem 0;">
+                <div class="nav-section-header">Feed Directory Source Mapping</div>
                 
-                <div style="display:flex; flex-direction:column; gap:4px;">
-                    <label style="font-weight:600; font-size:0.85rem;">d. Channel Selection Filters</label>
-                    <div id="built-in-feeds-toggle-list" style="margin-bottom:10px; max-height:120px; overflow-y:auto; border:1px solid var(--border-color); padding:6px; border-radius:6px; background:var(--bg-primary);"></div>
+                <!-- BUILT-IN RSS REPOSITORIES LISTING BOX -->
+                <div class="sidebar-nested-source-tree-box" id="sidebar-builtin-sources-root">
+                    <!-- Loaded dynamically during script lifecycle sequences -->
                 </div>
 
-                <div style="display:flex; flex-direction:column; gap:4px; margin-top:4px;">
-                    <label style="font-weight:600; font-size:0.85rem;">e. Ingest Custom Diagnostic XML RSS Feed</label>
-                    <div style="display:flex; gap:6px;">
-                        <input type="url" id="custom-rss-input-field" placeholder="https://news.google.com/rss/..." style="flex:1; padding: 0.5rem; border-radius:6px; border:1px solid var(--border-color);">
-                        <button onclick="registerCustomUserInjectedRSS()" style="padding: 0 12px; cursor:pointer; background:var(--bg-surface); border:1px solid var(--border-color); border-radius:6px;">Ingest Feed</button>
-                    </div>
-                    <div id="custom-feeds-toggle-list" style="margin-top:6px;"></div>
+                <!-- CUSTOM SUBSCRIBED CHANNELS BOX -->
+                <div class="sidebar-nested-source-tree-box" id="sidebar-custom-sources-root">
+                    <div class="empty-tree-placeholder-message">No custom RSS layers compiled.</div>
                 </div>
 
-                <div style="margin-top: 1.5rem; display: flex; justify-content: flex-end;">
-                    <button id="save-settings-cta-btn" onclick="executeUnifiedSettingsSaveWorkflow()" style="width: 100%; padding: 0.75rem; font-size: 0.95rem;">
-                        💾 Save & Apply Settings
+                <!-- QUICK INTERACTIVE FORM BOX AT BASE OF ROUTING COLUMN -->
+                <div class="sidebar-action-form-anchor-block">
+                    <button class="action-trigger-btn-outline-variant" id="btn-open-add-feed-panel">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 5V19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span>Inject Custom RSS Link</span>
                     </button>
                 </div>
-            </div>
-        </div>
-    </div>
+            </nav>
 
-    <div class="modal-overlay" id="immersive-reader-modal-root" onclick="if(event.target===this) closeImmersiveReader()">
-        <div class="modal-surface">
-            <div class="modal-header">
-                <div style="display:flex; flex-direction:column; gap:4px;">
-                    <h3 id="reader-title-node">Article Immersive Workspace</h3>
-                    <div style="display:flex; align-items:center; gap:8px; margin-top:4px;">
-                        <select id="modal-change-level" onchange="syncModalLevelAndRegenerate()" style="padding:2px 6px; font-size:0.8rem; border-radius:4px;">
-                            <option value="A1">A1 (Introductory)</option>
-                            <option value="A2">A2 (Elementary)</option>
-                            <option value="B1">B1 (Intermediate)</option>
-                            <option value="B2">B2 (Upper Intermediate)</option>
-                            <option value="C1">C1 (Advanced)</option>
-                            <option value="C2">C2 (Mastery)</option>
-                            <option value="Fluent">Fluent (Native)</option>
-                        </select>
-                        <select id="modal-change-lang" onchange="syncModalLevelAndRegenerate()" style="padding:2px 6px; font-size:0.8rem; border-radius:4px;">
-                            <option value="French">French</option>
+            <!-- SIDEBAR FOOTER HARDWARE METRICS AND PROFILE ALIGNMENT -->
+            <div class="sidebar-system-profile-footer">
+                <div class="user-avatar-initials-badge">AU</div>
+                <div class="user-profile-meta-data-block">
+                    <div class="profile-title-string">Australian in Paris</div>
+                    <div class="profile-subtext-string">Target Level Tracker: <span id="footer-active-level-token">A1</span></div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- TOP CONTEXTUAL BAR GRID LAYER -->
+        <header class="workspace-top-bar-alignment-header">
+            <div class="viewport-headline-dynamic-container">
+                <h2 id="top-bar-viewport-title-string">Unified News Stream</h2>
+                <p id="top-bar-viewport-subtitle-string">Parsing decentralized real-time media feeds across targeted difficulty tiers</p>
+            </div>
+
+            <!-- DYNAMIC TARGET CONFIGURATION CONTROL TOOLBAR PANEL -->
+            <div class="workspace-global-matrix-config-toolbar">
+                <div class="toolbar-input-item-wrapper">
+                    <label for="config-target-article-lang" class="toolbar-label-node">Target Translation Track</label>
+                    <div class="custom-select-styling-shell">
+                        <select id="config-target-article-lang" class="core-toolbar-select-element">
+                            <option value="French" selected>French (Français)</option>
                             <option value="English">English</option>
-                            <option value="Spanish">Spanish</option>
-                            <option value="German">German</option>
                         </select>
-                        <div id="reader-cefr-badge-container"></div>
                     </div>
                 </div>
-                <button onclick="closeImmersiveReader()">✕</button>
-            </div>
-            <div class="modal-body" id="reader-body-node">
+
+                <div class="toolbar-input-item-wrapper">
+                    <label for="config-target-reading-level" class="toolbar-label-node">CEFR Core Scale Target</label>
+                    <div class="custom-select-styling-shell">
+                        <select id="config-target-reading-level" class="core-toolbar-select-element">
+                            <option value="A1" selected>A1 - Beginner</option>
+                            <option value="A2">A2 - Elementary</option>
+                            <option value="B1">B1 - Intermediate</option>
+                            <option value="B2">B2 - Upper-Intermediate</option>
+                            <option value="C1">C1 - Advanced</option>
+                            <option value="Fluent">Fluent - Native Track</option>
+                        </select>
+                    </div>
                 </div>
+
+                <!-- HARD RECOVERY REFRESH BUTTON COMPONENT -->
+                <button class="toolbar-icon-action-btn" id="btn-trigger-network-resync-pipeline" title="Force absolute clear and download sequence across active pipelines">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- CENTER COMPILATION CONTENT VIEWPANEL INTERFACE SCRIPTHOOK -->
+        <main class="primary-scrollable-workspace-content-canvas" id="app-primary-view-canvas-root">
+            
+            <!-- SECTION CONTAINER A: LIVE FEEDS CARDS STREAM -->
+            <section class="workspace-view-module-container active-layout-view" id="module-layout-view-news-stream">
+                <div class="stream-data-grid-header-context-bar">
+                    <div class="stream-structural-counter-string" id="stream-payload-range-readout-label">Showing records 1 - 5 in cluster</div>
+                    <div class="stream-status-indicator-badge">
+                        <span class="pulsing-radar-dot"></span>
+                        <span class="status-badge-text-string">Edge Sync Broker Connected via CorsProxy</span>
+                    </div>
+                </div>
+
+                <!-- PROGRAMMATIC TARGET INSERTION HOOK FOR INGESTED CARDS -->
+                <div class="news-cards-vertical-stack-viewport" id="news-feed-target-root">
+                    <div class="initial-loading-shimmer-card-placeholder">
+                        <div class="shimmer-animated-graphic-box"></div>
+                        <div class="shimmer-lines-group">
+                            <div class="shimmer-line line-long"></div>
+                            <div class="shimmer-line line-medium"></div>
+                            <div class="shimmer-line line-short"></div>
+                        </div>
+                    </div>
+                    <div class="initial-loading-shimmer-card-placeholder">
+                        <div class="shimmer-animated-graphic-box"></div>
+                        <div class="shimmer-lines-group">
+                            <div class="shimmer-line line-long"></div>
+                            <div class="shimmer-line line-medium"></div>
+                            <div class="shimmer-line line-short"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIEWPORT NAVIGATION PAGINATION CONTROL ACCESS SLAT -->
+                <div class="feed-pagination-toolbar-panel">
+                    <button id="feed-pagination-prev" class="action-trigger-btn-outline-variant btn-pag-nav" onclick="shiftActiveFeedBatchWindow(-1)" disabled>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M19 12H5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12 19L5 12L12 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span>Previous Stories</span>
+                    </button>
+                    <div class="pagination-page-indicator-bubbles" id="pagination-indicator-dots-root">
+                        <!-- Dynamic indicator arrays go here -->
+                    </div>
+                    <button id="feed-pagination-next" class="action-trigger-btn-outline-variant btn-pag-nav" onclick="shiftActiveFeedBatchWindow(1)">
+                        <span>Next Stories</span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12 5L19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </div>
+            </section>
+
+            <!-- SECTION CONTAINER B: DICTIONARY LEXICON MATRIX -->
+            <section class="workspace-view-module-container hidden-layout-view" id="module-layout-view-dictionary-matrix">
+                <div class="dictionary-control-header-actions-row">
+                    <div class="search-input-field-relative-wrapper">
+                        <input type="text" id="dictionary-search-filter-input" class="matrix-search-input-element" placeholder="Filter tracked terminology database index...">
+                        <span class="search-input-embedded-icon">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/>
+                                <path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="dictionary-level-filter-tab-row" id="dictionary-tier-tab-filters-root">
+                        <button class="tier-filter-tab-btn active-tab" data-tier-filter="ALL">All Tiers</button>
+                        <button class="tier-filter-tab-btn" data-tier-filter="A1">A1</button>
+                        <button class="tier-filter-tab-btn" data-tier-filter="A2">A2</button>
+                        <button class="tier-filter-tab-btn" data-tier-filter="B1">B1</button>
+                        <button class="tier-filter-tab-btn" data-tier-filter="B2">B2</button>
+                        <button class="tier-filter-tab-btn" data-tier-filter="C1">C1</button>
+                    </div>
+                </div>
+
+                <!-- LEXICAL GRID BLOCK HOOK -->
+                <div class="dictionary-cards-responsive-grid-layout" id="dictionary-terms-target-root">
+                    <!-- Cards representing targeted translation items compile here -->
+                </div>
+            </section>
+
+            <!-- SECTION CONTAINER C: PERFORMANCE ANALYTICS AND METRIC DASHBOARDS -->
+            <section class="workspace-view-module-container hidden-layout-view" id="module-layout-view-analytics-dash">
+                <div class="analytics-metrics-overview-summary-grid">
+                    <div class="metric-card-summary-display">
+                        <div class="metric-visual-icon-box m-variant-blue">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2"/>
+                                <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <div class="metric-numerical-readout-block">
+                            <div class="metric-label-string">Articles Digested</div>
+                            <div class="metric-value-huge-string" id="stat-articles-read-counter">0</div>
+                        </div>
+                    </div>
+                    <div class="metric-card-summary-display">
+                        <div class="metric-visual-icon-box m-variant-green">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                <path d="M22 4L12 14.01L9 11.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div class="metric-numerical-readout-block">
+                            <div class="metric-label-string">Quiz Precision Accuracy</div>
+                            <div class="metric-value-huge-string" id="stat-quiz-accuracy-percentage">0%</div>
+                        </div>
+                    </div>
+                    <div class="metric-card-summary-display">
+                        <div class="metric-visual-icon-box m-variant-purple">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div class="metric-numerical-readout-block">
+                            <div class="metric-label-string">Logged Vocabulary Footprint</div>
+                            <div class="metric-value-huge-string" id="stat-total-logged-lexicon-units">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="analytics-charts-secondary-layout-split-grid">
+                    <div class="chart-container-card-box">
+                        <h3>Distribution Profile by CEFR Level Breakdown</h3>
+                        <div class="cefr-distribution-bars-vertical-stack" id="analytics-cefr-bar-stack-root">
+                            <!-- Graphical balance gauges insert via data arrays -->
+                        </div>
+                    </div>
+                    <div class="chart-container-card-box">
+                        <h3>Session Activity Log Tracks</h3>
+                        <div class="activity-timeline-canvas-box" id="analytics-timeline-activity-log-root">
+                            <div class="empty-timeline-notice">No system events logged within current execution runtime.</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- IMMERSIVE IMMEDIATE POPUP READER MODAL PANEL DISPLAY -->
+    <div id="immersive-reader-modal-root" class="modal-overlay-container" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="reader-title-node">
+        <div class="modal-card-workspace">
+            
+            <!-- Modal Operational Header Control Row -->
+            <div class="modal-control-header">
+                <div class="modal-origin-feed-badge-label" id="reader-source-origin-badge">RSS Stream Source</div>
+                <h2 id="reader-title-node" class="modal-header-article-headline">Processing Dynamic CEFR Text Stream...</h2>
+                <button class="close-modal-round-action-btn" onclick="closeImmersiveReader()" aria-label="Terminate interface reader views and return to stream">✕</button>
+            </div>
+
+            <!-- INTEGRATED SYNCHRONIZED RANGE SLIDER SLAT -->
+            <div class="modal-slider-alignment-box">
+                <div class="slider-status-row">
+                    <span id="modal-slider-badge-label" class="slider-prominent-status-tag">Target Tier: A1 (French)</span>
+                    <span class="slider-action-callout">Slide tracker tracking line to rewrite data matrices instantly</span>
+                </div>
+                <div class="slider-interactive-element-wrapper-box">
+                    <input type="range" id="modal-level-slider" min="0" max="5" step="1" value="0" class="premium-range-slider-input-track" oninput="syncModalSliderLevelAndRegenerate()">
+                    <div class="slider-ticks-labels-row">
+                        <span class="tick-label-anchor" data-slider-step-idx="0">A1</span>
+                        <span class="tick-label-anchor" data-slider-step-idx="1">A2</span>
+                        <span class="tick-label-anchor" data-slider-step-idx="2">B1</span>
+                        <span class="tick-label-anchor" data-slider-step-idx="3">B2</span>
+                        <span class="tick-label-anchor" data-slider-step-idx="4">C1</span>
+                        <span class="tick-label-anchor" data-slider-step-idx="5">Fluent</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DUAL VIEW WRAPPER SPLIT LAYOUT CONTAINER -->
+            <div class="modal-dual-column-scrollable-content-wrapper">
+                
+                <!-- LEFT COLUMN: SYSTEM GENERATED TEXT SEGMENT ENGINE VIEWPORT -->
+                <div class="modal-left-article-body-column-viewport">
+                    <div id="reader-body-node" class="modal-inner-article-paragraphs-canvas-target">
+                        <!-- Content inserts programmatically inside lexical span frames -->
+                    </div>
+                </div>
+
+                <!-- RIGHT COLUMN: INTERACTIVE ATELIER LEXICON UTILITY CONTROLS -->
+                <aside class="modal-right-atelier-utilities-column-sidebar">
+                    
+                    <!-- WIDGET CARD A: VOCAB ATELIER REVIEW ASSIGNMENT HUB -->
+                    <div class="atelier-utility-widget-card-container">
+                        <div class="widget-header-title-row">
+                            <h4>Vocab Atelier Assessment</h4>
+                            <span class="widget-context-badge">Active Practice</span>
+                        </div>
+                        <div id="atelier-gamification-node-root" class="atelier-game-injection-hub">
+                            <!-- Inline context term review questions render inside this element -->
+                        </div>
+                    </div>
+
+                    <!-- WIDGET CARD B: IMMEDIATE SELECTION LOOKUP TERM SIDE DRAW PANEL -->
+                    <div class="atelier-utility-widget-card-container">
+                        <div class="widget-header-title-row">
+                            <h4>Real-time Inline Definition Lookup</h4>
+                            <span class="widget-context-badge">Lexicon Diagnostics</span>
+                        </div>
+                        <div id="vocabulary-definition-drawer" class="vocab-drawer-panel-inline-mode">
+                            <div class="drawer-empty-state-fallback-message-block">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="opacity: 0.4; margin-bottom: 8px;">
+                                    <path d="M15 15L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    <circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="2"/>
+                                </svg>
+                                <p>Click any token word structure inside the text column to reveal its direct translation mapping matrix.</p>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+            </div>
         </div>
     </div>
 
-    <div class="toast-popup" id="toast-notification-node"></div>
+    <!-- INJECT CUSTOM RSS LAYER REGISTRATION MANAGEMENT POPUP MODAL DIALOG -->
+    <div id="custom-feed-management-modal-root" class="modal-overlay-container visual-layer-priority-high" style="display: none;" role="dialog" aria-modal="true">
+        <div class="modal-card-workspace size-variant-compact">
+            <div class="modal-control-header">
+                <h3 style="margin: 0; font-family: var(--font-display); font-size: 1.4rem;">Map New Distributed RSS Feed Stream</h3>
+                <button class="close-modal-round-action-btn" id="btn-close-add-feed-panel">✕</button>
+            </div>
+            <form id="form-register-custom-rss-pipeline" class="modal-interactive-form-grid-layout" onsubmit="return false;">
+                <div class="form-input-element-row-block">
+                    <label for="input-rss-feed-label-tag" class="form-field-label-node">Feed Source Label Descriptor</label>
+                    <input type="text" id="input-rss-feed-label-tag" class="form-field-input-element" placeholder="e.g., Le Monde International" required>
+                </div>
+                <div class="form-input-element-row-block">
+                    <label for="input-rss-feed-endpoint-url" class="form-field-label-node">Public XML/RSS Endpoint URL String</label>
+                    <input type="url" id="input-rss-feed-endpoint-url" class="form-field-input-element" placeholder="https://example.com/feed.xml" required>
+                    <small class="form-input-field-subtext-annotation">The framework routes requests via corsproxy.io configuration layers to prevent Cross-Origin Request Blockings.</small>
+                </div>
+                <div class="form-modal-actions-footer-row">
+                    <button type="button" class="action-trigger-btn-outline-variant" id="btn-cancel-feed-registration">Cancel Execution</button>
+                    <button type="submit" class="action-trigger-btn-primary-accent" id="btn-submit-feed-registration">Compile RSS Node</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-    <script>
-        // --- DATA REPOSITORIES AND DIRECTORIES ---
-        let GLOBAL_MAINSTREAM_FEED_DIRECTORY = [
-            { id: "feed_google", name: "Google News Global Feed", url: "https://news.google.com/rss?hl=en-US&gl=US&ceid=US:en", enabled: true },
-            { id: "feed_bbc", name: "BBC News World Service", url: "http://feeds.bbci.co.uk/news/world/rss.xml", enabled: true },
-            { id: "feed_lemonde", name: "Le Monde Unified RSS", url: "https://www.lemonde.fr/rss/une.xml", enabled: true },
-            { id: "feed_cnn", name: "CNN International Network", url: "http://rss.cnn.com/rss/edition.rss", enabled: true },
-            { id: "feed_nytimes", name: "The New York Times Global", url: "https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml", enabled: true }
-        ];
-
-        let CUSTOM_USER_FEEDS_ARRAY = [];
-        let INGESTED_PARSED_ARTICLES_POOL = [];
-        let ACTIVE_FEED_DISPLAY_INDEX = 0;
-        let USER_FLASHCARD_REPOSITORY = [];
-        let CURRENT_ACTIVE_FLASHCARD_INDEX = 0;
-        let IS_FLASHCARD_FLIPPED = false;
-        let CURRENTLY_OPENED_ARTICLE_OBJECT = null;
-
-        let fawSolutionWordsMapping = {};
-        let fawGridDimension = 10;
-        let wordleActiveTargetKeyword = "";
-        let wordleCurrentAttemptRow = 0;
-        let wordleIsEngineTerminated = false;
-
-        const CORS_SYSTEM_RESOLVER_PREFIX = "https://api.allorigins.win/get?url=";
-
-        // --- HARDENED RESILIENCE CIRCUIT BREAKER ENGINE ---
-        const CircuitBreaker = {
-            state: "CLOSED",
-            failureCount: 0,
-            failureThreshold: 2,
-            recoveryTimeout: 15000,
-            lastStateChange: Date.now(),
-
-            recordSuccess() {
-                this.failureCount = 0;
-                if (this.state !== "CLOSED") {
-                    this.state = "CLOSED";
-                    this.updateUIIndicator();
-                    triggerSystemToastNotification("🔄 Connection to live API restored safely.");
-                }
-            },
-            recordFailure() {
-                this.failureCount++;
-                if (this.failureCount >= this.failureThreshold && this.state !== "OPEN") {
-                    this.state = "OPEN";
-                    this.lastStateChange = Date.now();
-                    this.updateUIIndicator();
-                    triggerSystemToastNotification("🚨 Protected Mode: API threshold exceeded. Running local fallback structures.");
-                }
-            },
-            checkState() {
-                if (this.state === "OPEN") {
-                    if (Date.now() - this.lastStateChange > this.recoveryTimeout) {
-                        this.state = "HALF-OPEN";
-                        this.updateUIIndicator();
-                        return true;
-                    }
-                    return false;
-                }
-                return true;
-            },
-            updateUIIndicator() {
-                const el = document.getElementById('circuit-breaker-indicator');
-                if (!el) return;
-                el.className = `status-pill ${this.state.toLowerCase()}`;
-                el.textContent = this.state === "CLOSED" ? "Ready" : this.state;
-            }
-        };
-
-        // --- LIFE-CYCLE INIT BOOTSTRAPPING ---
-        window.addEventListener('DOMContentLoaded', () => {
-            loadCachedSystemPreferences();
-            initializeSystemDefaults();
-            buildFeedManagementSettingsUI();
-            fetchComprehensiveRSSNetworkPipeline();
-            CircuitBreaker.updateUIIndicator();
-        });
-
-        function initializeSystemDefaults() {
-            document.getElementById('wordle-hidden-input').addEventListener('input', handleWordleInputStep);
-            document.getElementById('wordle-hidden-input').addEventListener('keydown', handleWordleKeydownStep);
-        }
-
-        // --- PREFERENCES CACHING SYSTEMS LAYER ---
-        function loadCachedSystemPreferences() {
-            try {
-                const cachedPrefs = localStorage.getItem('CORE_READER_PREFERENCES_V1');
-                if (cachedPrefs) {
-                    const prefs = JSON.parse(cachedPrefs);
-                    if (prefs.readingLevel) document.getElementById('config-target-reading-level').value = prefs.readingLevel;
-                    if (prefs.articleLang) document.getElementById('config-target-article-lang').value = prefs.articleLang;
-                    if (prefs.vocabLang) document.getElementById('config-target-vocab-lang').value = prefs.vocabLang;
-                    // Security: Restoring token directly from user's storage instance
-                    if (prefs.apiKey) document.getElementById('config-engine-api-key').value = prefs.apiKey;
-                }
-                
-                const cachedFeeds = localStorage.getItem('CUSTOM_USER_FEEDS_V1');
-                if (cachedFeeds) CUSTOM_USER_FEEDS_ARRAY = JSON.parse(cachedFeeds);
-                
-                const cachedDirectoryState = localStorage.getItem('GLOBAL_FEED_DIRECTORY_STATE_V1');
-                if (cachedDirectoryState) {
-                    const savedStates = JSON.parse(cachedDirectoryState);
-                    GLOBAL_MAINSTREAM_FEED_DIRECTORY.forEach(feed => {
-                        if (savedStates[feed.id] !== undefined) feed.enabled = savedStates[feed.id];
-                    });
-                }
-            } catch (e) {
-                console.error("Failed to recover configurations from localStorage partitions:", e);
-            }
-        }
-
-        function saveSystemPreferencesToCache() {
-            try {
-                const preferencesObj = {
-                    readingLevel: document.getElementById('config-target-reading-level').value,
-                    articleLang: document.getElementById('config-target-article-lang').value,
-                    vocabLang: document.getElementById('config-target-vocab-lang').value,
-                    apiKey: document.getElementById('config-engine-api-key').value
-                };
-                localStorage.setItem('CORE_READER_PREFERENCES_V1', JSON.stringify(preferencesObj));
-                localStorage.setItem('CUSTOM_USER_FEEDS_V1', JSON.stringify(CUSTOM_USER_FEEDS_ARRAY));
-                
-                const directoryState = {};
-                GLOBAL_MAINSTREAM_FEED_DIRECTORY.forEach(feed => { directoryState[feed.id] = feed.enabled; });
-                localStorage.setItem('GLOBAL_FEED_DIRECTORY_STATE_V1', JSON.stringify(directoryState));
-            } catch (e) {
-                console.error("Failed to cache configurations parameters:", e);
-            }
-        }
-
-        function normalizeReadingLevelProfile(tierString) {
-            switch(tierString) {
-                case 'A1A2B1': return 'A1';
-                case 'B1B2C1': return 'B1';
-                case 'C1c2fluent':
-                case 'C1C2fluent': return 'C1';
-                default: return tierString || 'A1';
-            }
-        }
-
-        // --- TRANSLATION MODEL SIMULATION AND INTEGRATION RUNTIME ---
-        const TARGET_TO_LEARNER_DICTIONARY = {
-            "le": "the (Masculine)", "la": "the (Feminine)", "les": "the (Plural)", "un": "a/an (Masculine)", "une": "a/an (Feminine)",
-            "rapport": "report / link", "indique": "indicates / shows", "à": "to / at", "jour": "day", "importante": "important",
-            "marché": "market", "mondial": "global / worldwide", "l'économie": "the economy", "change": "changes / is changing"
-        };
-
-        const IMMERSIVE_LANGUAGE_TRANSLATION_DICTIONARY = {
-            "French": {
-                "A1": { prefix: "Rapport d'actualité élémentaire (Niveau A1).", body: "Regardez cette mise à jour importante du marché mondial. L'économie globale change rapidement chaque jour et les équipes locales travaillent très dur. Ils adoptent maintenant la nouvelle stratégie de croissance durable." },
-                "A2": { prefix: "Analyse Élémentaire Suivie (Niveau A2).", body: "Cette grande entreprise internationale commence un projet important sur le marché mondial. Les ingénieurs construisent une nouvelle voiture électrique avec un moteur très efficace." },
-                "B1": { prefix: "Développement Thématique Structurel (Niveau Intermédiaire B1).", body: "L'évolution récente du marché mondial suscite des discussions stratégiques majeures au sein de l'entreprise. En examinant les données de croissance sectorielles, les experts constatent une accélération notable." },
-                "B2": { prefix: "Rapport Analytique Avancé (Niveau Élevé B2).", body: "Les indicateurs macroéconomiques actuels révèlent une mutation profonde des structures opérationnelles de l'entreprise. La convergence de l'intelligence artificielle permet de maximiser l'efficacité." },
-                "C1": { prefix: "Synthèse Institutionnelle Complexe (Niveau Avancé C1).", body: "L'examen approfondi des dynamiques systémiques qui régissent le marché mondial met en exergue l'impératif de restructuration pour toute entreprise aspirant à la pérennité." },
-                "C2": { prefix: "Haute Spécification Conceptuelle (Niveau Maîtrise C2).", body: "L'analyse herméneutique des paradigmes industriels contemporains révèle une imbrication inextricable entre la viabilité financière de l'entreprise et les fluctuations exogènes." },
-                "Fluent": { prefix: "Éditorial Natif Intégral (Niveau Bilingue).", body: "Dans un contexte de mondialisation exacerbée, les performances de l'entreprise témoignent d'une remarquable maîtrise des leviers opérationnels sur un marché en perpétuelle mutation." }
-            }
-        };
-
-        async function fetchCEFRContentMatrixFromAPI(text, level, lang) {
-            const userTokenKey = document.getElementById('config-engine-api-key').value.trim();
-            
-            // Check state variables against current circuit breaker configurations
-            if (!CircuitBreaker.checkState() || !userTokenKey) {
-                return generateLocalDynamicFallbackData(level, lang);
-            }
-
-            try {
-                // Simulation processing simulating a remote micro-call targeting generative APIs
-                const response = await fetch('https://httpbin.org/post', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${userTokenKey}` },
-                    body: JSON.stringify({ text: text, level: level, lang: lang }),
-                    signal: AbortSignal.timeout(3000)
-                });
-
-                if (!response.ok) {
-                    CircuitBreaker.recordFailure();
-                    return generateLocalDynamicFallbackData(level, lang);
-                }
-
-                CircuitBreaker.recordSuccess();
-                return generateLocalDynamicFallbackData(level, lang);
-            } catch (err) {
-                CircuitBreaker.recordFailure();
-                return generateLocalDynamicFallbackData(level, lang);
-            }
-        }
-
-        function generateLocalDynamicFallbackData(level, lang) {
-            const normalizedLvl = normalizeReadingLevelProfile(level);
-            const dataset = IMMERSIVE_LANGUAGE_TRANSLATION_DICTIONARY[lang] || IMMERSIVE_LANGUAGE_TRANSLATION_DICTIONARY["French"];
-            const match = dataset[normalizedLvl] || dataset["A1"];
-            return match.prefix + "\n\n" + match.body;
-        }
-
-        function generateAdvancedCEFRContentMatrix(seedId, chosenLevelProfile, targetLanguageString, elementFieldTarget) {
-            const rawContent = generateLocalDynamicFallbackData(chosenLevelProfile, targetLanguageString);
-            if (elementFieldTarget === 'title') return `Rapport Stratégique Info Axis (${targetLanguageString})`;
-            if (elementFieldTarget === 'snippet') return rawContent.substring(0, 120) + "...";
-            return rawContent;
-        }
-
-        // --- RSS STREAM HANDLERS & MODAL MANAGEMENT ---
-        function buildFeedManagementSettingsUI() {
-            const container = document.getElementById('built-in-feeds-toggle-list');
-            if (!container) return; container.innerHTML = "";
-            
-            GLOBAL_MAINSTREAM_FEED_DIRECTORY.forEach(feed => {
-                const itemLabel = document.createElement('label');
-                itemLabel.style = "display: block; font-size: 0.8rem; margin: 4px 0; cursor: pointer;";
-                const checkbox = document.createElement('input');
-                checkbox.type = "checkbox"; checkbox.checked = feed.enabled;
-                checkbox.onchange = () => { feed.enabled = checkbox.checked; saveSystemPreferencesToCache(); };
-                itemLabel.appendChild(checkbox);
-                itemLabel.appendChild(document.createTextNode(" " + feed.name));
-                container.appendChild(itemLabel);
-            });
-            renderCustomFeedsToggleSection();
-        }
-
-        function renderCustomFeedsToggleSection() {
-            const container = document.getElementById('custom-feeds-toggle-list');
-            if (!container) return; container.innerHTML = "";
-            CUSTOM_USER_FEEDS_ARRAY.forEach((feed, index) => {
-                const wrapper = document.createElement('div');
-                wrapper.style = "display:flex; justify-content:space-between; align-items:center; background:var(--bg-surface); padding:4px 6px; border-radius:4px; border:1px solid var(--border-color); margin-top:4px;";
-                const label = document.createElement('label'); label.style = "font-size:0.75rem; cursor:pointer;";
-                const checkbox = document.createElement('input'); checkbox.type = "checkbox"; checkbox.checked = feed.enabled;
-                checkbox.onchange = () => { feed.enabled = checkbox.checked; saveSystemPreferencesToCache(); };
-                label.appendChild(checkbox); label.appendChild(document.createTextNode(" " + feed.name));
-                wrapper.appendChild(label);
-                const btn = document.createElement('button'); btn.textContent = "🗑️"; btn.style = "background:transparent; border:none; cursor:pointer;";
-                btn.onclick = () => { CUSTOM_USER_FEEDS_ARRAY.splice(index, 1); saveSystemPreferencesToCache(); renderCustomFeedsToggleSection(); };
-                wrapper.appendChild(btn); container.appendChild(wrapper);
-            });
-        }
-
-        function registerCustomUserInjectedRSS() {
-            const field = document.getElementById('custom-rss-input-field');
-            if (!field || !field.value.trim()) return;
-            const url = field.value.trim();
-            CUSTOM_USER_FEEDS_ARRAY.push({ id: 'custom_' + Date.now(), name: `User Stream (${url.substring(12,25)}...)`, url: url, enabled: true });
-            saveSystemPreferencesToCache(); renderCustomFeedsToggleSection(); field.value = "";
-            triggerSystemToastNotification("Custom feed configured safely.");
-        }
-
-        async function fetchComprehensiveRSSNetworkPipeline() {
-            INGESTED_PARSED_ARTICLES_POOL = [];
-            const activeBuiltIn = GLOBAL_MAINSTREAM_FEED_DIRECTORY.filter(f => f.enabled);
-            const activeCustom = CUSTOM_USER_FEEDS_ARRAY.filter(f => f.enabled);
-            const targets = [...activeBuiltIn, ...activeCustom];
-
-            if(targets.length === 0) { generateStructuralLocalFallbackDatabase(); return; }
-            await Promise.all(targets.map(source => executeXMLExtractionQuery(source.url, source.name)));
-            if (INGESTED_PARSED_ARTICLES_POOL.length === 0) generateStructuralLocalFallbackDatabase();
-            INGESTED_PARSED_ARTICLES_POOL.sort(() => Math.random() - 0.5);
-            ACTIVE_FEED_DISPLAY_INDEX = 0; renderActiveFiveArticlesBatch();
-        }
-
-        async function executeXMLExtractionQuery(url, label) {
-            try {
-                const gate = `${CORS_SYSTEM_RESOLVER_PREFIX}${encodeURIComponent(url)}`;
-                const res = await fetch(gate); if (!res.ok) return;
-                const json = await res.json();
-                const doc = (new DOMParser()).parseFromString(json.contents, "text/xml");
-                doc.querySelectorAll("item").forEach((item, idx) => {
-                    if (idx > 4) return;
-                    INGESTED_PARSED_ARTICLES_POOL.push({
-                        id: 'art-' + Math.random().toString(36).substr(2, 9),
-                        originSource: label,
-                        publishTimestamp: "Live Source",
-                        imageAssetURL: "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600",
-                        sourceRefLink: item.querySelector("link")?.textContent || "#",
-                        rawPayloadContent: item.querySelector("description")?.textContent || "Standard contextual content stream payload."
-                    });
-                });
-            } catch(e) { console.warn("Failed channel stream parsing step: " + label); }
-        }
-
-        function renderActiveFiveArticlesBatch() {
-            const root = document.getElementById('news-feed-target-root'); if (!root) return; root.innerHTML = "";
-            const slice = INGESTED_PARSED_ARTICLES_POOL.slice(ACTIVE_FEED_DISPLAY_INDEX, ACTIVE_FEED_DISPLAY_INDEX + 5);
-            const lang = document.getElementById('config-target-article-lang').value;
-            const lvl = normalizeReadingLevelProfile(document.getElementById('config-target-reading-level').value);
-
-            slice.forEach(art => {
-                const title = generateAdvancedCEFRContentMatrix(art.id, lvl, lang, 'title');
-                const snippet = generateAdvancedCEFRContentMatrix(art.id, lvl, lang, 'snippet');
-                const card = document.createElement('div'); card.className = "news-card";
-                card.onclick = () => launchImmersiveReaderPopUp(art);
-                card.innerHTML = `<img class="news-thumb" src="${art.imageAssetURL}"><div class="news-content"><div class="news-meta">🌐 ${art.originSource}  •  📅 ${art.publishTimestamp}</div><div class="news-title">${title}</div><div class="news-snippet">${snippet}</div></div>`;
-                root.appendChild(card);
-            });
-        }
-
-        async function launchImmersiveReaderPopUp(articleObject) {
-            CURRENTLY_OPENED_ARTICLE_OBJECT = articleObject;
-            const rawLvl = document.getElementById('config-target-reading-level').value;
-            const lang = document.getElementById('config-target-article-lang').value;
-
-            document.getElementById('modal-change-level').value = normalizeReadingLevelProfile(rawLvl);
-            document.getElementById('modal-change-lang').value = lang;
-            await rebuildModalContentDynamicView();
-        }
-
-        async function rebuildModalContentDynamicView() {
-            if (!CURRENTLY_OPENED_ARTICLE_OBJECT) return;
-            const lvl = document.getElementById('modal-change-level').value;
-            const lang = document.getElementById('modal-change-lang').value;
-            
-            document.getElementById('reader-title-node').textContent = generateAdvancedCEFRContentMatrix(CURRENTLY_OPENED_ARTICLE_OBJECT.id, lvl, lang, 'title');
-            document.getElementById('reader-cefr-badge-container').innerHTML = `<span style="background:var(--brand-color); color:#fff; padding:2px 6px; border-radius:4px; font-size:0.75rem;">CEFR: ${lvl}</span>`;
-            
-            const bodyNode = document.getElementById('reader-body-node'); bodyNode.innerHTML = "";
-            const img = document.createElement('img'); img.className = "modal-hero-img"; img.src = CURRENTLY_OPENED_ARTICLE_OBJECT.imageAssetURL;
-            bodyNode.appendChild(img);
-
-            // Execute the live verification workflow check passing values through the protected breaker route
-            const managedContent = await fetchCEFRContentMatrixFromAPI(CURRENTLY_OPENED_ARTICLE_OBJECT.rawPayloadContent, lvl, lang);
-            
-            managedContent.split('\n\n').forEach(pStr => {
-                const pNode = document.createElement('p'); pNode.className = "reader-article-p";
-                pStr.split(' ').forEach(token => {
-                    let key = token.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()""'\[\]]/g,"");
-                    const span = document.createElement('span'); span.className = "clickable-word"; span.textContent = token + " ";
-                    span.onclick = (e) => { e.stopPropagation(); executeInteractiveInlineWordLookup(key); };
-                    pNode.appendChild(span);
-                });
-                bodyNode.appendChild(pNode);
-            });
-            document.getElementById('immersive-reader-modal-root').style.display = 'flex';
-            triggerAtelierGamesInitializationPipeline(CURRENTLY_OPENED_ARTICLE_OBJECT, managedContent);
-        }
-
-        function syncModalLevelAndRegenerate() { rebuildModalContentDynamicView(); }
-
-        function executeInteractiveInlineWordLookup(key) {
-            if (!key) return;
-            let output = TARGET_TO_LEARNER_DICTIONARY[key] || "Definition saved to vocabulary deck log.";
-            triggerSystemToastNotification(`💡 ${key.toUpperCase()} ➔ ${output}`);
-            if (!USER_FLASHCARD_REPOSITORY.some(e => e.front.toLowerCase() === key)) {
-                USER_FLASHCARD_REPOSITORY.push({ front: key, back: output });
-                CURRENT_ACTIVE_FLASHCARD_INDEX = USER_FLASHCARD_REPOSITORY.length - 1;
-                updateFlashcardUIContainerDisplay();
-            }
-        }
-
-        // --- ATELIER DE JEUX CORE VOCABULARY ENGINE ---
-        function triggerAtelierGamesInitializationPipeline(artObj, text) {
-            document.getElementById('lock-state-label').textContent = "🔓 State: Atelier Mini-Games Matrix Generated.";
-            document.getElementById('lock-state-label').style = "font-size: 0.85rem; color: var(--correct-color); font-weight: bold; background: #ecfdf5; padding: 10px; border-radius: 6px; border: 1px solid #a7f3d0;";
-            const keywords = text.toUpperCase().replace(/[^A-Z\s]/g, "").split(/\s+/).filter(w => w.length >= 5 && w.length <= 8).slice(0, 4);
-            generateFindAWordGameMatrix(keywords.length >= 3 ? keywords : ["RAPPORT", "MARCHE", "MONDIAL", "EQUIPES"]);
-            generateWordleGameEngineMatrix(text);
-        }
-
-        function generateFindAWordGameMatrix(words) {
-            const pool = document.getElementById('faw-pool'); const grid = document.getElementById('faw-grid-target');
-            pool.innerHTML = ""; grid.innerHTML = ""; fawSolutionWordsMapping = {};
-            words.forEach(w => {
-                fawSolutionWordsMapping[w] = { found: false };
-                const b = document.createElement('span'); b.className = "faw-badge"; b.id = `faw-badge-${w}`; b.textContent = w; pool.appendChild(b);
-            });
-            let matrix = Array(fawGridDimension).fill(null).map(() => Array(fawGridDimension).fill(''));
-            words.forEach((w, idx) => { for(let i=0; i<w.length; i++) matrix[idx*2][i] = w[i]; });
-            for(let r=0; r<fawGridDimension; r++) {
-                for(let c=0; c<fawGridDimension; c++) {
-                    if(!matrix[r][c]) matrix[r][c] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[Math.floor(Math.random()*26)];
-                }
-            }
-            grid.style.gridTemplateColumns = `repeat(${fawGridDimension}, 1fr)`;
-            for(let r=0; r<fawGridDimension; r++) {
-                for(let c=0; c<fawGridDimension; c++) {
-                    const cell = document.createElement('div'); cell.className = "faw-cell"; cell.textContent = matrix[r][c];
-                    cell.onclick = () => {
-                        if(cell.classList.contains('permanent')) return; cell.classList.toggle('selected');
-                        let check = ""; document.querySelectorAll('#faw-grid-target .faw-cell.selected').forEach(n => check += n.textContent);
-                        words.forEach(w => {
-                            if(check.includes(w) && !fawSolutionWordsMapping[w].found) {
-                                fawSolutionWordsMapping[w].found = true; document.getElementById(`faw-badge-${w}`).classList.add('found');
-                                document.querySelectorAll('#faw-grid-target .faw-cell.selected').forEach(n => { n.classList.remove('selected'); n.classList.add('permanent'); });
-                            }
-                        });
-                    };
-                    grid.appendChild(cell);
-                }
-            }
-        }
-
-        function generateWordleGameEngineMatrix(text) {
-            const tokens = text.toUpperCase().replace(/[^A-Z\s]/g, "").split(/\s+/).filter(w => w.length === 5);
-            wordleActiveTargetKeyword = tokens.length > 0 ? tokens[0] : "MARCH";
-            wordleCurrentAttemptRow = 0; wordleIsEngineTerminated = false;
-            const grid = document.getElementById('wordle-grid-target'); grid.innerHTML = "";
-            document.getElementById('wordle-status-hint').textContent = "Click grid bounding field to activate focus input window.";
-            for (let r=0; r<5; r++) {
-                const row = document.createElement('div'); row.className = "wordle-row";
-                for (let c=0; c<5; c++) {
-                    const cell = document.createElement('div'); cell.className = "wordle-cell"; cell.id = `wd-c-${r}-${c}`; row.appendChild(cell);
-                }
-                grid.appendChild(row);
-            }
-            grid.onclick = () => document.getElementById('wordle-hidden-input').focus();
-        }
-
-        function handleWordleInputStep(e) {
-            if (wordleIsEngineTerminated) return;
-            const val = e.target.value.toUpperCase().replace(/[^A-Z]/g, "");
-            for (let c=0; c<5; c++) {
-                const cell = document.getElementById(`wd-c-${wordleCurrentAttemptRow}-${c}`);
-                if (cell) cell.textContent = val[c] || "";
-            }
-        }
-
-        function handleWordleKeydownStep(e) {
-            if (wordleIsEngineTerminated) return;
-            if (e.key === 'Enter') {
-                const input = document.getElementById('wordle-hidden-input');
-                const guess = input.value.toUpperCase().replace(/[^A-Z]/g, "");
-                if (guess.length !== 5) return;
-                for (let i=0; i<5; i++) {
-                    const cell = document.getElementById(`wd-c-${wordleCurrentAttemptRow}-${i}`);
-                    if (wordleActiveTargetKeyword[i] === guess[i]) cell.style.backgroundColor = "var(--correct-color)";
-                    else if (wordleActiveTargetKeyword.includes(guess[i])) cell.style.backgroundColor = "var(--accent-yellow)";
-                    else cell.style.backgroundColor = "var(--text-muted)";
-                    cell.style.color = "#fff";
-                }
-                if (guess === wordleActiveTargetKeyword) { wordleIsEngineTerminated = true; return; }
-                wordleCurrentAttemptRow++; input.value = "";
-            }
-        }
-
-        function updateFlashcardUIContainerDisplay() {
-            const count = document.getElementById('fc-counter-display');
-            const txt = document.getElementById('fc-content-text');
-            if (count) count.textContent = `Deck: ${USER_FLASHCARD_REPOSITORY.length} items`;
-            if (USER_FLASHCARD_REPOSITORY.length === 0) return;
-            const card = USER_FLASHCARD_REPOSITORY[CURRENT_ACTIVE_FLASHCARD_INDEX];
-            if (txt) txt.textContent = IS_FLASHCARD_FLIPPED ? card.back : card.front;
-        }
-
-        function flipActiveFlashcardNode() { if(USER_FLASHCARD_REPOSITORY.length > 0) { IS_FLASHCARD_FLIPPED = !IS_FLASHCARD_FLIPPED; updateFlashcardUIContainerDisplay(); } }
-        function cycleFlashcardIndex(dir) {
-            if (USER_FLASHCARD_REPOSITORY.length === 0) return; IS_FLASHCARD_FLIPPED = false;
-            CURRENT_ACTIVE_FLASHCARD_INDEX = (CURRENT_ACTIVE_FLASHCARD_INDEX + dir + USER_FLASHCARD_REPOSITORY.length) % USER_FLASHCARD_REPOSITORY.length;
-            updateFlashcardUIContainerDisplay();
-        }
-
-        function toggleEngineSettingsView() {
-            const modal = document.getElementById('settings-config-modal-root');
-            modal.style.display = (modal.style.display !== 'flex') ? 'flex' : 'none';
-        }
-
-        function toggleAtelierGamesModalView() {
-            const node = document.getElementById('atelier-games-modal-root');
-            node.style.display = (node.style.display === 'flex') ? 'none' : 'flex';
-        }
-
-        function closeImmersiveReader() { document.getElementById('immersive-reader-modal-root').style.display = 'none'; CURRENTLY_OPENED_ARTICLE_OBJECT = null; }
-        function cycleActiveFeedBatch() { ACTIVE_FEED_DISPLAY_INDEX = (ACTIVE_FEED_DISPLAY_INDEX + 5) % Math.max(1, INGESTED_PARSED_ARTICLES_POOL.length); renderActiveFiveArticlesBatch(); }
-        function triggerSystemToastNotification(msg) { const n = document.getElementById('toast-notification-node'); n.textContent = msg; n.style.display = 'block'; setTimeout(() => n.style.display='none', 3500); }
-
-        function generateStructuralLocalFallbackDatabase() {
-            for (let i = 1; i <= 8; i++) {
-                INGESTED_PARSED_ARTICLES_POOL.push({
-                    id: `fallback-node-${i}`, originSource: "Local System Matrix", publishTimestamp: "Static Offline Mode",
-                    imageAssetURL: `https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600`, sourceRefLink: "#",
-                    rawPayloadContent: "Regardez cette mise à jour importante du marché mondial."
-                });
-            }
-            renderActiveFiveArticlesBatch();
-        }
-
-        function executeUnifiedSettingsSaveWorkflow() {
-            saveSystemPreferencesToCache();
-            fetchComprehensiveRSSNetworkPipeline();
-            toggleEngineSettingsView();
-            triggerSystemToastNotification("✅ System settings updated. Secure access tokens registered.");
-        }
-    </script>
+    <!-- PIPELINE SCRIPT DEPLOYMENT MATRIX HOOKS -->
+    <script src="app.js"></script>
 </body>
 </html>
